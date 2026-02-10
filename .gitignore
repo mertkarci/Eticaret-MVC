@@ -1,0 +1,13 @@
+# --- Gereksiz Dosyalar ---
+bin/
+obj/
+
+# --- Editör Ayarları ---
+.vs/
+.vscode/
+*.user
+*.suo
+
+# --- Güvenlik ---
+appsettings.Development.json
+appsettings.Local.json
