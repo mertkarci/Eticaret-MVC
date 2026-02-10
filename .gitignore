@@ -11,3 +11,7 @@ obj/
 # --- Güvenlik ---
 appsettings.Development.json
 appsettings.Local.json
+
+# --- Veritabanı ve Mac Dosyaları ---
+*.db
+.DS_Store
