@@ -1,26 +1,27 @@
-@model IEnumerable<Eticaret.Core.Entities.Brand>
+@model IEnumerable<Eticaret.Core.Entities.Slider>
 
 @{
-    ViewData["Title"] = "Markalar";
+    ViewData["Title"] = "Slider";
 }
 
+
 <p>
-    <a asp-action="Create"class="btn btn-outline-primary">Yeni Marka Oluştur</a>
+    <a asp-action="Create"class="btn btn-outline-primary">Yeni Slider Oluştur</a>
 </p>
-<table class="table">
+<table class="table" >
     <thead>
         <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Title)
+            </th>
             <th>
                 @Html.DisplayNameFor(model => model.Description)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Name)
+                @Html.DisplayNameFor(model => model.Image)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Logo)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.isActive)
+                @Html.DisplayNameFor(model => model.Link)
             </th>
             <th></th>
         </tr>
@@ -29,17 +30,16 @@
 @foreach (var item in Model) {
         <tr>
             <td>
+                @Html.DisplayFor(modelItem => item.Title)
+            </td>
+            <td>
                 @Html.DisplayFor(modelItem => item.Description)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Name)
+                <img src="/img/sliders/@Html.DisplayFor(modelItem => item.Image)" height="100">
             </td>
             <td>
-                
-                <img src="/img/brands/@Html.DisplayFor(modelItem => item.Logo)" alt="" height="30"/">
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.isActive)
+                @Html.DisplayFor(modelItem => item.Link)
             </td>
             <td>
                 <a asp-action="Edit" class="btn btn-sm btn-primary" asp-route-id="@item.Id">Düzenle</a>

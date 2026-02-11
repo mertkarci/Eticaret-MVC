@@ -1,23 +1,35 @@
-@model IEnumerable<Eticaret.Core.Entities.Category>
+@model IEnumerable<Eticaret.Core.Entities.Product>
 
 @{
-    ViewData["Title"] = "Kategoriler";
+    ViewData["Title"] = "Ürünler";
 }
 
 <p>
-    <a asp-action="Create"class="btn btn-outline-primary">Yeni Kategori Oluştur</a>
+    <a asp-action="Create"class="btn btn-outline-primary">Yeni Ürün Ekle</a>
 </p>
 <table class="table">
     <thead>
         <tr>
-                    <th>
-                @Html.DisplayNameFor(model => model.Id)
-            </th>
             <th>
                 @Html.DisplayNameFor(model => model.ParentId)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.OrderNo)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Stock)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Category)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Brand)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Price)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ProductCode)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Description)
@@ -32,7 +44,7 @@
                 @Html.DisplayNameFor(model => model.isActive)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.isTopMenu)
+                @Html.DisplayNameFor(model => model.isHome)
             </th>
             <th></th>
         </tr>
@@ -40,14 +52,26 @@
     <tbody>
 @foreach (var item in Model) {
         <tr>
-                    <td>
-                @Html.DisplayFor(modelItem => item.Id)
-            </td>
             <td>
                 @Html.DisplayFor(modelItem => item.ParentId)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.OrderNo)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Stock)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Category.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Brand.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Price)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ProductCode)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Description)
@@ -56,13 +80,13 @@
                 @Html.DisplayFor(modelItem => item.Name)
             </td>
             <td>
-                <img src="/img/categories/@Html.DisplayFor(modelItem => item.Image)" height="100">
+                <img src="/img/products/@Html.DisplayFor(modelItem => item.Image)" height="100">
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.isActive)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.isTopMenu)
+                @Html.DisplayFor(modelItem => item.isHome)
             </td>
             <td>
                 <a asp-action="Edit" class="btn btn-sm btn-primary" asp-route-id="@item.Id">Düzenle</a>

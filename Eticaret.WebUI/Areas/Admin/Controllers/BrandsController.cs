@@ -61,7 +61,7 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
         {
             if (ModelState.IsValid)
             {
-                brand.Logo = await FileHelper.FileLoaderAsync(Logo);
+                brand.Logo = await FileHelper.FileLoaderAsync(Logo,"/img/brands/");
                 _context.Add(brand);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -108,7 +108,7 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
                     if(Logo != null)
                     {
                         
-                    brand.Logo = await FileHelper.FileLoaderAsync(Logo);
+                    brand.Logo = await FileHelper.FileLoaderAsync(Logo,"/img/brands/");
                     }
                     _context.Update(brand);
                     await _context.SaveChangesAsync();
@@ -157,7 +157,7 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
             {
                 if(!string.IsNullOrEmpty(brand.Logo))
                 {
-                    FileHelper.FileRemover(brand.Logo);
+                    FileHelper.FileRemover(brand.Logo,"/wwwroot/img/brands/");
                 }
                 _context.Brands.Remove(brand);
             }

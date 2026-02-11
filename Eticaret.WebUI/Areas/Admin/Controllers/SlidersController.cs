@@ -12,22 +12,22 @@ using Eticaret.WebUI.Utils;
 namespace Eticaret.WebUI.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    public class CategoriesController : Controller
+    public class SlidersController : Controller
     {
         private readonly DatabaseContext _context;
 
-        public CategoriesController(DatabaseContext context)
+        public SlidersController(DatabaseContext context)
         {
             _context = context;
         }
 
-        // GET: Admin/Categories
+        // GET: Admin/Sliders
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Categories.ToListAsync());
+            return View(await _context.Sliders.ToListAsync());
         }
 
-        // GET: Admin/Categories/Details/5
+        // GET: Admin/Sliders/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -35,42 +35,40 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
                 return NotFound();
             }
 
-            var category = await _context.Categories
-            
+            var slider = await _context.Sliders
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (category == null)
+            if (slider == null)
             {
                 return NotFound();
             }
 
-            return View(category);
+            return View(slider);
         }
 
-        // GET: Admin/Categories/Create
-        public async Task<IActionResult> CreateAsync()
+        // GET: Admin/Sliders/Create
+        public IActionResult Create()
         {
-            ViewBag.Kategoriler = new SelectList(_context.Categories, "Id", "Name");
             return View();
         }
 
-        // POST: Admin/Categories/Create
+        // POST: Admin/Sliders/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Category category, IFormFile Image)
+        public async Task<IActionResult> Create(Slider slider,IFormFile? Image)
         {
             if (ModelState.IsValid)
             {
-                category.Image = await FileHelper.FileLoaderAsync(Image,"/img/categories/");
-                _context.Add(category);
+                slider.Image = await FileHelper.FileLoaderAsync(Image,"/img/sliders/");
+                _context.Add(slider);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(category);
+            return View(slider);
         }
 
-        // GET: Admin/Categories/Edit/5
+        // GET: Admin/Sliders/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -78,22 +76,22 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
                 return NotFound();
             }
 
-            var category = await _context.Categories.FindAsync(id);
-            if (category == null)
+            var slider = await _context.Sliders.FindAsync(id);
+            if (slider == null)
             {
                 return NotFound();
             }
-            return View(category);
+            return View(slider);
         }
 
-        // POST: Admin/Categories/Edit/5
+        // POST: Admin/Sliders/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, Category category, IFormFile? Image, bool cbResmiSil)
+        public async Task<IActionResult> Edit(int id, Slider slider, IFormFile? Image, bool cbResmiSil)
         {
-            if (id != category.Id)
+            if (id != slider.Id)
             {
                 return NotFound();
             }
@@ -104,19 +102,19 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
                 {
                     if(cbResmiSil)
                     {
-                        category.Image = string.Empty;
+                        slider.Image = string.Empty;
                     }
                     if(Image != null)
                     {
                         
-                    category.Image = await FileHelper.FileLoaderAsync(Image,"/img/categories/");
+                    slider.Image = await FileHelper.FileLoaderAsync(Image,"/img/sliders/");
                     }
-                    _context.Update(category);
+                    _context.Update(slider);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!CategoryExists(category.Id))
+                    if (!SliderExists(slider.Id))
                     {
                         return NotFound();
                     }
@@ -127,10 +125,10 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(category);
+            return View(slider);
         }
 
-        // GET: Admin/Categories/Delete/5
+        // GET: Admin/Sliders/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -138,38 +136,38 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
                 return NotFound();
             }
 
-            var category = await _context.Categories
+            var slider = await _context.Sliders
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (category == null)
+            if (slider == null)
             {
                 return NotFound();
             }
 
-            return View(category);
+            return View(slider);
         }
 
-        // POST: Admin/Categories/Delete/5
+        // POST: Admin/Sliders/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var category = await _context.Categories.FindAsync(id);
-            if (category != null)
+            var slider = await _context.Sliders.FindAsync(id);
+            if (slider != null)
             {
-                if(!string.IsNullOrEmpty(category.Image))
+                if(!string.IsNullOrEmpty(slider.Image))
                 {
-                    FileHelper.FileRemover(category.Image,"/wwwroot/img/categories/");
+                    FileHelper.FileRemover(slider.Image,"/wwwroot/img/sliders/");
                 }
-                _context.Categories.Remove(category);
+                _context.Sliders.Remove(slider);
             }
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool CategoryExists(int id)
+        private bool SliderExists(int id)
         {
-            return _context.Categories.Any(e => e.Id == id);
+            return _context.Sliders.Any(e => e.Id == id);
         }
     }
 }

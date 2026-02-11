@@ -28,7 +28,7 @@
                 <span asp-validation-for="Logo" class="text-danger"></span>
                 @if(Model.Logo != null && !string.IsNullOrWhiteSpace(Model.Logo))
                 {
-                    <img src="/img/@Model.Logo" alt="" height="30"/>
+                    <img src="/img/brands/@Model.Logo" alt="" height="30"/>
                 <label class="form-check-label">
                     @Html.CheckBox("cbResmiSil") Logoyu Sil
                 </label>

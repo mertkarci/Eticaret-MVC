@@ -1,18 +1,14 @@
-@model Eticaret.Core.Entities.Category
+@model Eticaret.Core.Entities.Product
 
 @{
-    ViewData["Title"] = "Düzenle";
+    ViewData["Title"] = "Yeni Ürün";
 }
 
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Edit"enctype="multipart/form-data"
-        >
+        <form asp-action="Create"enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="Id" />
-            <input type="hidden" asp-for="Image" />
-
             <div class="form-group">
                 <label asp-for="ParentId" class="control-label"></label>
                 <input asp-for="ParentId" class="form-control" />
@@ -22,6 +18,29 @@
                 <label asp-for="OrderNo" class="control-label"></label>
                 <input asp-for="OrderNo" class="form-control" />
                 <span asp-validation-for="OrderNo" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Stock" class="control-label"></label>
+                <input asp-for="Stock" class="form-control" />
+                <span asp-validation-for="Stock" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CategoryId" class="control-label"></label>
+                <select asp-for="CategoryId" class ="form-control" asp-items="ViewBag.CategoryId"></select>
+            </div>
+            <div class="form-group">
+                <label asp-for="BrandId" class="control-label"></label>
+                <select asp-for="BrandId" class ="form-control" asp-items="ViewBag.BrandId"></select>
+            </div>
+            <div class="form-group">
+                <label asp-for="Price" class="control-label"></label>
+                <input asp-for="Price" class="form-control" />
+                <span asp-validation-for="Price" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ProductCode" class="control-label"></label>
+                <input asp-for="ProductCode" class="form-control" />
+                <span asp-validation-for="ProductCode" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="Description" class="control-label"></label>
@@ -35,20 +54,8 @@
             </div>
             <div class="form-group">
                 <label asp-for="Image" class="control-label"></label>
-                <img src="/img/categories/@Model.Image" height=150/>
-                <input class="form-control" type="file" asp-for="Image" />
+                <input asp-for="Image" class="form-control" type="file" />
                 <span asp-validation-for="Image" class="text-danger"></span>
-                                @if(Model.Image != null && !string.IsNullOrWhiteSpace(Model.Image))
-                {
-                    <img src="/img/@Model.Image" alt="" height="30"/>
-                <label class="form-check-label">
-                    @Html.CheckBox("cbResmiSil") Logoyu Sil
-                </label>
-                }
-                else
-                {
-
-                }
             </div>
             <div class="form-group form-check">
                 <label class="form-check-label">
@@ -57,18 +64,18 @@
             </div>
             <div class="form-group form-check">
                 <label class="form-check-label">
-                    <input class="form-check-input" asp-for="isTopMenu" /> @Html.DisplayNameFor(model => model.isTopMenu)
+                    <input class="form-check-input" asp-for="isHome" /> @Html.DisplayNameFor(model => model.isHome)
                 </label>
             </div>
             <div class="form-group">
-                <input type="submit" value="Kaydet" class="btn btn-primary" />
+                <input type="submit" value="Oluştur" class="btn btn-primary mt-2" />
             </div>
         </form>
     </div>
 </div>
 
 <div>
-    <a asp-action="Index" class="btn btn-danger mt-2">Geri Dön</a>
+    <a asp-action="Index" class="btn btn-danger mt-2"  >Geri Dön</a>
 </div>
 
 @section Scripts {

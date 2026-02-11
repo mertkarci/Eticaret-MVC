@@ -12,22 +12,23 @@ using Eticaret.WebUI.Utils;
 namespace Eticaret.WebUI.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    public class CategoriesController : Controller
+    public class ProductsController : Controller
     {
         private readonly DatabaseContext _context;
 
-        public CategoriesController(DatabaseContext context)
+        public ProductsController(DatabaseContext context)
         {
             _context = context;
         }
 
-        // GET: Admin/Categories
+        // GET: Admin/Products
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Categories.ToListAsync());
+            var databaseContext = _context.Products.Include(p => p.Brand).Include(p => p.Category);
+            return View(await databaseContext.ToListAsync());
         }
 
-        // GET: Admin/Categories/Details/5
+        // GET: Admin/Products/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -35,42 +36,46 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
                 return NotFound();
             }
 
-            var category = await _context.Categories
-            
+            var product = await _context.Products
+                .Include(p => p.Brand)
+                .Include(p => p.Category)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (category == null)
+            if (product == null)
             {
                 return NotFound();
             }
 
-            return View(category);
+            return View(product);
         }
 
-        // GET: Admin/Categories/Create
-        public async Task<IActionResult> CreateAsync()
+        // GET: Admin/Products/Create
+        public IActionResult Create()
         {
-            ViewBag.Kategoriler = new SelectList(_context.Categories, "Id", "Name");
+            ViewData["BrandId"] = new SelectList(_context.Brands, "Id", "Name");
+            ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name");
             return View();
         }
 
-        // POST: Admin/Categories/Create
+        // POST: Admin/Products/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Category category, IFormFile Image)
+        public async Task<IActionResult> Create( Product product, IFormFile? Image)
         {
             if (ModelState.IsValid)
             {
-                category.Image = await FileHelper.FileLoaderAsync(Image,"/img/categories/");
-                _context.Add(category);
+                product.Image = await FileHelper.FileLoaderAsync(Image,"/img/products/");
+                _context.Add(product);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(category);
+            ViewData["BrandId"] = new SelectList(_context.Brands, "Id", "Name", product.BrandId);
+            ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name", product.CategoryId);
+            return View(product);
         }
 
-        // GET: Admin/Categories/Edit/5
+        // GET: Admin/Products/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -78,22 +83,24 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
                 return NotFound();
             }
 
-            var category = await _context.Categories.FindAsync(id);
-            if (category == null)
+            var product = await _context.Products.FindAsync(id);
+            if (product == null)
             {
                 return NotFound();
             }
-            return View(category);
+            ViewData["BrandId"] = new SelectList(_context.Brands, "Id", "Name", product.BrandId);
+            ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name", product.CategoryId);
+            return View(product);
         }
 
-        // POST: Admin/Categories/Edit/5
+        // POST: Admin/Products/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, Category category, IFormFile? Image, bool cbResmiSil)
+        public async Task<IActionResult> Edit(int id, Product product, IFormFile? Image, bool cbResmiSil)
         {
-            if (id != category.Id)
+            if (id != product.Id)
             {
                 return NotFound();
             }
@@ -102,21 +109,21 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
             {
                 try
                 {
-                    if(cbResmiSil)
+                                        if(cbResmiSil)
                     {
-                        category.Image = string.Empty;
+                        product.Image = string.Empty;
                     }
                     if(Image != null)
                     {
                         
-                    category.Image = await FileHelper.FileLoaderAsync(Image,"/img/categories/");
+                    product.Image = await FileHelper.FileLoaderAsync(Image,"/img/products/");
                     }
-                    _context.Update(category);
+                    _context.Update(product);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!CategoryExists(category.Id))
+                    if (!ProductExists(product.Id))
                     {
                         return NotFound();
                     }
@@ -127,10 +134,12 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(category);
+            ViewData["BrandId"] = new SelectList(_context.Brands, "Id", "Name", product.BrandId);
+            ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name", product.CategoryId);
+            return View(product);
         }
 
-        // GET: Admin/Categories/Delete/5
+        // GET: Admin/Products/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -138,38 +147,40 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
                 return NotFound();
             }
 
-            var category = await _context.Categories
+            var product = await _context.Products
+                .Include(p => p.Brand)
+                .Include(p => p.Category)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (category == null)
+            if (product == null)
             {
                 return NotFound();
             }
 
-            return View(category);
+            return View(product);
         }
 
-        // POST: Admin/Categories/Delete/5
+        // POST: Admin/Products/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var category = await _context.Categories.FindAsync(id);
-            if (category != null)
+            var product = await _context.Products.FindAsync(id);
+            if (product != null)
             {
-                if(!string.IsNullOrEmpty(category.Image))
+                                if(!string.IsNullOrEmpty(product.Image))
                 {
-                    FileHelper.FileRemover(category.Image,"/wwwroot/img/categories/");
+                    FileHelper.FileRemover(product.Image,"/wwwroot/img/products/");
                 }
-                _context.Categories.Remove(category);
+                _context.Products.Remove(product);
             }
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool CategoryExists(int id)
+        private bool ProductExists(int id)
         {
-            return _context.Categories.Any(e => e.Id == id);
+            return _context.Products.Any(e => e.Id == id);
         }
     }
 }
