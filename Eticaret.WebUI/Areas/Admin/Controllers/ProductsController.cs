@@ -109,14 +109,13 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
             {
                 try
                 {
-                                        if(cbResmiSil)
+                    if(cbResmiSil)
                     {
                         product.Image = string.Empty;
                     }
                     if(Image != null)
-                    {
-                        
-                    product.Image = await FileHelper.FileLoaderAsync(Image,"/img/products/");
+                    { 
+                        product.Image = await FileHelper.FileLoaderAsync(Image,"/img/products/");
                     }
                     _context.Update(product);
                     await _context.SaveChangesAsync();

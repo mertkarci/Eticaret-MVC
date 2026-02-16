@@ -17,107 +17,6 @@ namespace Eticaret.Data.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.0");
 
-            modelBuilder.Entity("Eticaret.Core.Brand", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<DateTime>("CreateDate")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(50)
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Logo")
-                        .HasMaxLength(50)
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("TEXT");
-
-                    b.Property<bool>("isActive")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Brands");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            CreateDate = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Description = "Example Description of Brand",
-                            Logo = "Example Logo of Brand",
-                            Name = "New Brand",
-                            isActive = true
-                        });
-                });
-
-            modelBuilder.Entity("Eticaret.Core.Category", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<DateTime>("CreateDate")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Image")
-                        .HasMaxLength(50)
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("OrderNo")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("ParentId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<bool>("isActive")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<bool>("isTopMenu")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Categories");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            CreateDate = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Name = "Elektronik",
-                            OrderNo = 1,
-                            ParentId = 0,
-                            isActive = true,
-                            isTopMenu = true
-                        },
-                        new
-                        {
-                            Id = 2,
-                            CreateDate = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Name = "Bilgisayar",
-                            OrderNo = 2,
-                            ParentId = 0,
-                            isActive = true,
-                            isTopMenu = true
-                        });
-                });
-
             modelBuilder.Entity("Eticaret.Core.Entities.AppUser", b =>
                 {
                     b.Property<int>("Id")
@@ -186,6 +85,97 @@ namespace Eticaret.Data.Migrations
                         });
                 });
 
+            modelBuilder.Entity("Eticaret.Core.Entities.Brand", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Logo")
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("isActive")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Brands");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CreateDate = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Example Description of Brand",
+                            Logo = "Example Logo of Brand",
+                            Name = "New Brand",
+                            isActive = true
+                        });
+                });
+
+            modelBuilder.Entity("Eticaret.Core.Entities.Category", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Image")
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("OrderNo")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("ParentId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("isActive")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("isTopMenu")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Categories");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CreateDate = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Name = "Elektronik",
+                            OrderNo = 1,
+                            ParentId = 0,
+                            isActive = true,
+                            isTopMenu = true
+                        });
+                });
+
             modelBuilder.Entity("Eticaret.Core.Entities.Contact", b =>
                 {
                     b.Property<int>("Id")
@@ -233,16 +223,15 @@ namespace Eticaret.Data.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Description")
-                        .HasMaxLength(50)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Image")
-                        .HasMaxLength(50)
+                        .HasMaxLength(100)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(50)
+                        .HasMaxLength(250)
                         .HasColumnType("TEXT");
 
                     b.Property<bool>("isActive")
@@ -339,13 +328,13 @@ namespace Eticaret.Data.Migrations
 
             modelBuilder.Entity("Eticaret.Core.Entities.Product", b =>
                 {
-                    b.HasOne("Eticaret.Core.Brand", "Brand")
+                    b.HasOne("Eticaret.Core.Entities.Brand", "Brand")
                         .WithMany("Products")
                         .HasForeignKey("BrandId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Eticaret.Core.Category", "Category")
+                    b.HasOne("Eticaret.Core.Entities.Category", "Category")
                         .WithMany("Products")
                         .HasForeignKey("CategoryId");
 
@@ -354,12 +343,12 @@ namespace Eticaret.Data.Migrations
                     b.Navigation("Category");
                 });
 
-            modelBuilder.Entity("Eticaret.Core.Brand", b =>
+            modelBuilder.Entity("Eticaret.Core.Entities.Brand", b =>
                 {
                     b.Navigation("Products");
                 });
 
-            modelBuilder.Entity("Eticaret.Core.Category", b =>
+            modelBuilder.Entity("Eticaret.Core.Entities.Category", b =>
                 {
                     b.Navigation("Products");
                 });

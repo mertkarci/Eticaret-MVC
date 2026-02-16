@@ -1,0 +1,40 @@
+@model IEnumerable<Category>
+
+<div class="collapse navbar-collapse" id="navbarsExample04">
+    
+    <ul class="navbar-nav mr-auto navbar-font">
+        
+        @foreach (var mainCategory in Model.Where(c => c.isActive && c.isTopMenu && c.ParentId == 0))
+        {
+            // Bu ana kategoriye ait alt kategorileri buluyoruz
+            var subCategories = Model.Where(c => c.isActive && c.ParentId == mainCategory.Id).ToList();
+
+            if (subCategories.Any())
+            {
+                // --- EĞER ALT KATEGORİSİ VARSA (Dropdown Yap) ---
+                <li class="nav-item dropdown navbar-font">
+                    <a class="nav-link dropdown-toggle navbar-font" href="#" id="dropdown-@mainCategory.Id" 
+                       data-bs-toggle="dropdown" aria-expanded="false">
+                        @mainCategory.Name
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="dropdown-@mainCategory.Id">
+                        @foreach (var sub in subCategories)
+                        {
+                            <li>
+                                <a class="dropdown-item" href="/Categories/Index/@sub.Id">@sub.Name</a>
+                            </li>
+                        }
+                    </ul>
+                </li>
+            }
+            else
+            {
+                // --- ALT KATEGORİSİ YOKSA (Düz Link Yap) ---
+                <li class="nav-item">
+                    <a class="nav-link" href="/Categories/Index/@mainCategory.Id">@mainCategory.Name</a>
+                </li>
+            }
+        }
+    </ul>
+    
+</div>

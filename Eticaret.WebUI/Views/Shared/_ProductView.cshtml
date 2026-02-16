@@ -1,0 +1,37 @@
+@model Product
+
+<div class="col mb-4">
+    
+    <div class="product-card-wrapper">
+        
+        <div class="card product-card">
+            
+            <div class="badge-discount">
+                İndirim
+            </div>
+            
+            <a href="/Products/Details/@Model.Id" class="img-wrapper d-block">
+                <img class="img-fit" src="~/img/products/@Model.Image" alt="@Model.Name">
+            </a>
+
+            <div class="card-body-compact text-center">
+                
+                <h6 class="mb-1">
+                    <a href="/Products/Details/@Model.Id" class="title-compact d-block" title="@Model.Name">
+                        @Model.Name
+                    </a>
+                </h6>
+                
+                <div class="price-area">
+                    <span class="price-old">@((Model.Price + 500).ToString("c"))</span>
+                    <span class="price-new">@Model.Price.ToString("c")</span>
+                </div>
+            </div>
+
+            <a class="btn btn-compact" href="#">
+                <i class="bi bi-cart-plus me-1"></i> SEPETE EKLE
+            </a>
+
+        </div>
+    </div>
+</div>

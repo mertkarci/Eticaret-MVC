@@ -61,7 +61,7 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
             if (ModelState.IsValid)
             {
 
-                news.Image = await FileHelper.FileLoaderAsync(Image);
+                news.Image = await FileHelper.FileLoaderAsync(Image,"/img/news/");
                 _context.Add(news);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -106,9 +106,8 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
                         news.Image = string.Empty;
                     }
                     if(Image != null)
-                    {
-                        
-                    news.Image = await FileHelper.FileLoaderAsync(Image);
+                    { 
+                        news.Image = await FileHelper.FileLoaderAsync(Image,"/img/news/");
                     }
                     _context.Update(news);
                     await _context.SaveChangesAsync();
@@ -155,9 +154,9 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
             var news = await _context.News.FindAsync(id);
             if (news != null)
             {
-                if(!string.IsNullOrEmpty(news.Image))
+                                if(!string.IsNullOrEmpty(news.Image))
                 {
-                    FileHelper.FileRemover(news.Image);
+                    FileHelper.FileRemover(news.Image,"/wwwroot/img/news/");
                 }
                 _context.News.Remove(news);
             }

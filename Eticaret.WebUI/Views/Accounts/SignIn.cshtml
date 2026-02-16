@@ -1,0 +1,56 @@
+@model LoginViewModel
+@{
+  ViewData["Title"] = "SignIn";
+}
+<style>
+  .form-signin {
+    width: 100%;
+    max-width: 330px;
+    padding: 15px;
+    margin: auto;
+  }
+
+  .form-signin .checkbox {
+    font-weight: 400;
+  }
+
+  .form-signin .form-floating:focus-within {
+    z-index: 2;
+  }
+
+  .form-signin input[type="email"] {
+    margin-bottom: -1px;
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
+  }
+
+  .form-signin input[type="password"] {
+    margin-bottom: 10px;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+  }
+</style>
+<main class="form-signin">
+  <form asp-action="SignIn">
+    <h1 class="h3 mb-3 fw-normal">Lütfen Giriş Yapın</h1>
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="form-floating">
+      <input asp-for="Email" class="form-control" id="floatingInput" placeholder="name@example.com" />
+      <label for="floatingInput">E-mail</label>
+      <span asp-validation-for="Email" class="text-danger"></span>
+    </div>
+    <div class="form-floating">
+      <input asp-for="Password" type="password" class="form-control" id="floatingPassword" placeholder="Password">
+      <label for="floatingPassword">Şifre</label>
+      <span asp-validation-for="Password" class="text-danger"></span>
+    </div>
+
+    <div class="checkbox mb-3">
+      <label>
+        <input asp-for="RememberMe" type="checkbox" /> Beni Hatırla
+      </label>
+    </div>
+    <button class="w-100 btn btn-lg btn-primary" type="submit">Giriş Yap</button>
+    <p class="mt-5 mb-3 text-muted">© 2017–2021</p>
+  </form>
+</main>

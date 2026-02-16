@@ -15,6 +15,11 @@ public class DatabaseContext : DbContext
     public DbSet<Product> Products {get; set;}
     public DbSet<Slider> Sliders {get; set;}
 
+    public async Task AddSync(AppUser appUser)
+    {
+        throw new NotImplementedException();
+    }
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         optionsBuilder.UseSqlite("Data Source=Eticaret.db");

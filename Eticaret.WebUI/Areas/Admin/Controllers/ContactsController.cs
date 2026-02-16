@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Eticaret.Core.Entities;
 using Eticaret.Data;
+using Eticaret.WebUI.Utils;
 
 namespace Eticaret.WebUI.Areas.Admin.Controllers
 {
@@ -22,6 +23,37 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
        public IActionResult Index()
         {
             return View(_context.Contacts);
+        }
+        public async Task<IActionResult> Delete(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var contact = await _context.Contacts
+                .FirstOrDefaultAsync(m => m.Id == id);
+            if (contact == null)
+            {
+                return NotFound();
+            }
+
+            return View(contact);
+        }
+
+        // POST: Admin/Categories/Delete/5
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            var contact = await _context.Contacts.FindAsync(id);
+            if (contact != null)
+            {
+                _context.Contacts.Remove(contact);
+            }
+
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
         }
     }
 }

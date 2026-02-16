@@ -40,7 +40,7 @@
                 <span asp-validation-for="Image" class="text-danger"></span>
                                 @if(Model.Image != null && !string.IsNullOrWhiteSpace(Model.Image))
                 {
-                    <img src="/img/@Model.Image" alt="" height="30"/>
+                    <img src="/img/categories/@Model.Image" alt="" height="30"/>
                 <label class="form-check-label">
                     @Html.CheckBox("cbResmiSil") Logoyu Sil
                 </label>

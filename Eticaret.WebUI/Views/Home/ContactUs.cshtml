@@ -1,0 +1,88 @@
+@model Eticaret.WebUI.Models.ContactViewModel
+
+@{
+    ViewData["Title"] = "İletişim";
+}
+
+<div class="container mt-5 mb-5">
+    
+    @if (TempData["Message"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show rounded-0" role="alert">
+            <strong>Tebrikler!</strong> @TempData["Message"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="text-center mb-5">
+        <h1 class="display-4 fw-bold">Bize Ulaşın</h1>
+        <p class="text-muted">Sorularınız için formu doldurabilir veya haritadan konumumuzu inceleyebilirsiniz.</p>
+    </div>
+
+    <div class="row g-4 align-items-stretch">
+        
+        <div class="col-lg-6">
+            <div class="card shadow border-0 rounded-0 h-100">
+                <div class="card-body p-4 d-flex flex-column">
+                    
+                    <h3 class="fw-bold mb-4">İletişim Formu</h3>
+                    
+                    <form asp-action="ContactUs" method="post" class="d-flex flex-column h-100">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label asp-for="Name" class="form-label">Adınız</label>
+                                <input asp-for="Name" class="form-control rounded-0" placeholder="Adınız" />
+                                <span asp-validation-for="Name" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="Surname" class="form-label">Soyadınız</label>
+                                <input asp-for="Surname" class="form-control rounded-0" placeholder="Soyadınız" />
+                                <span asp-validation-for="Surname" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label asp-for="Email" class="form-label">E-Posta</label>
+                                <input asp-for="Email" type="email" class="form-control rounded-0" placeholder="mail@site.com" />
+                                <span asp-validation-for="Email" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="Phone" class="form-label">Telefon</label>
+                                <input asp-for="Phone" class="form-control rounded-0" placeholder="0555 123 45 67" />
+                                <span asp-validation-for="Phone" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-4 flex-grow-1">
+                            <label asp-for="Message" class="form-label">Mesajınız</label>
+                            <textarea asp-for="Message" class="form-control h-100 rounded-0" style="resize: none; min-height: 150px;" placeholder="Mesajınızı buraya yazın..."></textarea>
+                            <span asp-validation-for="Message" class="text-danger"></span>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg rounded-0">GÖNDER</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card shadow border-0 rounded-0 h-100">
+                <div class="card-body p-0">
+                    <iframe 
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3008.9633698339308!2d28.9755716!3d41.0369453!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x14cab7650656bd63%3A0x8ca058b28c20b6c3!2sTaksim%20Meydan%C4%B1%2C%20G%C3%BCm%C3%BC%C5%9Fsuyu%2C%2034437%20Beyo%C4%9Flu%2F%C4%B0stanbul!5e0!3m2!1str!2str!4v1684333333333!5m2!1str!2str" 
+                        class="w-100 h-100" 
+                        style="border:0; min-height: 400px;" 
+                        allowfullscreen="" 
+                        loading="lazy">
+                    </iframe>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
