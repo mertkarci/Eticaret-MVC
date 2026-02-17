@@ -26,6 +26,17 @@ builder.Services.AddDbContext<DatabaseContext>(options =>
 
 // Servisleri ekliyoruz
 builder.Services.AddControllersWithViews();
+builder.Services.AddSession(options =>
+{
+    options.Cookie.Name = ".Eticaret.Session";
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+    options.IdleTimeout = TimeSpan.FromDays(1);
+    options.IOTimeout = TimeSpan.FromMinutes(10);
+});
+
+
+;
 
 // Authentication (Giriş) Ayarları
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie
@@ -42,7 +53,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 builder.Services.AddAuthorization(p =>
 {
     p.AddPolicy("AdminPolicy", policy => policy.RequireClaim(ClaimTypes.Role, "Admin"));
-    p.AddPolicy("UserPolicy", policy => policy.RequireClaim(ClaimTypes.Role, "Admin","User","Customer"));
+    p.AddPolicy("UserPolicy", policy => policy.RequireClaim(ClaimTypes.Role, "Admin", "User", "Customer"));
 });
 
 var app = builder.Build();
@@ -69,9 +80,10 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 // Statik Dosyalar (CSS, JS, Resimler için ŞART)
-app.UseStaticFiles(); 
+app.UseStaticFiles();
 
 app.UseRouting();
+app.UseSession();
 
 app.UseAuthentication(); // Önce kimlik doğrulama
 app.UseAuthorization();  // Sonra yetkilendirme
