@@ -44,11 +44,38 @@
                     <input name="q" class="form-control me-2" type="search" placeholder="Sitede Ara..."
                         aria-label="Search">
                 </form>
+                @if (Context.User.Identity.IsAuthenticated)
+                {
+                    <div class="dropdown">
+                        <a class="dropdown-toggle nav-link text-dark" href="#" role="button" data-bs-toggle="dropdown"
+                            aria-expanded="false">
+                            Hesabım
+                        </a>
 
-                <div class="d-flex mt-3 mt-lg-0">
-                    <a class="btn btn-outline-light me-2" asp-controller="Accounts" asp-action="SignIn">Giriş Yap</a>
-                    <a class="btn btn-light text-primary" asp-controller="Accounts" asp-action="SignUp">Kayıt Ol</a>
-                </div>
+                        <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+
+                            <li><a class="dropdown-item" asp-controller="Accounts" asp-action="Details">Kullanıcı
+                                    Bilgilerim</a></li>
+                            <li><a class="dropdown-item" asp-controller="Accounts" asp-action="Orders">Siparişlerim</a></li>
+                            <li><a class="dropdown-item" asp-controller="Accounts"
+                                    asp-action="Reviews">Değerlendirmelerim</a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item text-danger" asp-controller="Accounts" asp-action="SignOut">Çıkış
+                                    Yap</a></li>
+
+                        </ul>
+                    </div>
+                }
+                else
+                {
+                    <div class="d-flex mt-3 mt-lg-0">
+                        <a class="btn btn-outline-light me-2" asp-controller="Accounts" asp-action="SignIn">Giriş Yap</a>
+                        <a class="btn btn-light text-primary" asp-controller="Accounts" asp-action="SignUp">Kayıt Ol</a>
+                    </div>
+                }
+
             </div>
         </div>
     </nav>

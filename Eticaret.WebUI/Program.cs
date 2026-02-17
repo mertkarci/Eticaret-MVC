@@ -10,7 +10,7 @@ builder.Services.AddDbContext<DatabaseContext>();
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie
 (p =>
 {
-    p.LoginPath = "/Account/SignIn";
+    p.LoginPath = "/Accounts/SignIn";
     p.AccessDeniedPath = "/AccessDenied";
     p.Cookie.Name = "Account";
     p.Cookie.MaxAge = TimeSpan.FromDays(1);
@@ -20,7 +20,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 builder.Services.AddAuthorization(p =>
 {
     p.AddPolicy("AdminPolicy", policy => policy.RequireClaim(ClaimTypes.Role, "Admin"));
-    p.AddPolicy("AdminPolicy", policy => policy.RequireClaim(ClaimTypes.Role, "Admin","User","Customer"));
+    p.AddPolicy("UserPolicy", policy => policy.RequireClaim(ClaimTypes.Role, "Admin","User","Customer"));
 });
 var app = builder.Build();
 

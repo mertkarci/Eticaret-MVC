@@ -1,9 +1,10 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Eticaret.WebUI.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    public class MainController : Controller
+    [Authorize(Policy = "AdminPolicy")]    public class MainController : Controller
     {
         public IActionResult Index()
         {

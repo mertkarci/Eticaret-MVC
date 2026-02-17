@@ -50,6 +50,7 @@
         <input asp-for="RememberMe" type="checkbox" /> Beni Hatırla
       </label>
     </div>
+    <input type="hidden" asp-for="ReturnUrl" value="@Context.Request.Query["ReturnUrl"]"/>
     <button class="w-100 btn btn-lg btn-primary" type="submit">Giriş Yap</button>
     <p class="mt-5 mb-3 text-muted">© 2017–2021</p>
   </form>

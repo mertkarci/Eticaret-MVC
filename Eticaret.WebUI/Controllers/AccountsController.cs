@@ -48,12 +48,14 @@ public class AccountsController : Controller
                         new(ClaimTypes.Email,account.Email),
                         new(ClaimTypes.Role, account.isAdmin ? "Admin" : "User"),
                         new("UserId", account.Id.ToString()),
-                        new("UserGuid", account.UserGuid.ToString())
+                        new("UserGuid", account.UserGuid.ToString()),
+                        new("ReturnUrl", loginViewModel.ReturnUrl ?? "/")
                     };
                     var userIdentity = new ClaimsIdentity(claims, "Login");
                     ClaimsPrincipal userPrincipal = new ClaimsPrincipal(userIdentity);
                     await HttpContext.SignInAsync(userPrincipal);
-                    return RedirectToAction("Index", "Home");
+                    return Redirect(string.IsNullOrEmpty(loginViewModel.ReturnUrl) ? "/" : 
+                    loginViewModel.ReturnUrl);
 
                 }
             }
@@ -83,6 +85,11 @@ public class AccountsController : Controller
         }
         return View(appUser);
 
+    }
+        public async Task<IActionResult> SignOutAsync()
+    {
+        await HttpContext.SignOutAsync();
+        return RedirectToAction("SignIn");
     }
 }
 
