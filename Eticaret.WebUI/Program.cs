@@ -1,12 +1,33 @@
 using System.Security.Claims;
 using Eticaret.Data;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.EntityFrameworkCore; // UseSqlite için gerekli
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// --- 1. VERİTABANI YOLU AYARI (KRİTİK KISIM) ---
+// Mevcut WebUI klasörünün yolunu alıyoruz
+var webUiPath = builder.Environment.ContentRootPath;
+
+// Bir üst klasöre çıkıp (..) "Eticaret.Data" klasörünü hedefliyoruz.
+// DİKKAT: Klasör adın "Eticaret.Data" değilse burayı kendi klasör adınla değiştir.
+var dbPath = Path.GetFullPath(Path.Combine(webUiPath, "..", "Eticaret.Data", "Eticaret.db"));
+
+// Konsola yazdıralım ki doğru yeri bulduğundan emin ol
+Console.WriteLine($"--------------------------------------------------");
+Console.WriteLine($"KULLANILAN DB YOLU: {dbPath}");
+Console.WriteLine($"--------------------------------------------------");
+
+// DbContext'e bu özel yolu veriyoruz.
+builder.Services.AddDbContext<DatabaseContext>(options =>
+    options.UseSqlite($"Data Source={dbPath}"));
+// --------------------------------------------------
+
+
+// Servisleri ekliyoruz
 builder.Services.AddControllersWithViews();
-builder.Services.AddDbContext<DatabaseContext>();
+
+// Authentication (Giriş) Ayarları
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie
 (p =>
 {
@@ -17,22 +38,19 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     p.Cookie.IsEssential = true;
 });
 
+// Authorization (Yetki) Ayarları
 builder.Services.AddAuthorization(p =>
 {
     p.AddPolicy("AdminPolicy", policy => policy.RequireClaim(ClaimTypes.Role, "Admin"));
     p.AddPolicy("UserPolicy", policy => policy.RequireClaim(ClaimTypes.Role, "Admin","User","Customer"));
 });
+
 var app = builder.Build();
 
+// Dil ve Para Birimi Ayarları
 var supportedCultures = new[] { new System.Globalization.CultureInfo("tr-TR") };
-
-// Para birimi formatını özelleştiriyoruz
 supportedCultures[0].NumberFormat.CurrencySymbol = "₺";
 supportedCultures[0].NumberFormat.CurrencyPositivePattern = 1;
-// 0: ₺150
-// 1: 150₺
-// 2: ₺ 150
-// 3: 150 ₺
 
 app.UseRequestLocalization(new RequestLocalizationOptions
 {
@@ -41,30 +59,31 @@ app.UseRequestLocalization(new RequestLocalizationOptions
     SupportedUICultures = supportedCultures
 });
 
-// Configure the HTTP request pipeline.
+// Hata Yönetimi
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
 app.UseHttpsRedirection();
+
+// Statik Dosyalar (CSS, JS, Resimler için ŞART)
+app.UseStaticFiles(); 
+
 app.UseRouting();
 
-app.UseAuthentication(); // önce oturum
-app.UseAuthorization(); // sonra yetkilendirme
+app.UseAuthentication(); // Önce kimlik doğrulama
+app.UseAuthorization();  // Sonra yetkilendirme
 
-app.MapStaticAssets();
+// Rotalar
 app.MapControllerRoute(
     name: "admin",
     pattern: "{area:exists}/{controller=Main}/{action=Index}/{id?}"
 );
+
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}")
-    .WithStaticAssets();
+    pattern: "{controller=Home}/{action=Index}/{id?}");
 
-var path = builder.Configuration.GetConnectionString("DefaultConnection");
-Console.WriteLine("DB PATH = " + path);
 app.Run();
