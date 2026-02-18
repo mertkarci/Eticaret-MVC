@@ -1,5 +1,7 @@
 using System.Security.Claims;
 using Eticaret.Data;
+using Eticaret.Service.Abstract;
+using Eticaret.Service.Concrete;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore; // UseSqlite için gerekli
 
@@ -37,7 +39,7 @@ builder.Services.AddSession(options =>
 
 
 ;
-
+builder.Services.AddScoped(typeof(IService<>),typeof(Service<>));
 // Authentication (Giriş) Ayarları
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie
 (p =>

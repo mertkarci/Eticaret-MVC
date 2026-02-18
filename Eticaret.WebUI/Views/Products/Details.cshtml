@@ -10,52 +10,49 @@
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="/" class="text-decoration-none text-muted">Ana Sayfa</a></li>
                 <li class="breadcrumb-item"><a href="/Products" class="text-decoration-none text-muted">Ürünler</a></li>
-                <li class="breadcrumb-item active" aria-current="page">Detay</li>
+                <li class="breadcrumb-item active" aria-current="page">@Model.Product.Name</li>
             </ol>
         </nav>
 
-        <div class="row gx-5 align-items-start">
+        <div class="row gx-5 align-items-center">
             
             <div class="col-md-6 mb-5 mb-md-0">
                 <div class="position-relative">
-                    <span class="badge bg-danger position-absolute top-0 start-0 m-3 px-3 py-2 rounded-pill shadow-sm">
+                    <span class="badge bg-danger position-absolute top-0 start-0 m-3 px-3 py-2 rounded-pill shadow-sm" style="z-index: 10;">
                         %20 İndirim
                     </span>
-                    <img class="product-detail-img mb-3" 
+                    
+                    <img class="card-img-top img-fluid w-100 rounded mb-5 mb-md-0 shadow-sm" 
                          src="/img/products/@Model.Product.Image" 
-                         alt="@Model.Product.Name">
-                </div>
+                         alt="@Model.Product.Name"
+                         style="object-fit: contain; max-height: 600px;"> 
+                         </div>
             </div>
 
             <div class="col-md-6">
-                <div class="small text-muted mb-2">Ürün Kodu: <strong>@Model.Product.ProductCode</strong></div>
-                
-                <h1 class="fw-bold fs-2 mb-3 text-dark">@Model.Product.Name</h1>
+                <div class="small text-muted mb-2">Ürün Kodu: <strong>@Model.Product.Id</strong></div> <h1 class="display-5 fw-bolder mb-3">@Model.Product.Name</h1>
 
-                <div class="mb-4 d-flex align-items-center">
-                    <span class="text-muted text-decoration-line-through me-3 fs-5">@(Model.Product.Price * 1.2m)₺</span>
-                    <span class="display-6 fw-bold text-primary">@Model.Product.Price.ToString("c")</span>
+                <div class="fs-5 mb-4">
+                    <span class="text-decoration-line-through text-muted me-2">@(Model.Product.Price * 1.2m) ₺</span>
+                    <span class="fw-bold text-primary">@Model.Product.Price.ToString("c")</span>
                 </div>
 
-                <p class="lead text-secondary mb-5" style="font-size: 1rem; line-height: 1.6;">
+                <p class="lead mb-5">
                     @Model.Product.Description
                 </p>
 
-                <div class="card bg-light border-0 rounded-3 p-4">
-                    <div class="d-flex align-items-center justify-content-between">
-                        
-                        <div class="input-group" style="width: 140px;">
-                            <button class="btn btn-outline-secondary" type="button" onclick="decreaseQty()">-</button>
-                            <input type="number" class="form-control quantity-input bg-white" id="inputQuantity" value="1" min="1">
-                            <button class="btn btn-outline-secondary" type="button" onclick="increaseQty()">+</button>
-                        </div>
-
-                        <button class="btn btn-primary btn-lg flex-fill ms-3 shadow-sm" type="button">
-                            <i class="bi-cart-plus-fill me-2"></i> Sepete Ekle
-                        </button>
+                <div class="d-flex">
+                    <div class="input-group me-3" style="max-width: 130px;">
+                        <button class="btn btn-outline-secondary" type="button" onclick="decreaseQty()">-</button>
+                        <input class="form-control text-center" id="inputQuantity" type="num" value="1" style="max-width: 3rem" />
+                        <button class="btn btn-outline-secondary" type="button" onclick="increaseQty()">+</button>
                     </div>
+                    
+                    <button class="btn btn-outline-dark flex-shrink-0" type="button">
+                        <i class="bi-cart-fill me-1"></i>
+                        Sepete Ekle
+                    </button>
                 </div>
-
             </div>
         </div>
     </div>
@@ -63,25 +60,21 @@
 
 <section class="py-5 bg-light">
     <div class="container px-4 px-lg-5 mt-5">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="fw-bolder m-0">Bunları da Beğenebilirsiniz</h2>
-            <a href="/Products" class="text-decoration-none fw-bold">Tümünü Gör &rarr;</a>
-        </div>
-        
-        <hr class="mb-5 text-muted">
-
+        <h2 class="fw-bolder mb-4">Bunları da Beğenebilirsiniz</h2>
         <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
+            
             @if (Model.RelatedProducts != null && Model.RelatedProducts.Any())
             {
                 @foreach (var item in Model.RelatedProducts)
                 {
-                    <partial name="_ProductView" model="item"></partial>
+                    <partial name="_ProductView" model="item" />
                 }
             }
             else
             {
-                <div class="alert alert-warning w-100 text-center">Benzer ürün bulunamadı.</div>
+                <div class="alert alert-warning w-100 text-center">Bu kategoride başka benzer ürün bulunamadı.</div>
             }
+
         </div>
     </div>
 </section>
@@ -89,12 +82,15 @@
 <script>
     function increaseQty() {
         var input = document.getElementById('inputQuantity');
-        input.value = parseInt(input.value) + 1;
+        var value = parseInt(input.value);
+        input.value = value + 1;
     }
+
     function decreaseQty() {
         var input = document.getElementById('inputQuantity');
-        if (parseInt(input.value) > 1) {
-            input.value = parseInt(input.value) - 1;
+        var value = parseInt(input.value);
+        if (value > 1) {
+            input.value = value - 1;
         }
     }
 </script>

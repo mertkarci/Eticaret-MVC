@@ -1,30 +1,34 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Eticaret.WebUI.Models;
-using Eticaret.Data;
-using Microsoft.EntityFrameworkCore;
 using Eticaret.Core.Entities;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using System.Threading.Tasks;
-using Eticaret.WebUI.Utils;
+using Eticaret.Service.Abstract;
 
 namespace Eticaret.WebUI.Controllers;
 
 public class HomeController : Controller
 {
-    private readonly DatabaseContext _context;
+    private readonly IService<Product> _serviceProduct;
+    private readonly IService<Slider> _serviceSlider;
+    private readonly IService<News> _serviceNews;
+        private readonly IService<Contact> _serviceContact;
 
-    public HomeController(DatabaseContext context)
+    public HomeController(IService<Product> serviceProduct,IService<Slider> serviceSlider,IService<News> serviceNews, IService<Contact> serviceContact)
     {
-        _context = context;
+        _serviceProduct = serviceProduct;
+        _serviceSlider = serviceSlider;
+        _serviceNews = serviceNews;
+        _serviceContact = serviceContact;
+
     }
     public async Task<IActionResult> Index()
     {
         var model = new HomePageViewModel()
         {
-            Sliders = await _context.Sliders.ToListAsync(),
-            Products = await _context.Products.Where(p => p.isActive && p.isHome).ToListAsync(),
-            News = await _context.News.ToListAsync()
+            Sliders = await _serviceSlider.GetAllAsync(),
+            Products = await _serviceProduct.GetAllAsync(p => p.isActive && p.isHome),
+            News = await _serviceNews.GetAllAsync()
+            
         };
 
 
@@ -70,8 +74,8 @@ public class HomeController : Controller
                 };
 
                 // 3. Veritabanına Ekleme
-                await _context.Contacts.AddAsync(contact);
-                var result = await _context.SaveChangesAsync();
+                await _serviceContact.AddAsync(contact);
+                var result = await _serviceContact.SaveChangesAsync();
 
                 if (result > 0)
                 {

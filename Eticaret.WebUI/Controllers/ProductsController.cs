@@ -1,42 +1,43 @@
-using Eticaret.Data;
-using Eticaret.WebUI;
+using Eticaret.Core.Entities;
+using Eticaret.Service.Abstract;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore; 
 
 namespace Eticaret.WebUI.Controllers
 {
     public class ProductsController : Controller
     {
-        private readonly DatabaseContext _context;
+        private readonly IService<Product> _service;
 
-        public ProductsController(DatabaseContext context)
+        public ProductsController(IService<Product> service)
         {
-            _context = context;
+            _service = service;
         }
+
         public async Task<IActionResult> Index(string q = "")
         {
-            // Start with the base query
-            var products = _context.Products.AsQueryable();
+            // 1. ADIM: Servisten "Henüz Çalışmamış" sorguyu (IQueryable) alıyoruz.
+            // _context.Products.AsQueryable() YERİNE:
+            var productQuery = _service.GetQueryable();
 
+            // 2. ADIM: Filtreleme (Arama mantığı)
             if (!string.IsNullOrEmpty(q))
             {
-                // Convert search term to lowercase
                 string query = q.ToLower();
-
-                // Filter: Convert Database Name to lowercase AND compare with query
-                products = products.Where(p => p.isActive && p.Name.ToLower().Contains(query));
+                // İsmi aranan kelimeyi içeren VE Aktif olanlar
+                productQuery = productQuery.Where(p => p.isActive && p.Name.ToLower().Contains(query));
             }
             else
             {
-                // If no search, just get active products
-                products = products.Where(p => p.isActive);
+                // Arama yoksa sadece aktifleri getir
+                productQuery = productQuery.Where(p => p.isActive);
             }
 
-            // Include related tables and execute query
-            var result = await products
+            // 3. ADIM: İlişkili tabloları (Brand, Category) dahil et ve veritabanına git
+            var result = await productQuery
                                 .Include(p => p.Brand)
                                 .Include(p => p.Category)
-                                .ToListAsync();
+                                .ToListAsync(); // Veritabanı sorgusu BURADA çalışır
 
             return View(result);
         }
@@ -48,19 +49,32 @@ namespace Eticaret.WebUI.Controllers
                 return NotFound();
             }
 
-            var product = await _context.Products
+            // 1. Ürünü Detaylarıyla Çekme
+            // _context... YERİNE _service.GetQueryable()...
+            var product = await _service.GetQueryable()
                 .Include(p => p.Brand)
                 .Include(p => p.Category)
                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (product == null)
             {
                 return NotFound();
             }
+
+            // 2. Benzer Ürünleri Çekme (Related Products)
+            // Aynı kategorideki, kendisi haricindeki aktif 4 ürünü getir.
+            var relatedProducts = await _service.GetQueryable()
+                .Where(p => p.isActive && p.CategoryId == product.CategoryId && p.Id != product.Id)
+                .Take(4)
+                .ToListAsync();
+
+            // ViewModel Doldurma
             var model = new ProductDetailViewModel()
             {
                 Product = product,
-                RelatedProducts = _context.Products.Where(p => p.isActive && p.CategoryId == product.CategoryId && p.Id != product.Id).Take(4).ToList()
+                RelatedProducts = relatedProducts
             };
+
             return View(model);
         }
     }
