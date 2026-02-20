@@ -1,36 +1,203 @@
+@using Eticaret.WebUI.ExtensionMethods
+@using Eticaret.Service.Concrete
+@using Eticaret.Core.Entities
 @{
     ViewData["Title"] = "_Header";
+    
+    // Sepet ve Favori verilerini okuyoruz
+    var cart = Context.Session.GetJson<CartService>("Cart");
+    int cartCount = cart?.CartLines.Sum(x => x.Quantity) ?? 0;
+    decimal cartTotal = cart?.CartLines.Sum(x => x.Quantity * x.Product.Price) ?? 0;
+
+    var favourites = Context.Session.GetJson<List<Product>>("Favourites");
+    int favCount = favourites?.Count ?? 0;
 }
 
 <head>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- Frontendci Dokunuşları --- */
+
+        /* 1. Hover ve Taşma Düzeltmesi */
+        .dropdown-menu-end {
+            right: 0 !important;
+            left: auto !important;
+        }
+
+        /* 2. Mobil Menü Hizalama Düzeltmesi */
+        @@media (max-width: 991.98px) {
+            .navbar-collapse .navbar-nav {
+                padding-left: 0;
+                padding-right: 0;
+            }
+            .navbar-collapse .navbar-nav .nav-link,
+            .navbar-collapse .navbar-nav .dropdown-toggle,
+            .navbar-collapse .navbar-nav .dropdown-item {
+                 padding-left: 1rem !important; 
+                 padding-right: 1rem !important;
+            }
+             .navbar-collapse .navbar-nav ul {
+                padding-left: 0 !important;
+                list-style: none;
+            }
+        }
+        
+        /* 3. Çok Dar Ekranlarda Logoyu Gizleme (YENİ) */
+        @@media (max-width: 320px) {
+            .hide-on-tiny { display: none !important; }
+        }
+        
+        /* Diğer Tasarım Kuralları */
+        .cart-dropdown-menu {
+            width: 340px;
+            padding: 0;
+            border: none;
+            border-radius: 12px;
+            max-width: 95vw; 
+        }
+        .cart-scroll-area {
+            max-height: 320px;
+            overflow-y: auto;
+        }
+        .cart-scroll-area::-webkit-scrollbar { width: 6px; }
+        .cart-scroll-area::-webkit-scrollbar-track { background: #f1f1f1; }
+        .cart-scroll-area::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 10px; }
+        .cart-scroll-area::-webkit-scrollbar-thumb:hover { background: #a8a8a8; }
+        
+        .cart-item-row:hover { background-color: #f8f9fa; }
+        
+        .nav-badge {
+            font-size: 0.65rem;
+            transform: translate(-30%, -20%) !important;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .fav-icon:hover i { color: #ff6b6b; transition: color 0.2s ease-in-out; }
+
+        @@media (max-width: 576px) {
+            .cart-dropdown-menu { width: 300px; }
+            .mobile-icon-size { font-size: 1.25rem !important; } 
+        }
+    </style>
 </head>
 
 <header class="position-relative">
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-color shadow-sm py-2 py-lg-3">
+        <div class="container px-2 px-lg-4">
 
-    <nav class="navbar navbar-expand-lg navbar-dark navbar-color shadow-sm">
-        <div class="container-fluid">
+            <a class="navbar-brand fw-bold fs-4 tracking-wide order-1 hide-on-tiny" asp-controller="Home" asp-action="Index">SAFU</a>
 
-            <a class="navbar-brand" asp-controller="Home" asp-action="Index">SAFU</a>
-
-            <div class="d-lg-none ms-auto d-flex align-items-center">
-
-                <button class="btn btn-link text-white me-2" type="button" data-bs-toggle="collapse"
-                    data-bs-target="#mobileSearchBox" aria-expanded="false" aria-controls="mobileSearchBox">
-                    <i class="bi bi-search fs-4"></i>
+            <div class="d-flex align-items-center gap-1 gap-lg-3 order-2 order-lg-3 ms-auto">
+                
+                <button class="btn btn-link text-white p-1 d-lg-none" type="button" data-bs-toggle="collapse" data-bs-target="#mobileSearchBox">
+                    <i class="bi bi-search mobile-icon-size"></i>
                 </button>
 
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-                    data-bs-target="#navbarsExample04" aria-controls="navbarsExample04" aria-expanded="false"
-                    aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
+                <form action="/Products" class="d-none d-lg-flex position-relative me-2" role="search">
+                    <input name="q" class="form-control rounded-pill ps-4 pe-5 bg-light border-0" type="search" placeholder="Sitede Ara..." style="width: 250px;">
+                    <button type="submit" class="btn btn-link text-muted position-absolute end-0 top-50 translate-middle-y text-decoration-none">
+                        <i class="bi bi-search"></i>
+                    </button>
+                </form>
+
+                <a class="nav-link text-white position-relative p-1 p-lg-2 fav-icon" asp-controller="Favourites" asp-action="Index" title="Favorilerim">
+                    <i class="bi bi-heart fs-5 fs-lg-4 mobile-icon-size"></i>
+                    @if (favCount > 0)
+                    {
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-2 border-dark nav-badge">@favCount</span>
+                    }
+                </a>
+
+                <div class="dropdown">
+                    <a class="nav-link text-white position-relative p-1 p-lg-2" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" title="Sepetim">
+                        <i class="bi bi-cart3 fs-5 fs-lg-4 mobile-icon-size"></i>
+                        @if (cartCount > 0)
+                        {
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-2 border-dark nav-badge">@cartCount</span>
+                        }
+                    </a>
+
+                    <ul class="dropdown-menu dropdown-menu-end shadow-lg cart-dropdown-menu mt-2">
+                        @if (cart != null && cart.CartLines.Any())
+                        {
+                            <li class="px-4 py-3 border-bottom d-flex justify-content-between align-items-center bg-light" style="border-radius: 12px 12px 0 0;">
+                                <span class="fw-bold text-dark mb-0">Sepetim (@cartCount)</span>
+                                <span class="fw-bolder text-primary">@cartTotal.ToString("c")</span>
+                            </li>
+                            
+                            <div class="cart-scroll-area py-2">
+                                @foreach (var item in cart.CartLines)
+                                {
+                                    <li class="dropdown-item-text d-flex align-items-center gap-3 py-2 px-4 cart-item-row transition-all">
+                                        <div class="position-relative">
+                                            <img src="/img/products/@item.Product.Image" alt="@item.Product.Name" class="rounded shadow-sm" style="width: 50px; height: 50px; object-fit: cover;" />
+                                            <span class="position-absolute top-0 start-0 translate-middle badge rounded-pill bg-secondary" style="font-size: 0.6rem;">@item.Quantity</span>
+                                        </div>
+                                        
+                                        <div class="flex-grow-1 overflow-hidden">
+                                            <a href="/Products/Details/@item.Product.Id" class="text-decoration-none text-dark fw-bold d-block text-truncate" style="font-size: 0.85rem;">@item.Product.Name</a>
+                                            <small class="text-muted fw-medium">@((item.Product.Price * item.Quantity).ToString("c"))</small>
+                                        </div>
+                                        
+                                        <form asp-controller="Cart" asp-action="Remove" method="post" class="m-0">
+                                            <input type="hidden" name="ProductId" value="@item.Product.Id">
+                                            <button type="submit" class="btn btn-sm btn-link text-danger p-1" title="Kaldır"><i class="bi bi-trash3"></i></button>
+                                        </form>
+                                    </li>
+                                }
+                            </div>
+                            
+                            <li class="p-3 border-top bg-white" style="border-radius: 0 0 12px 12px;">
+                                <a href="/Cart/Index" class="btn btn-primary w-100 rounded-pill fw-bold py-2 shadow-sm">Sepete Git <i class="bi bi-arrow-right-short fs-5 align-middle"></i></a>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="px-4 py-5 text-center text-muted">
+                                <i class="bi bi-cart-x opacity-50 mb-3 d-block" style="font-size: 3rem;"></i>
+                                <span class="fw-medium d-block">Sepetiniz şu an boş.</span>
+                            </li>
+                        }
+                    </ul>
+                </div>
+
+                <div class="dropdown">
+                    <a class="nav-link text-white p-1 p-lg-2" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" title="Hesabım">
+                        <i class="bi bi-person-circle fs-5 fs-lg-4 mobile-icon-size"></i>
+                    </a>
+
+                    <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2" style="border-radius: 12px; width: 220px;">
+                        @if (Context.User.Identity.IsAuthenticated)
+                        {
+                            <li class="px-3 py-2 border-bottom bg-light text-center" style="border-radius: 12px 12px 0 0;">
+                                <small class="text-muted d-block">Hoş geldiniz,</small>
+                                <span class="fw-bold text-dark text-truncate d-block">@Context.User.Identity.Name</span>
+                            </li>
+                            <li><a class="dropdown-item py-2 mt-1" asp-controller="Accounts" asp-action="Index"><i class="bi bi-person-vcard me-2 text-primary"></i>Kullanıcı Bilgilerim</a></li>
+                            <li><a class="dropdown-item py-2" asp-controller="Accounts" asp-action="Orders"><i class="bi bi-box-seam me-2 text-success"></i>Siparişlerim</a></li>
+                            <li><a class="dropdown-item py-2" asp-controller="Accounts" asp-action="Reviews"><i class="bi bi-star me-2 text-warning"></i>Değerlendirmelerim</a></li>
+                            <li><hr class="dropdown-divider my-1"></li>
+                            <li><a class="dropdown-item py-2 text-danger fw-medium" asp-controller="Accounts" asp-action="SignOut"><i class="bi bi-box-arrow-right me-2"></i>Çıkış Yap</a></li>
+                        }
+                        else
+                        {
+                            <li><a class="dropdown-item py-2 mt-1 fw-medium" asp-controller="Accounts" asp-action="SignIn"><i class="bi bi-box-arrow-in-right me-2 text-primary"></i>Giriş Yap</a></li>
+                            <li><a class="dropdown-item py-2 fw-medium" asp-controller="Accounts" asp-action="SignUp"><i class="bi bi-person-plus me-2 text-success"></i>Kayıt Ol</a></li>
+                        }
+                    </ul>
+                </div>
+
+                <button class="navbar-toggler border-0 ms-1 p-1" type="button" data-bs-toggle="collapse" data-bs-target="#navbarsExample04" aria-controls="navbarsExample04" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon" style="width: 1.3rem; height: 1.3rem;"></span>
                 </button>
+
             </div>
 
-            <div class="collapse navbar-collapse" id="navbarsExample04">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <div class="collapse navbar-collapse order-3 order-lg-2 mt-3 mt-lg-0" id="navbarsExample04">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0 fw-medium">
                     <li class="nav-item">
                         <a class="nav-link" asp-controller="Home" asp-action="Index">Ana Sayfa</a>
                     </li>
@@ -39,56 +206,17 @@
                         <a class="nav-link" asp-controller="Home" asp-action="ContactUs">İletişim</a>
                     </li>
                 </ul>
-
-                <form action="/Products" class="d-none d-lg-flex me-3" role="search">
-                    <input name="q" class="form-control me-2" type="search" placeholder="Sitede Ara..."
-                        aria-label="Search">
-                </form>
-                @if (Context.User.Identity.IsAuthenticated)
-                {
-                    <div class="dropdown">
-                        <a class="dropdown-toggle nav-link text-dark" href="#" role="button" data-bs-toggle="dropdown"
-                            aria-expanded="false">
-                            Hesabım
-                        </a>
-
-                        <ul class="dropdown-menu dropdown-menu-end shadow-sm">
-
-                            <li><a class="dropdown-item" asp-controller="Accounts" asp-action="Index">Kullanıcı
-                                    Bilgilerim</a></li>
-                            <li><a class="dropdown-item" asp-controller="Accounts" asp-action="Orders">Siparişlerim</a></li>
-                            <li><a class="dropdown-item" asp-controller="Accounts"
-                                    asp-action="Reviews">Değerlendirmelerim</a></li>
-                            <li>
-                                <hr class="dropdown-divider">
-                            </li>
-                            <li><a class="dropdown-item text-danger" asp-controller="Accounts" asp-action="SignOut">Çıkış
-                                    Yap</a></li>
-
-                        </ul>
-                    </div>
-                }
-                else
-                {
-                    <div class="d-flex mt-3 mt-lg-0">
-                        <a class="btn btn-outline-light me-2" asp-controller="Accounts" asp-action="SignIn">Giriş Yap</a>
-                        <a class="btn btn-light text-primary" asp-controller="Accounts" asp-action="SignUp">Kayıt Ol</a>
-                    </div>
-                }
-
             </div>
+
         </div>
     </nav>
-
-    <div class="collapse bg-light p-3 border-bottom shadow-sm w-100 position-absolute" id="mobileSearchBox"
-        style="z-index: 1050; top: 100%; left: 0;">
+    
+    <div class="collapse bg-white p-3 border-bottom shadow-sm w-100 position-absolute" id="mobileSearchBox" style="z-index: 1050; top: 100%; left: 0;">
         <div class="container">
-            <form action="/Products" class="d-flex" role="search">
-                <input name="q" class="form-control me-2" type="search" placeholder="Ne aramıştınız?"
-                    aria-label="Search">
-                <button class="btn btn-primary" type="submit">Ara</button>
+            <form action="/Products" class="d-flex position-relative" role="search">
+                <input name="q" class="form-control rounded-pill ps-4 pe-5 bg-light border-0 py-2" type="search" placeholder="Ne aramıştınız?">
+                <button class="btn btn-primary rounded-pill position-absolute end-0 top-0 bottom-0 px-4" type="submit">Ara</button>
             </form>
         </div>
     </div>
-
 </header>

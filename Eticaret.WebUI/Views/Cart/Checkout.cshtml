@@ -1,0 +1,186 @@
+@model CheckoutViewModel
+@{
+    ViewData["Title"] = "Satın Al";
+
+    // Kargo Hesaplamaları
+    decimal freeShippingThreshold = 1000m;
+    decimal shippingCost = Model.TotalPrice >= freeShippingThreshold ? 0 : 99m;
+    decimal finalTotal = Model.TotalPrice + shippingCost;
+}
+
+<div class="container mt-5">
+
+    <div class="text-center mb-5">
+        <h2 class="display-6">Satın Al</h2>
+    </div>
+
+    @if (Model.CartProducts != null && Model.CartProducts.Any())
+    {
+        <div class="row mb-5">
+
+            <div class="col-md-8">
+                <table class="table table-borderless border-bottom">
+                    <thead class="border-bottom">
+                        <tr>
+                            <th>Ürün</th>
+                            <th>Fiyat</th>
+                            <th>Miktar</th>
+                            <th>Toplam</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.CartProducts)
+                        {
+                            <tr class="border-bottom">
+                                <td class="py-3">
+                                    <img src="~/img/products/@item.Product.Image" width="40" class="me-2" />
+                                    @item.Product.Name
+                                </td>
+                                <td class="py-3">@item.Product.Price.ToString("c")</td>
+                                <td class="py-3">@item.Quantity</td>
+                                <td class="py-3">@((item.Product.Price * item.Quantity).ToString("c"))</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="col-md-4">
+                <h4 class="mb-3">Sipariş Özeti</h4>
+                <table class="table table-borderless">
+                    <tr>
+                        <td class="text-muted">Ürün Toplamı</td>
+                        <td class="text-end fw-bold">@Model.TotalPrice.ToString("c")</td>
+                    </tr>
+                    <tr class="border-bottom">
+                        <td class="text-muted">Kargo</td>
+                        <td class="text-end fw-bold">@(shippingCost == 0 ? "Ücretsiz" : shippingCost.ToString("c"))</td>
+                    </tr>
+                    <tr>
+                        <td class="fs-5 fw-bold pt-3">Sipariş Toplamı</td>
+                        <td class="fs-5 fw-bold text-end pt-3">@finalTotal.ToString("c")</td>
+                    </tr>
+                </table>
+            </div>
+
+        </div>
+
+        <div class="row">
+            <div class="col-12">
+
+                @if (Model.Addresses == null || !Model.Addresses.Any())
+                {
+                    <div class="p-4 rounded" style="background-color: #e9ecef; border: 1px solid #dee2e6;">
+                        <h5 class="text-danger fw-bold">Kayıtlı Adresiniz Yok!</h5>
+                        <p class="text-dark mb-3">Sipariş verebilmek için en az 1 adres eklemelisiniz!</p>
+
+                        <a href="/MyAddresses/Create" class="btn btn-danger">
+                            <i class="bi bi-person-plus-fill me-1"></i> Adres Ekle
+                        </a>
+                    </div>
+                }
+                else
+                {
+                    <form asp-asction="Checkout">
+                        <div class="my-5">
+                            <h3>Teslimat Adresi</h3>
+                            <div class="row row-cols-3">
+                                @foreach (var item in Model.Addresses)
+                                {
+                                    <div class="col">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <div class="form-check">
+                                                    <label class="form-check-label">
+                                                        <input class="form-check-input" type="radio" name="DeliveryAddress"
+                                                            value="@item.AddressGuid" @(item.IsDeliveryAddress ? "checked" : "") />
+                                                        @item.Title
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <div class="card-body">
+                                                <p> @item.OpenAddress @item.District @item.City</p>
+                                                <div class="form-check">
+                                                    <label class="form-check-label">
+                                                        <input class="form-check-input" type="radio" name="BillingAddress"
+                                                            value="@item.AddressGuid" @(item.IsBillingAddress ? "checked" : "") />
+                                                        Fatura Adresi
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                        <div class="my-5">
+                            <h2>Seçenekelr</h2>
+                            <h3>Ödeme</h3>
+                            <h6>banka veya kredi</h6>
+                            <h6>kart bilgileri</h6>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <label>Kart Numarası</label>
+                                    <input type="number" name="CardNumber" class="form-control" required />
+                                </div>
+                            </div>
+                            <div class="row">
+                                <label>Son kullanma</label>
+                                <div class="col-md-2">
+                                    <select class="form-select" name="CardMonth" required>
+                                        <option disabled value="">Ay</option>
+                                        <option value="1">01</option>
+                                        <option value="2">02</option>
+                                        <option value="3">03</option>
+                                        <option value="4">04</option>
+                                        <option value="5">05</option>
+                                        <option value="6">06</option>
+                                        <option value="7">07</option>
+                                        <option value="8">08</option>
+                                        <option value="9">09</option>
+                                        <option value="10">10</option>
+                                        <option value="11">11</option>
+                                        <option value="12">12</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <select class="form-select" name="CardYear" required>
+                                        <option disabled value="">Yıl</option>
+                                        <option value="2026">2026</option>
+                                        <option value="2027">2027</option>
+                                        <option value="2028">2028</option>
+                                        <option value="2029">2029</option>
+                                        <option value="2030">2030</option>
+                                        <option value="2031">2031</option>
+                                        <option value="2032">2032</option>
+                                        <option value="2033">2033</option>
+                                        <option value="2034">2034</option>
+                                        <option value="2035">2035</option>
+                                        <option value="2036">2036</option>
+                                        <option value="2037">2037</option>
+                                        <option value="2038">2038</option>
+                                        <option value="2039">2039</option>
+                                        <option value="2040">2040</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-2">
+                                    <label>CVV</label>
+                                    <input type="number" name="CVV" class="form-control" required />
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-success mt-2">Ödeme Yap</button>
+                    </form>
+                }
+
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="text-center py-5">
+            <h3 class="text-muted">Sepetinizde ürün bulunmuyor.</h3>
+        </div>
+    }
+</div>

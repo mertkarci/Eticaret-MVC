@@ -1,0 +1,196 @@
+@model CartViewModel
+@{
+    ViewData["Title"] = "Sepetim";
+
+    // Kargo ve Toplam Fiyat Hesaplamalarını Razor içinde yapıp HTML'i temiz tutuyoruz
+    decimal freeShippingThreshold = 1000m; // Ücretsiz kargo barajı
+    decimal shippingCost = Model.TotalPrice >= freeShippingThreshold ? 0 : 99m;
+    decimal finalTotal = Model.TotalPrice + shippingCost;
+
+    // İlerleme çubuğu yüzdesi
+    decimal progress = Model.TotalPrice >= freeShippingThreshold ? 100 : (Model.TotalPrice / freeShippingThreshold) * 100;
+    decimal remainingForFreeShipping = freeShippingThreshold - Model.TotalPrice;
+}
+
+<style>
+    /* Masaüstünde sağdaki özet kutusunun kaydırırken ekranda sabit kalması için */
+    .sticky-summary {
+        position: sticky;
+        top: 2rem;
+    }
+
+    .cart-item-row {
+        transition: background-color 0.2s;
+    }
+
+    .cart-item-row:hover {
+        background-color: #f8f9fa;
+    }
+
+    .table-cart th {
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        letter-spacing: 0.5px;
+        color: #6c757d;
+        border-bottom: 2px solid #dee2e6;
+    }
+</style>
+
+<section class="py-5 bg-light min-vh-100">
+    <div class="container">
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="display-6 fw-bold m-0">Sepetim</h1>
+            <a href="/Products" class="text-decoration-none text-primary fw-bold">
+                <i class="bi bi-arrow-left me-1"></i> Alışverişe Devam Et
+            </a>
+        </div>
+
+        @if (Model.CartLines.Any())
+        {
+            <div class="row g-4">
+
+                <div class="col-lg-8">
+                    <div class="card border-0 shadow-sm rounded-4">
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-cart align-middle mb-0">
+                                    <thead class="bg-white">
+                                        <tr>
+                                            <th class="ps-4 py-3">Ürün</th>
+                                            <th class="py-3">Fiyat</th>
+                                            <th class="text-center py-3">Adet</th>
+                                            <th class="py-3">Toplam</th>
+                                            <th class="pe-4 py-3 text-end">İşlem</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="border-top-0">
+                                        @foreach (var item in Model.CartLines)
+                                        {
+                                            <tr class="cart-item-row border-bottom">
+                                                <td class="ps-4 py-3">
+                                                    <div class="d-flex align-items-center">
+                                                        <img src="~/img/products/@item.Product.Image" alt="@item.Product.Name"
+                                                            class="rounded-3 shadow-sm me-3"
+                                                            style="width: 70px; height: 70px; object-fit: cover;" />
+                                                        <div>
+                                                            <a href="/Products/Details/@item.Product.Id"
+                                                                class="text-decoration-none fw-bold text-dark d-block mb-1">
+                                                                @item.Product.Name
+                                                            </a>
+                                                            <small class="text-muted">Kodu: @item.Product.Id</small>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td class="py-3 text-secondary fw-medium">@item.Product.Price.ToString("c")</td>
+                                                <td class="text-center py-3">
+                                                    <span
+                                                        class="badge bg-light text-dark border px-3 py-2 fs-6 rounded-pill">@item.Quantity</span>
+                                                </td>
+                                                <td class="fw-bold text-dark py-3">
+                                                    @((item.Product.Price * item.Quantity).ToString("c"))
+                                                </td>
+                                                <td class="pe-4 py-3 text-end">
+                                                    <form asp-controller="Cart" asp-action="Remove" method="post">
+                                                        <input type="hidden" name="ProductId" value="@item.Product.Id">
+                                                        <button class="btn btn-sm btn-light text-danger rounded-circle p-2"
+                                                            type="submit" data-bs-toggle="tooltip" title="Sepetten Çıkar">
+                                                            <i class="bi bi-trash3"></i>
+                                                        </button>
+                                                    </form>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <div class="sticky-summary">
+                        <div class="card border-0 shadow-sm rounded-4 bg-white p-4">
+                            <h4 class="fw-bold mb-4">Sipariş Özeti</h4>
+
+                            <div class="mb-4 bg-light p-3 rounded-3 border">
+                                @if (Model.TotalPrice >= freeShippingThreshold)
+                                {
+                                    <div class="text-success fw-bold text-center small mb-0">
+                                        <i class="bi bi-check-circle-fill me-1"></i> Tebrikler, kargonuz bedava!
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="d-flex justify-content-between small text-muted mb-2">
+                                        <span>Ücretsiz Kargo</span>
+                                        <span class="fw-bold text-dark">@remainingForFreeShipping.ToString("c") kaldı</span>
+                                    </div>
+                                    <div class="progress" style="height: 8px;">
+                                        <div class="progress-bar progress-bar-striped progress-bar-animated bg-success"
+                                            role="progressbar" style="width: @progress.ToString().Replace(",", ".")%"></div>
+                                    </div>
+                                }
+                            </div>
+
+                            <div class="d-flex justify-content-between mb-3 text-secondary">
+                                <span>Ara Toplam</span>
+                                <span class="fw-medium text-dark">@Model.TotalPrice.ToString("c")</span>
+                            </div>
+
+                            <div class="d-flex justify-content-between mb-3 text-secondary">
+                                <span>Kargo Ücreti</span>
+                                @if (shippingCost == 0)
+                                {
+                                    <span class="text-success fw-bold">Ücretsiz</span>
+                                }
+                                else
+                                {
+                                    <span class="fw-medium text-dark">@shippingCost.ToString("c")</span>
+                                }
+                            </div>
+
+                            <hr class="text-muted my-4">
+
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <span class="fs-5 fw-bold text-dark">Toplam</span>
+                                <span class="fs-4 fw-bolder text-primary">@finalTotal.ToString("c")</span>
+                            </div>
+
+                            <a href="/Cart/Checkout" class="btn btn-primary btn-lg w-100 rounded-pill shadow-sm fw-bold">
+                                Sepeti Onayla <i class="bi bi-lock-fill ms-1"></i>
+                            </a>
+                            <a href="#" class="btn btn-primary btn-lg w-100 rounded-pill shadow-sm fw-bold">
+                                Güvenli Ödeme <i class="bi bi-lock-fill ms-1"></i>
+                            </a>
+                        </div>
+
+                        <div class="d-flex justify-content-center gap-3 mt-4 text-muted small">
+                            <span><i class="bi bi-shield-check"></i> 256-bit SSL</span>
+                            <span><i class="bi bi-arrow-return-left"></i> Kolay İade</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        }
+        else
+        {
+            <div class="row justify-content-center">
+                <div class="col-md-6 text-center py-5">
+                    <div class="card border-0 shadow-sm rounded-4 p-5 bg-white">
+                        <div class="mb-4">
+                            <i class="bi bi-cart-x text-muted opacity-50" style="font-size: 6rem;"></i>
+                        </div>
+                        <h2 class="fw-bold text-dark mb-3">Sepetiniz Bomboş</h2>
+                        <p class="text-muted mb-4 fs-5">Alışverişe başlamak için harika ürünlerimizi inceleyebilirsiniz.</p>
+                        <a href="/Products" class="btn btn-primary btn-lg px-5 rounded-pill shadow-sm">
+                            Ürünleri Keşfet
+                        </a>
+                    </div>
+                </div>
+            </div>
+        }
+
+    </div>
+</section>

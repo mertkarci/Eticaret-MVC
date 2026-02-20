@@ -10,6 +10,9 @@
                 <a asp-action="Index" class="list-group-item list-group-item-action active">
                     <i class="bi bi-person"></i> Üyelik Bilgileri
                 </a>
+                <a href="/MyAddresses" class="list-group-item list-group-item-action">
+                    <i class="bi bi-box-arrow-right"></i> Adreslerim
+                </a>
                 <a href="/Accounts/SignOut" class="list-group-item list-group-item-action text-danger">
                     <i class="bi bi-box-arrow-right"></i> Çıkış Yap
                 </a>
@@ -17,11 +20,11 @@
         </div>
 
         <div class="col-md-9">
-        @if (TempData["Message"] != null)
-    {
-        /* HTML kodları içerdiği için Html.Raw kullanıyoruz */
-        @Html.Raw(TempData["Message"])
-    }
+            @if (TempData["Message"] != null)
+            {
+                /* HTML kodları içerdiği için Html.Raw kullanıyoruz */
+                @Html.Raw(TempData["Message"])
+            }
             <div class="card shadow-sm">
                 <div class="card-header bg-white">
                     <h5 class="mb-0">Üyelik Bilgilerini Güncelle</h5>

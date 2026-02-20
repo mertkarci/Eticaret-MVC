@@ -29,4 +29,5 @@ public class AppUser : IEntity
     [Display(Name ="Kayıt Tarihi"), ScaffoldColumn(false)]
     public DateTime CreateDate {get; set;} = DateTime.Now;
     public Guid? UserGuid {get; set;} = Guid.NewGuid(); 
+    public List<Address>? Addresses {get; set;}
 }

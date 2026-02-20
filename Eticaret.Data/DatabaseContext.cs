@@ -13,13 +13,18 @@ public class DatabaseContext : DbContext
     {
     }
 
-    public DbSet<AppUser> AppUsers {get; set;}
-    public DbSet<Brand> Brands {get; set;}
-    public DbSet<Category> Categories {get; set;}
-    public DbSet<Contact> Contacts {get; set;}
-    public DbSet<News> News {get; set;}
-    public DbSet<Product> Products {get; set;}
-    public DbSet<Slider> Sliders {get; set;}
+    public DbSet<AppUser> AppUsers { get; set; }
+    public DbSet<Brand> Brands { get; set; }
+    public DbSet<Category> Categories { get; set; }
+    public DbSet<Contact> Contacts { get; set; }
+    public DbSet<News> News { get; set; }
+    public DbSet<Product> Products { get; set; }
+    public DbSet<Slider> Sliders { get; set; }
+    public DbSet<Address> Addresses { get; set; }
+    public DbSet<Order> Orders { get; set; }
+    public DbSet<OrderLine> OrderLines { get; set; }
+
+
 
     // --- 2. DÜZELTME: OnConfiguring SİLİNDİ ---
     // Buradaki OnConfiguring metodunu kaldırdım.
@@ -31,7 +36,7 @@ public class DatabaseContext : DbContext
         base.OnModelCreating(modelBuilder);
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
     }
-    
+
     // Not: "AddSync" metodunu sildim çünkü gereksiz. 
     // EF Core'un kendi "AddAsync" veya "Add" metotları zaten var.
 }

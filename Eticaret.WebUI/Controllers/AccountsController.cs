@@ -5,27 +5,23 @@ using Eticaret.Service.Abstract;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Eticaret.WebUI;
 
 public class AccountsController : Controller
 {
-    // private readonly DatabaseContext _context;
-
-    // public AccountsController(DatabaseContext context)
-    // {
-    //     _context = context;
-    // }
-
     private readonly IService<AppUser> _service;
+    private readonly IService<Order> _serviceOrder;
 
-    public AccountsController(IService<AppUser> service)
+    public AccountsController(IService<AppUser> service,IService<Order> serviceOrder)
     {
         _service = service;
-
+        _serviceOrder = serviceOrder;
     }
+
     [Authorize]
-    public async Task<IActionResult> Index() // <-- Artık "async Task" oldu
+    public async Task<IActionResult> Index()
     {
         // 1. Cookie'deki String Guid'i al
         var userGuidClaim = HttpContext.User.FindFirst("UserGuid");
@@ -33,7 +29,6 @@ public class AccountsController : Controller
         if (userGuidClaim == null) return RedirectToAction("SignIn");
 
         // 2. String'i C# GUID nesnesine çevir
-        // (Bunu yine dışarıda yapıyoruz ki veritabanı yorulmasın/hata vermesin)
         if (!Guid.TryParse(userGuidClaim.Value, out Guid guidFromCookie))
         {
             await HttpContext.SignOutAsync();
@@ -41,14 +36,12 @@ public class AccountsController : Controller
         }
 
         // 3. SERVICE İLE ÇAĞIRMA (Async)
-        // _context.AppUsers.FirstOrDefault(...) YERİNE:
-        // await _service.GetAsync(...) kullanıyoruz.
         AppUser user = await _service.GetAsync(p => p.UserGuid == guidFromCookie);
 
         // 4. Kullanıcı kontrolü
         if (user is null)
         {
-            await HttpContext.SignOutAsync(); // SignOut da async oldu
+            await HttpContext.SignOutAsync();
             return RedirectToAction("SignIn");
         }
 
@@ -66,7 +59,7 @@ public class AccountsController : Controller
     }
 
 
-[HttpPost] // Bunu eklemeyi unutma
+    [HttpPost]
     [Authorize]
     public async Task<IActionResult> Index(UserEditViewModel model)
     {
@@ -74,7 +67,7 @@ public class AccountsController : Controller
         {
             try
             {
-                // 1. GUID ALMA VE GÜVENLİK (Aynı mantık korunuyor)
+                // 1. GUID ALMA VE GÜVENLİK
                 var userGuidClaim = HttpContext.User.FindFirst("UserGuid");
                 if (userGuidClaim == null) return RedirectToAction("SignIn");
 
@@ -85,7 +78,6 @@ public class AccountsController : Controller
                 }
 
                 // 2. VERİYİ SERVİSTEN ÇEKME (ASYNC)
-                // _context.AppUsers.FirstOrDefault(...) YERİNE:
                 AppUser user = await _service.GetAsync(p => p.UserGuid == guidFromCookie);
 
                 if (user is not null)
@@ -95,21 +87,17 @@ public class AccountsController : Controller
                     user.Surname = model.Surname;
                     user.Email = model.Email;
                     user.Phone = model.Phone;
-                    
-                    // Şifre boş gelirse eski şifreyi koru (Opsiyonel Güvenlik Önlemi)
+
+                    // Şifre boş gelirse eski şifreyi koru
                     if (!string.IsNullOrEmpty(model.Password))
                     {
                         user.Password = model.Password;
                     }
-                    
-                    // 3. GÜNCELLEME VE KAYDETME (ASYNC)
-                    // _context.AppUsers.Update(user) YERİNE:
-                    _service.Update(user); 
 
-                    // _context.SaveChanges() YERİNE:
+                    // 3. GÜNCELLEME VE KAYDETME (ASYNC)
+                    _service.Update(user);
                     var result = await _service.SaveChangesAsync();
 
-                    // Kullanıcı bir şey değiştirdiyse mesaj ver
                     if (result > 0)
                     {
                         TempData["Message"] = @"<div class='alert alert-success alert-dismissible fade show rounded-0' role='alert'>
@@ -121,29 +109,59 @@ public class AccountsController : Controller
                     }
                     else
                     {
-                        // Hiçbir değişiklik yapmadan kaydet'e bastıysa
                         TempData["Message"] = @"<div class='alert alert-info alert-dismissible fade show rounded-0' role='alert'>
                             Değişiklik yapılmadı.
                             <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
                         </div>";
-                         return RedirectToAction("Index");
+                        return RedirectToAction("Index");
                     }
                 }
             }
             catch (Exception ex)
             {
-                // Hata mesajını loglayabilirsin: Console.WriteLine(ex.Message);
                 ModelState.AddModelError("", "Güncelleme sırasında bir hata oluştu!");
             }
         }
         return View(model);
     }
 
-
-    public IActionResult SignIn()
+    // --- DEĞİŞİKLİK YAPILAN TEK YER BURASI (SIGNIN GET METODU) ---
+    [HttpGet]
+    public IActionResult SignIn(string returnUrl = null)
     {
-        return View();
+        // Yönlendirme Kontrolü ve ViewBag Doldurma İşlemi
+        if (!string.IsNullOrEmpty(returnUrl))
+        {
+            if (returnUrl.Contains("/Checkout", StringComparison.OrdinalIgnoreCase))
+            {
+                ViewBag.AlertMessage = "Siparişinizi tamamlayabilmek için giriş yapmanız veya hesap oluşturmanız gerekmektedir.";
+                ViewBag.AlertType = "info";
+                ViewBag.AlertIcon = "bi-bag-check-fill";
+            }
+            else if (returnUrl.Contains("/Admin", StringComparison.OrdinalIgnoreCase))
+            {
+                ViewBag.AlertMessage = "Yönetim paneline erişmek için yetkili bir hesapla giriş yapmalısınız.";
+                ViewBag.AlertType = "danger";
+                ViewBag.AlertIcon = "bi-shield-lock-fill";
+            }
+            else
+            {
+                ViewBag.AlertMessage = "Görüntülemeye çalıştığınız sayfaya erişmek için lütfen giriş yapın.";
+                ViewBag.AlertType = "warning";
+                ViewBag.AlertIcon = "bi-exclamation-triangle-fill";
+            }
+        }
+
+        // ReturnUrl verisini Frontend'deki hidden input'a göndermek için modeli dolduruyoruz
+        var model = new LoginViewModel
+        {
+            ReturnUrl = returnUrl
+        };
+
+        return View(model);
     }
+    // --------------------------------------------------------------
+
     [HttpPost]
     public async Task<IActionResult> SignInAsync(LoginViewModel loginViewModel)
     {
@@ -153,7 +171,7 @@ public class AccountsController : Controller
             {
                 var account = await _service.GetAsync(p => p.Email == loginViewModel.Email && p.Password == loginViewModel.Password && p.isActive);
                 if (account == null)
-                { 
+                {
                     ModelState.AddModelError("", "Giriş Başarısız!");
                 }
                 else
@@ -188,6 +206,7 @@ public class AccountsController : Controller
     {
         return View();
     }
+
     [HttpPost]
     public async Task<IActionResult> SignUpAsync(AppUser appUser)
     {
@@ -202,10 +221,38 @@ public class AccountsController : Controller
         return View(appUser);
 
     }
+
     public async Task<IActionResult> SignOutAsync()
     {
         await HttpContext.SignOutAsync();
         return RedirectToAction("SignIn");
     }
-}
+    [Authorize]
+    public async Task<IActionResult> MyOrders()
+    {
+        // 1. Cookie'deki String Guid'i al
+        var userGuidClaim = HttpContext.User.FindFirst("UserGuid");
 
+        if (userGuidClaim == null) return RedirectToAction("SignIn");
+
+        // 2. String'i C# GUID nesnesine çevir
+        if (!Guid.TryParse(userGuidClaim.Value, out Guid guidFromCookie))
+        {
+            await HttpContext.SignOutAsync();
+            return RedirectToAction("SignIn");
+        }
+
+        // 3. SERVICE İLE ÇAĞIRMA (Async)
+        AppUser user = await _service.GetAsync(p => p.UserGuid == guidFromCookie);
+
+        // 4. Kullanıcı kontrolü
+        if (user is null)
+        {
+            await HttpContext.SignOutAsync();
+            return RedirectToAction("SignIn");
+        }
+        var model = _serviceOrder.GetQueryable().Where(p=>p.AppUserId == user.Id).Include(p=>p.OrderLines).ThenInclude(p=>p.Product);
+        return View();
+    }
+
+}

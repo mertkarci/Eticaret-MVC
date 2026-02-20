@@ -1,0 +1,75 @@
+@model IEnumerable<Eticaret.Core.Entities.Order>
+
+@{
+    ViewData["Title"] = "Siparişlerim";
+}
+
+<h1>Siparişlerim</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Id)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.TotalPrice)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.OrderDate)
+            </th>
+            <th>Sipariş Özeti</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Id)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.TotalPrice) TL
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.OrderDate)
+                </td>
+                <td>
+                    @item.OrderLines.Count Ürün
+                </td>
+            </tr>
+            <tr>
+                <td colspan="4">
+                    <table class="table table-sm">
+                        <tr>
+                            <table class="table table-borderless border-bottom">
+                                <thead class="border-bottom">
+                                    <tr>
+                                        <th>Ürün</th>
+                                        <th>Fiyat</th>
+                                        <th>Miktar</th>
+                                        <th>Toplam</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item2 in item.OrderLines)
+                                    {
+                                        <tr class="border-bottom">
+                                            <td class="py-3">
+                                                <img src="~/img/products/@item2.Product.Image" width="40" class="me-2" />
+                                                @item2.Product.Name
+                                            </td>
+                                            <td class="py-3">@item2.UnitPrice.ToString("c")</td>
+                                            <td class="py-3">@item2.Quantity</td>
+                                            <td class="py-3">@((item2.UnitPrice * item2.Quantity).ToString("c"))</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

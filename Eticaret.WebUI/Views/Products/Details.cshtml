@@ -3,78 +3,180 @@
     ViewData["Title"] = Model.Product.Name;
 }
 
-<section class="py-5">
-    <div class="container px-4 px-lg-5 my-5">
+<style>
+    .product-image-wrapper {
+        background: #ffffff;
+        border-radius: 1.5rem;
+        padding: 2rem;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+        transition: transform 0.3s ease;
+    }
+    .product-image-wrapper:hover {
+        transform: translateY(-5px);
+    }
+    .description-box {
+        background: #f8f9fa;
+        border-left: 4px solid #0d6efd;
+        border-radius: 0 1rem 1rem 0;
+        padding: 1.5rem;
+    }
+    .related-section {
+        background: linear-gradient(180deg, #ffffff 0%, #f8f9fa 100%);
+        border-top: 1px solid #eaeaea;
+    }
+    .qty-btn {
+        width: 40px;
+        font-weight: bold;
+        background: #f1f2f6;
+        border: none;
+        color: #2f3542;
+        transition: all 0.2s;
+    }
+    .qty-btn:hover {
+        background: #dfe4ea;
+    }
+    .qty-input {
+        border: none;
+        background: #f1f2f6;
+        font-weight: bold;
+        font-size: 1.1rem;
+    }
+    .qty-input:focus {
+        box-shadow: none;
+        background: #f1f2f6;
+    }
+.product-title {
+        /* Min: 1.25rem (Mobilde)
+           Dinamik: 1.5vw (Ekran büyüdükçe çok hafif artar)
+           Max: 1.6rem (Masaüstünde artık bu sınırı ASLA geçemez, daha kompakt durur)
+        */
+        font-size: clamp(1.25rem, 1.5vw, 1.6rem); 
+        line-height: 1.4;
+        letter-spacing: -0.5px;
         
-        <nav aria-label="breadcrumb" class="mb-4">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="/" class="text-decoration-none text-muted">Ana Sayfa</a></li>
+        /* Yeni Nesil CSS: Uzun başlıkları en dengeli şekilde alt satıra atar */
+        text-wrap: balance; 
+    }
+</style>
+
+<section class="py-5">
+    <div class="container px-4 px-lg-5 my-4">
+
+        <nav aria-label="breadcrumb" class="mb-5">
+            <ol class="breadcrumb bg-transparent p-0 m-0">
+                <li class="breadcrumb-item"><a href="/" class="text-decoration-none text-muted"><i class="bi bi-house-door"></i> Ana Sayfa</a></li>
                 <li class="breadcrumb-item"><a href="/Products" class="text-decoration-none text-muted">Ürünler</a></li>
-                <li class="breadcrumb-item active" aria-current="page">@Model.Product.Name</li>
+                <li class="breadcrumb-item active fw-bold text-dark" aria-current="page">@Model.Product.Name</li>
             </ol>
         </nav>
 
         <div class="row gx-5 align-items-center">
-            
-            <div class="col-md-6 mb-5 mb-md-0">
-                <div class="position-relative">
-                    <span class="badge bg-danger position-absolute top-0 start-0 m-3 px-3 py-2 rounded-pill shadow-sm" style="z-index: 10;">
-                        %20 İndirim
+
+            <div class="col-lg-6 mb-5 mb-lg-0">
+                <div class="position-relative product-image-wrapper border border-light">
+                    <span class="badge bg-danger position-absolute top-0 start-0 m-4 px-3 py-2 rounded-pill shadow" style="z-index: 10; font-size: 0.9rem; letter-spacing: 1px;">
+                        <i class="bi bi-tags-fill me-1"></i> %20 İNDİRİM
                     </span>
-                    
-                    <img class="card-img-top img-fluid w-100 rounded mb-5 mb-md-0 shadow-sm" 
+
+                    <img class="img-fluid w-100 rounded"
                          src="/img/products/@Model.Product.Image" 
                          alt="@Model.Product.Name"
-                         style="object-fit: contain; max-height: 600px;"> 
-                         </div>
+                         style="object-fit: contain; max-height: 550px;">
+                </div>
             </div>
 
-            <div class="col-md-6">
-                <div class="small text-muted mb-2">Ürün Kodu: <strong>@Model.Product.Id</strong></div> <h1 class="display-5 fw-bolder mb-3">@Model.Product.Name</h1>
+            <div class="col-lg-6 ps-lg-5">
+                <div class="badge bg-dark text-white mb-3 px-3 py-2 rounded-pill shadow-sm">
+                    Ürün Kodu: @Model.Product.Id
+                </div>
+                
+                <h1 class="product-title fw-bold mb-3 text-dark">@Model.Product.Name</h1>
 
-                <div class="fs-5 mb-4">
-                    <span class="text-decoration-line-through text-muted me-2">@(Model.Product.Price * 1.2m) ₺</span>
-                    <span class="fw-bold text-primary">@Model.Product.Price.ToString("c")</span>
+                <div class="d-flex align-items-end mb-4 bg-light p-3 rounded-4 border">
+                    <div class="me-3">
+                        <span class="d-block text-muted text-decoration-line-through small mb-1">Eski Fiyat: @(Model.Product.Price * 1.2m) ₺</span>
+                        <span class="display-6 fw-bold text-primary">@Model.Product.Price.ToString("c")</span>
+                    </div>
+                    <div class="pb-1">
+                        <span class="badge bg-success text-white px-2 py-1"><i class="bi bi-truck me-1"></i> Ücretsiz Kargo</span>
+                    </div>
                 </div>
 
-                <p class="lead mb-5">
-                    @Model.Product.Description
-                </p>
+                <div class="description-box mb-5 shadow-sm text-secondary">
+                    <h6 class="text-dark fw-bold mb-2"><i class="bi bi-info-circle me-2"></i>Ürün Açıklaması</h6>
+                    <p class="m-0" style="line-height: 1.7;">
+                        @Model.Product.Description
+                    </p>
+                </div>
 
-                <div class="d-flex">
-                    <div class="input-group me-3" style="max-width: 130px;">
-                        <button class="btn btn-outline-secondary" type="button" onclick="decreaseQty()">-</button>
-                        <input class="form-control text-center" id="inputQuantity" type="num" value="1" style="max-width: 3rem" />
-                        <button class="btn btn-outline-secondary" type="button" onclick="increaseQty()">+</button>
-                    </div>
+<div class="d-flex align-items-center gap-3">
                     
-                    <button class="btn btn-outline-dark flex-shrink-0" type="button">
-                        <i class="bi-cart-fill me-1"></i>
-                        Sepete Ekle
-                    </button>
+                    <form asp-action="Add" asp-controller="Cart" method="post" class="d-flex align-items-center gap-3 flex-fill">
+                        <input type="hidden" name="ProductId" value="@Model.Product.Id">
+                        
+                        <div class="input-group shadow-sm rounded-pill overflow-hidden flex-shrink-0" style="width: 130px; border: 1px solid #e2e8f0;">
+                            <button class="btn qty-btn" type="button" onclick="decreaseQty()">-</button>
+                            <input class="form-control text-center qty-input px-0" id="inputQuantity" name="quantity" type="number" value="1" min="1" readonly />
+                            <button class="btn qty-btn" type="button" onclick="increaseQty()">+</button>
+                        </div>
+
+                        <button class="btn btn-primary btn-lg flex-fill rounded-pill shadow" type="submit">
+                            <i class="bi bi-cart-plus-fill me-2 fs-5"></i> <span class="fw-bold">Hemen Sepete Ekle</span>
+                        </button>
+                    </form>
+
+                    <form asp-action="Add" asp-controller="Favourites" method="post" class="m-0">
+                        <input type="hidden" name="productId" value="@Model.Product.Id">
+                        <button class="btn btn-outline-danger shadow-sm rounded-circle d-flex align-items-center justify-content-center transition-all" 
+                                type="submit" 
+                                style="width: 54px; height: 54px;" 
+                                data-bs-toggle="tooltip" 
+                                data-bs-placement="top" 
+                                title="Favorilere Ekle">
+                            <i class="bi bi-heart fs-4"></i>
+                        </button>
+                    </form>
+
+                </div>
+                <div class="d-flex align-items-center mt-4 pt-4 border-top text-muted small">
+                    <div class="me-4"><i class="bi bi-shield-check text-success fs-5 me-1"></i> Güvenli Ödeme</div>
+                    <div class="me-4"><i class="bi bi-arrow-counterclockwise text-primary fs-5 me-1"></i> 14 Gün İade</div>
+                    <div><i class="bi bi-award text-warning fs-5 me-1"></i> 2 Yıl Garanti</div>
                 </div>
             </div>
         </div>
     </div>
 </section>
 
-<section class="py-5 bg-light">
-    <div class="container px-4 px-lg-5 mt-5">
-        <h2 class="fw-bolder mb-4">Bunları da Beğenebilirsiniz</h2>
+<section class="py-5 related-section">
+    <div class="container px-4 px-lg-5 mt-4">
+        <div class="d-flex justify-content-between align-items-end mb-5">
+            <div>
+                <span class="text-primary fw-bold text-uppercase tracking-wider small"><i class="bi bi-stars"></i> Sizin İçin Seçtiklerimiz</span>
+                <h2 class="fw-bold m-0 mt-2 display-6">Bunları da Beğenebilirsiniz</h2>
+            </div>
+            <a href="/Products" class="btn btn-outline-dark rounded-pill px-4 d-none d-md-inline-block">Tümünü İncele <i class="bi bi-arrow-right ms-1"></i></a>
+        </div>
+        
         <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
-            
             @if (Model.RelatedProducts != null && Model.RelatedProducts.Any())
             {
                 @foreach (var item in Model.RelatedProducts)
                 {
-                    <partial name="_ProductView" model="item" />
+                    <div class="col mb-5">
+                        <partial name="_ProductView" model="item" />
+                    </div>
                 }
             }
             else
             {
-                <div class="alert alert-warning w-100 text-center">Bu kategoride başka benzer ürün bulunamadı.</div>
+                <div class="col-12">
+                    <div class="alert alert-light border shadow-sm p-5 text-center rounded-4">
+                        <i class="bi bi-search text-muted display-4 mb-3 d-block"></i>
+                        <h4 class="text-secondary">Bu kategoride başka benzer ürün bulunamadı.</h4>
+                    </div>
+                </div>
             }
-
         </div>
     </div>
 </section>

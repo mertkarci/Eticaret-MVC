@@ -1,7 +1,7 @@
-@model IEnumerable<Eticaret.Core.Entities.AppUser>
+@model IEnumerable<Eticaret.Core.Entities.Address>
 
 @{
-    ViewData["Title"] = "Kullanıcılar";
+    ViewData["Title"] = "Adresler";
 }
 
 <p>
@@ -11,31 +11,29 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Name)
+                @Html.DisplayNameFor(model => model.Title)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Surname)
+                @Html.DisplayNameFor(model => model.City)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Email)
+                @Html.DisplayNameFor(model => model.District)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Phone)
-            </th>
-
-            <th>
-                @Html.DisplayNameFor(model => model.Username)
+                @Html.DisplayNameFor(model => model.OpenAddress)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.isActive)
+                @Html.DisplayNameFor(model => model.IsActive)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.isAdmin)
+                @Html.DisplayNameFor(model => model.IsBillingAddress)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.CreateDate)
+                @Html.DisplayNameFor(model => model.IsDeliveryAddress)
             </th>
-
+            <th>
+                @Html.DisplayNameFor(model => model.AppUser)
+            </th>
             <th></th>
         </tr>
     </thead>
@@ -43,30 +41,29 @@
 @foreach (var item in Model) {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.Name)
+                @Html.DisplayFor(modelItem => item.Title)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Surname)
+                @Html.DisplayFor(modelItem => item.City)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Email)
+                @Html.DisplayFor(modelItem => item.District)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Phone)
+                @Html.DisplayFor(modelItem => item.OpenAddress)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Username)
+                @Html.DisplayFor(modelItem => item.IsActive)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.isActive)
+                @Html.DisplayFor(modelItem => item.IsBillingAddress)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.isAdmin)
+                @Html.DisplayFor(modelItem => item.IsDeliveryAddress)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.CreateDate)
+                @Html.DisplayFor(modelItem => item.AppUser.Email)
             </td>
-
             <td>
                 <a asp-action="Edit" class="btn btn-sm btn-primary" asp-route-id="@item.Id">Düzenle</a>
                 <a asp-action="Details" class="btn btn-sm btn-info" asp-route-id="@item.Id">Detaylar</a>

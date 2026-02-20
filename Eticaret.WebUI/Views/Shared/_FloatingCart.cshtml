@@ -1,0 +1,38 @@
+
+@{
+    ViewData["Title"] = "_FloatingCart";
+        int cartItemCount = 3; 
+}
+
+<style>
+    /* Sabit kalmasını sağlayan sihirli CSS */
+    .floating-cart-btn {
+        position: fixed;      /* Ekrana çiviler */
+        bottom: 30px;         /* Alttan boşluk */
+        right: 30px;          /* Sağdan boşluk */
+        z-index: 1050;        /* Diğer her şeyin üstünde görünmesini sağlar */
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;   /* Yuvarlak yapar */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform 0.2s; /* Üzerine gelince büyüme animasyonu için */
+    }
+
+    .floating-cart-btn:hover {
+        transform: scale(1.1); /* Fareyle üzerine gelince %10 büyür */
+    }
+</style>
+
+<a href="/Cart/Index" class="btn btn-primary shadow-lg floating-cart-btn">
+    <i class="bi bi-cart3" style="font-size: 1.5rem;"></i>
+    
+    @if(cartItemCount > 0)
+    {
+        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-light">
+            @cartItemCount
+            <span class="visually-hidden">Sepetteki Ürünler</span>
+        </span>
+    }
+</a>

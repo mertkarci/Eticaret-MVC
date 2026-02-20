@@ -1,57 +1,119 @@
 @model LoginViewModel
 @{
-  ViewData["Title"] = "SignIn";
+  ViewData["Title"] = "Giriş Yap";
 }
+
 <style>
-  .form-signin {
-    width: 100%;
-    max-width: 330px;
-    padding: 15px;
-    margin: auto;
+  /* Modern Form Tasarım Dokunuşları */
+  body {
+    background-color: #f8f9fa;
   }
 
-  .form-signin .checkbox {
-    font-weight: 400;
+  .login-card {
+    border-radius: 1.5rem;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
   }
 
-  .form-signin .form-floating:focus-within {
-    z-index: 2;
+  .form-floating>.form-control:focus~label,
+  .form-floating>.form-control:not(:placeholder-shown)~label {
+    color: #0d6efd;
+    font-weight: 600;
   }
 
-  .form-signin input[type="email"] {
-    margin-bottom: -1px;
-    border-bottom-right-radius: 0;
-    border-bottom-left-radius: 0;
+  .form-control {
+    border-radius: 0.75rem;
+    border: 1px solid #dee2e6;
+    padding: 1rem 0.75rem;
   }
 
-  .form-signin input[type="password"] {
-    margin-bottom: 10px;
-    border-top-left-radius: 0;
-    border-top-right-radius: 0;
+  .form-control:focus {
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+  }
+
+  .brand-icon-wrapper {
+    width: 70px;
+    height: 70px;
+    background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem auto;
+    box-shadow: 0 5px 15px rgba(13, 110, 253, 0.3);
   }
 </style>
-<main class="form-signin">
-  <form asp-action="SignIn">
-    <h1 class="h3 mb-3 fw-normal">Lütfen Giriş Yapın</h1>
-    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-    <div class="form-floating">
-      <input asp-for="Email" class="form-control" id="floatingInput" placeholder="name@example.com" />
-      <label for="floatingInput">E-mail</label>
-      <span asp-validation-for="Email" class="text-danger"></span>
+
+<div class="container py-4  d-flex flex-column justify-content-center align-items-center">
+  @if (ViewBag.AlertMessage != null)
+  {
+    <div class="alert alert-@ViewBag.AlertType d-flex align-items-center rounded-3 shadow-sm mb-2" role="alert">
+      <i class="bi @ViewBag.AlertIcon fs-4 me-3"></i>
+      <div class="small fw-medium">
+        @ViewBag.AlertMessage
+      </div>
     </div>
-    <div class="form-floating">
-      <input asp-for="Password" type="password" class="form-control" id="floatingPassword" placeholder="Password">
-      <label for="floatingPassword">Şifre</label>
-      <span asp-validation-for="Password" class="text-danger"></span>
+  }
+  <div class="col-12 col-md-8 col-lg-5 col-xl-4">
+
+    <div class="card login-card border-0 bg-white">
+      <div class="card-body p-4 p-sm-5">
+
+        <div class="brand-icon-wrapper">
+          <i class="bi bi-person-fill fs-1"></i>
+        </div>
+
+        <div class="text-center mb-4">
+          <h2 class="fw-bold text-dark mb-1">Hoş Geldiniz</h2>
+          <p class="text-muted">Devam etmek için hesabınıza giriş yapın.</p>
+        </div>
+
+
+        <form asp-action="SignIn" method="post">
+          <div asp-validation-summary="ModelOnly" class="alert alert-danger rounded-3 small"></div>
+
+          <input type="hidden" asp-for="ReturnUrl" />
+
+          <div class="form-floating mb-3">
+            <input asp-for="Email" type="email" class="form-control" id="floatingInput" placeholder="name@example.com"
+              required />
+            <label for="floatingInput">E-Posta Adresi</label>
+            <span asp-validation-for="Email" class="text-danger small mt-1 d-block"></span>
+          </div>
+
+          <div class="form-floating mb-3">
+            <input asp-for="Password" type="password" class="form-control" id="floatingPassword" placeholder="Şifre"
+              required>
+            <label for="floatingPassword">Şifre</label>
+            <span asp-validation-for="Password" class="text-danger small mt-1 d-block"></span>
+          </div>
+
+          <div class="d-flex justify-content-between align-items-center mb-4 small">
+            <div class="form-check">
+              <input asp-for="RememberMe" class="form-check-input shadow-sm" type="checkbox" id="RememberMe" />
+              <label class="form-check-label text-muted user-select-none" for="RememberMe">
+                Beni Hatırla
+              </label>
+            </div>
+
+            <a href="/Accounts/ForgotPassword" class="text-primary text-decoration-none fw-medium">Şifremi Unuttum?</a>
+          </div>
+
+          <button class="btn btn-primary btn-lg w-100 rounded-pill fw-bold shadow-sm" type="submit">
+            Giriş Yap <i class="bi bi-box-arrow-in-right ms-1"></i>
+          </button>
+        </form>
+
+      </div>
+
+      <div class="card-footer bg-light border-0 text-center py-4">
+        <span class="text-muted small">Hesabınız yok mu?</span>
+        <a asp-action="SignUp" asp-controller="Accounts" class="text-primary text-decoration-none fw-bold ms-1">
+          Hemen Kayıt Ol
+        </a>
+      </div>
     </div>
 
-    <div class="checkbox mb-3">
-      <label>
-        <input asp-for="RememberMe" type="checkbox" /> Beni Hatırla
-      </label>
-    </div>
-    <input type="hidden" asp-for="ReturnUrl" value="@Context.Request.Query["ReturnUrl"]"/>
-    <button class="w-100 btn btn-lg btn-primary" type="submit">Giriş Yap</button>
-    <p class="mt-5 mb-3 text-muted">© 2017–2021</p>
-  </form>
-</main>
+  </div>
+</div>
