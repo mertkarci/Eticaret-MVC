@@ -168,12 +168,13 @@ namespace Eticaret.WebUI.Controllers
             var order = new Order
             {
                 AppUserId = appUser.Id,
-                BillingAddress = BillingAddress,
-                DeliveryAddress = DeliveryAddress,
+                BillingAddress = $"{billingAddress.OpenAddress}{billingAddress.City}{billingAddress.District}",//BillingAddress,
+                DeliveryAddress = $"{deliveryAddress.OpenAddress}{deliveryAddress.City}{deliveryAddress.District}",//DeliveryAddress,
                 CustomerId = appUser.UserGuid.ToString(),
                 OrderDate = DateTime.Now,
                 OrderNumber = Guid.NewGuid().ToString(),
                 TotalPrice = cart.TotalPrice(),
+                OrderState = EnumOrderState.Waiting,
                 OrderLines = []
             };
 
@@ -185,6 +186,7 @@ namespace Eticaret.WebUI.Controllers
                     OrderId = order.Id,
                     Quantity = item.Quantity,
                     UnitPrice = item.Product.Price,
+
                 });
             }
 

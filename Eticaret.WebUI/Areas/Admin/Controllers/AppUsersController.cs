@@ -57,7 +57,7 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create( AppUser appUser)
+        public async Task<IActionResult> Create(AppUser appUser)
         {
             if (ModelState.IsValid)
             {
@@ -120,6 +120,7 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
         }
 
         // GET: Admin/AppUsers/Delete/5
+        // GET: Admin/AppUsers/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -129,6 +130,7 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
 
             var appUser = await _context.AppUsers
                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (appUser == null)
             {
                 return NotFound();
@@ -140,15 +142,48 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
         // POST: Admin/AppUsers/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(int id, bool isHardDelete = false)
         {
             var appUser = await _context.AppUsers.FindAsync(id);
+
             if (appUser != null)
             {
-                _context.AppUsers.Remove(appUser);
+                if (isHardDelete)
+                {
+                    // --- 1. SEÇENEK: HARD DELETE (Kalıcı Silme) ---
+                    // FOREIGN KEY hatası almamak için önce bu kullanıcıya ait diğer verileri silmeliyiz.
+
+                    // Kullanıcının adreslerini bul ve sil (DbSet adın 'Addresses' değilse kendine göre düzelt)
+                    var userAddresses = _context.Addresses.Where(a => a.AppUserId == id);
+                    if (userAddresses.Any())
+                    {
+                        _context.Addresses.RemoveRange(userAddresses);
+                    }
+
+                    // Kullanıcının siparişlerini bul ve sil (DbSet adın 'Orders' değilse düzelt)
+                    // Not: Siparişlerin içindeki OrderLines tabloları cascade delete ile otomatik silinmiyorsa, onları da bulup silmen gerekebilir.
+                    var userOrders = _context.Orders.Where(o => o.AppUserId == id);
+                    if (userOrders.Any())
+                    {
+                        _context.Orders.RemoveRange(userOrders);
+                    }
+
+                    // Bağlantılı verileri temizledikten sonra artık kullanıcıyı kökünden silebiliriz.
+                    _context.AppUsers.Remove(appUser);
+                }
+                else
+                {
+                    // --- 2. SEÇENEK: SOFT DELETE (Pasife Çekme) ---
+                    // Veritabanından silmek yerine durumu pasif yapıyoruz. Muhasebe ve sipariş geçmişi bozulmaz.
+                    appUser.isActive = false;
+
+                    _context.AppUsers.Update(appUser);
+                }
+
+                // Yapılan işlemi (Silme veya Güncelleme) veritabanına kaydet
+                await _context.SaveChangesAsync();
             }
 
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 

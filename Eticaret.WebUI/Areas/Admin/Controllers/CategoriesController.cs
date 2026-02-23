@@ -38,7 +38,6 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
             }
 
             var category = await _context.Categories
-            
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (category == null)
             {
@@ -51,24 +50,30 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
         // GET: Admin/Categories/Create
         public async Task<IActionResult> CreateAsync()
         {
-            ViewBag.Kategoriler = new SelectList(_context.Categories, "Id", "Name");
+            // ViewBag.Kategoriler yerine ViewBag.Categories yaptık ki View ile tam eşleşsin.
+            ViewBag.Categories = new SelectList(await _context.Categories.ToListAsync(), "Id", "Name");
             return View();
         }
 
         // POST: Admin/Categories/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Category category, IFormFile Image)
         {
             if (ModelState.IsValid)
             {
-                category.Image = await FileHelper.FileLoaderAsync(Image,"/img/categories/");
+                if (Image != null)
+                {
+                    category.Image = await FileHelper.FileLoaderAsync(Image, "/img/categories/");
+                }
+                
                 _context.Add(category);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+            
+            // Model hatalıysa sayfa geri dönerken dropdown boşalmasın diye tekrar listeyi gönderiyoruz
+            ViewBag.Categories = new SelectList(await _context.Categories.ToListAsync(), "Id", "Name", category.ParentId);
             return View(category);
         }
 
@@ -85,12 +90,15 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
             {
                 return NotFound();
             }
+
+            // Kategori kendi kendisinin üst kategorisi olamaz (c.Id != id)
+            var categoryList = await _context.Categories.Where(c => c.Id != id).ToListAsync();
+            ViewBag.Categories = new SelectList(categoryList, "Id", "Name", category.ParentId);
+
             return View(category);
         }
 
         // POST: Admin/Categories/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, Category category, IFormFile? Image, bool cbResmiSil)
@@ -104,14 +112,13 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
             {
                 try
                 {
-                    if(cbResmiSil)
+                    if (cbResmiSil)
                     {
                         category.Image = string.Empty;
                     }
-                    if(Image != null)
+                    if (Image != null)
                     {
-                        
-                    category.Image = await FileHelper.FileLoaderAsync(Image,"/img/categories/");
+                        category.Image = await FileHelper.FileLoaderAsync(Image, "/img/categories/");
                     }
                     _context.Update(category);
                     await _context.SaveChangesAsync();
@@ -129,6 +136,11 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
+
+            // İşlem başarısız olursa ve sayfa geri yüklenecekse, dropdown'ı tekrar doldur (Kendisi hariç)
+            var categoryList = await _context.Categories.Where(c => c.Id != id).ToListAsync();
+            ViewBag.Categories = new SelectList(categoryList, "Id", "Name", category.ParentId);
+
             return View(category);
         }
 
@@ -158,9 +170,9 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
             var category = await _context.Categories.FindAsync(id);
             if (category != null)
             {
-                if(!string.IsNullOrEmpty(category.Image))
+                if (!string.IsNullOrEmpty(category.Image))
                 {
-                    FileHelper.FileRemover(category.Image,"/wwwroot/img/categories/");
+                    FileHelper.FileRemover(category.Image, "/wwwroot/img/categories/");
                 }
                 _context.Categories.Remove(category);
             }

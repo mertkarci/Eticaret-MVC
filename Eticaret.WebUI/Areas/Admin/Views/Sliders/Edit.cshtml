@@ -7,9 +7,10 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Edit"enctype="multipart/form-data">
+        <form asp-action="Edit" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="Image" />
             <div class="form-group">
                 <label asp-for="Title" class="control-label"></label>
                 <input asp-for="Title" class="form-control" />
@@ -24,12 +25,12 @@
                 <label asp-for="Image" class="control-label"></label>
                 <input asp-for="Image" class="form-control" type="file" />
                 <span asp-validation-for="Image" class="text-danger"></span>
-                 @if(Model.Image != null && !string.IsNullOrWhiteSpace(Model.Image))
+                @if (Model.Image != null && !string.IsNullOrWhiteSpace(Model.Image))
                 {
-                    <img src="/img/sliders/@Model.Image" alt="" height="30"/>
-                <label class="form-check-label">
-                    @Html.CheckBox("cbResmiSil") Logoyu Sil
-                </label>
+                    <img src="/img/sliders/@Model.Image" alt="" height="30" />
+                    <label class="form-check-label">
+                        @Html.CheckBox("cbResmiSil") Logoyu Sil
+                    </label>
                 }
                 else
                 {
@@ -53,5 +54,7 @@
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

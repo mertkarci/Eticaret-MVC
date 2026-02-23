@@ -18,7 +18,12 @@
             <th>
                 @Html.DisplayNameFor(model => model.OrderDate)
             </th>
-            <th>Sipariş Özeti</th>
+            <th>
+                Sipariş Özeti
+            </th>
+            @Html.DisplayNameFor(model => model.OrderState)
+            </th>
+            <th>
         </tr>
     </thead>
     <tbody>
@@ -36,6 +41,9 @@
                 </td>
                 <td>
                     @item.OrderLines.Count Ürün
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.OrderState)
                 </td>
             </tr>
             <tr>
