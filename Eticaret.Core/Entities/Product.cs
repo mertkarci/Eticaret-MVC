@@ -16,10 +16,16 @@ public class Product : IEntity
 
     [Display(Name ="Kategori ID")]
     public int? CategoryId {get; set;}
+    
+    // View'da çağırdığın Navigation Property burası, etiketi buraya ekledik.
+    [Display(Name ="Kategori")] 
     public Category? Category {get; set;} 
 
     [Display(Name ="Marka ID")]
     public int BrandId {get; set;}
+    
+    // Aynı şekilde Brand için de etiketi ekledik.
+    [Display(Name ="Marka")] 
     public Brand? Brand {get; set;}
 
     [Display(Name ="Fiyat")]
@@ -32,13 +38,20 @@ public class Product : IEntity
     public string? Description {get; set;}
 
     [Display(Name ="Ürün Adı")]
-    public string?Name {get; set;}
+    public string? Name {get; set;}
 
     [Display(Name ="Ürün Görseli")]
     public string? Image {get; set;}
+    
+    // Eksik olan etiketleri ekledik
+    [Display(Name ="Aktif mi?")]
     public bool isActive {get; set;}
+    
+    [Display(Name ="Anasayfada Göster")]
     public bool isHome {get; set;}
 
     [Display(Name ="Kayıt Tarihi"), ScaffoldColumn(false)]
-    public DateTime CreateDate {get; set;}
+    public DateTime CreateDate {get; set;} = DateTime.Now;
+    public IList<ProductImage>? ProductImages {get; set;}
+    
 }

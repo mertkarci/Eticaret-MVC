@@ -54,6 +54,7 @@ namespace Eticaret.WebUI.Controllers
             var product = await _service.GetQueryable()
                 .Include(p => p.Brand)
                 .Include(p => p.Category)
+                .Include(p => p.ProductImages)
                 .FirstOrDefaultAsync(m => m.Id == id);
 
             if (product == null)

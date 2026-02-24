@@ -2,18 +2,15 @@
 @{
     ViewData["Title"] = "Sepetim";
 
-    // Kargo ve Toplam Fiyat Hesaplamalarını Razor içinde yapıp HTML'i temiz tutuyoruz
     decimal freeShippingThreshold = 1000m; // Ücretsiz kargo barajı
     decimal shippingCost = Model.TotalPrice >= freeShippingThreshold ? 0 : 99m;
     decimal finalTotal = Model.TotalPrice + shippingCost;
 
-    // İlerleme çubuğu yüzdesi
     decimal progress = Model.TotalPrice >= freeShippingThreshold ? 100 : (Model.TotalPrice / freeShippingThreshold) * 100;
     decimal remainingForFreeShipping = freeShippingThreshold - Model.TotalPrice;
 }
 
 <style>
-    /* Masaüstünde sağdaki özet kutusunun kaydırırken ekranda sabit kalması için */
     .sticky-summary {
         position: sticky;
         top: 2rem;

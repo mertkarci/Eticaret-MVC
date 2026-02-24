@@ -1,4 +1,5 @@
 using System.Reflection;
+using Eticaret.Core;
 using Eticaret.Core.Entities;
 using Microsoft.EntityFrameworkCore;
 
@@ -23,6 +24,7 @@ public class DatabaseContext : DbContext
     public DbSet<Address> Addresses { get; set; }
     public DbSet<Order> Orders { get; set; }
     public DbSet<OrderLine> OrderLines { get; set; }
+    public DbSet<ProductImage> ProductImages { get; set; }
 
 
 
