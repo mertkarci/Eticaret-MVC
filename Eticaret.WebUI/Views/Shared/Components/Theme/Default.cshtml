@@ -1,0 +1,26 @@
+<!-- Dosya Yolu: /Users/mesut/Desktop/Eticaret/Eticaret.WebUI/Views/Shared/Components/Theme/Default.cshtml -->
+<!-- (Bu yeni bir dosyadır, klasör yapısını oluşturun: Views/Shared/Components/Theme/Default.cshtml) -->
+
+@model Eticaret.Core.Entities.ThemeSetting
+
+<style>
+    :root {
+        --main-color: @Model.MainColor;
+        --secondary-color: @Model.SecondaryColor;
+        --bg-color: @Model.BackgroundColor;
+        --text-color: @Model.TextColor;
+        --navbar-bg: @Model.NavbarBgColor;
+        --footer-bg: @Model.FooterBgColor;
+        
+        /* Bootstrap Override (Opsiyonel: Bootstrap değişkenlerini de eziyoruz) */
+        --bs-primary: @Model.MainColor;
+        --bs-body-bg: @Model.BackgroundColor;
+        --bs-body-color: @Model.TextColor;
+    }
+
+    /* Temel Body Ayarı */
+    body {
+        background-color: var(--bg-color);
+        color: var(--text-color);
+    }
+</style>

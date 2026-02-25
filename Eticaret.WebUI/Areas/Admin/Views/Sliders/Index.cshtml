@@ -1,52 +1,59 @@
 @model IEnumerable<Eticaret.Core.Entities.Slider>
 
 @{
-    ViewData["Title"] = "Slider";
+    ViewData["Title"] = "Slider Yönetimi";
 }
 
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <a asp-action="Create" class="btn btn-create shadow-sm">
+        <i class="bi bi-plus-lg me-1"></i> Yeni Slider Ekle
+    </a>
+</div>
 
-<p>
-    <a asp-action="Create"class="btn btn-outline-primary">Yeni Slider Oluştur</a>
-</p>
-<table class="table" >
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Title)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Description)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Image)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Link)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Title)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Description)
-            </td>
-            <td>
-                <img src="/img/sliders/@Html.DisplayFor(modelItem => item.Image)" height="100">
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Link)
-            </td>
-            <td>
-                <a asp-action="Edit" class="btn btn-sm btn-primary" asp-route-id="@item.Id">Düzenle</a>
-                <a asp-action="Details" class="btn btn-sm btn-info" asp-route-id="@item.Id">Detaylar</a>
-                <a asp-action="Delete" class="btn btn-sm btn-danger" asp-route-id="@item.Id">Sil</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+<div class="card card-admin">
+    <div class="card-body">
+        <table id="datatablesSimple" class="table-admin table-hover">
+            <thead>
+                <tr>
+                    <th class="ps-4">Görsel</th>
+                    <th>@Html.DisplayNameFor(model => model.Title)</th>
+                    <th>@Html.DisplayNameFor(model => model.Link)</th>
+                    <th class="text-end pe-4">İşlemler</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td class="ps-4">
+                            @if (!string.IsNullOrEmpty(item.Image))
+                            {
+                                <img src="/img/sliders/@item.Image" alt="@item.Title" class="rounded shadow-sm" style="width: 100px; height: 40px; object-fit: cover;" />
+                            }
+                            else
+                            {
+                                <span class="text-muted small">Görsel Yok</span>
+                            }
+                        </td>
+                        <td class="fw-bold text-dark">@Html.DisplayFor(modelItem => item.Title)</td>
+                        <td>
+                            <a href="@item.Link" target="_blank" class="text-decoration-none text-truncate d-block" style="max-width: 200px;">
+                                @Html.DisplayFor(modelItem => item.Link)
+                            </a>
+                        </td>
+                        <td class="text-end pe-4">
+                            <div class="action-buttons">
+                                <a asp-action="Edit" class="btn btn-outline-primary" asp-route-id="@item.Id" title="Düzenle">
+                                    <i class="bi bi-pencil-square"></i>
+                                </a>
+                                <a asp-action="Delete" class="btn btn-outline-danger" asp-route-id="@item.Id" title="Sil">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

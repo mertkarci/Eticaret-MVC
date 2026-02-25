@@ -1,0 +1,108 @@
+@model Eticaret.Core.Entities.ThemeSetting
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Create</h1>
+
+<h4>ThemeSetting</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-3">
+                <label asp-for="MainColor" class="control-label"></label>
+
+                <div class="color-wrapper d-flex align-items-center">
+                    <input asp-for="MainColor" type="color" class="form-control form-control-color me-2 color-input"
+                        title="Renk Seçin" />
+
+                    <span class="font-monospace fw-bold text-secondary text-uppercase color-display"></span>
+                </div>
+                <span asp-validation-for="MainColor" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-3">
+                <label asp-for="SecondaryColor" class="control-label"></label>
+
+                <div class="color-wrapper d-flex align-items-center">
+                    <input asp-for="SecondaryColor" type="color"
+                        class="form-control form-control-color me-2 color-input" title="Renk Seçin" />
+
+                    <span class="font-monospace fw-bold text-secondary text-uppercase color-display"></span>
+                </div>
+                <span asp-validation-for="SecondaryColor" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-3">
+                <label asp-for="BackgroundColor" class="control-label"></label>
+
+                <div class="color-wrapper d-flex align-items-center">
+                    <input asp-for="BackgroundColor" type="color"
+                        class="form-control form-control-color me-2 color-input" title="Renk Seçin" />
+
+                    <span class="font-monospace fw-bold text-secondary text-uppercase color-display"></span>
+                </div>
+                <span asp-validation-for="BackgroundColor" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-3">
+                <label asp-for="TextColor" class="control-label"></label>
+
+                <div class="color-wrapper d-flex align-items-center">
+                    <input asp-for="TextColor" type="color" class="form-control form-control-color me-2 color-input"
+                        title="Renk Seçin" />
+
+                    <span class="font-monospace fw-bold text-secondary text-uppercase color-display"></span>
+                </div>
+                <span asp-validation-for="TextColor" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-3">
+                <label asp-for="NavbarBgColor" class="control-label"></label>
+
+                <div class="color-wrapper d-flex align-items-center">
+                    <input asp-for="NavbarBgColor" type="color" class="form-control form-control-color me-2 color-input"
+                        title="Renk Seçin" />
+
+                    <span class="font-monospace fw-bold text-secondary text-uppercase color-display"></span>
+                </div>
+                <span asp-validation-for="NavbarBgColor" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-3">
+                <label asp-for="FooterBgColor" class="control-label"></label>
+
+                <div class="color-wrapper d-flex align-items-center">
+                    <input asp-for="FooterBgColor" type="color" class="form-control form-control-color me-2 color-input"
+                        title="Renk Seçin" />
+
+                    <span class="font-monospace fw-bold text-secondary text-uppercase color-display"></span>
+                </div>
+                <span asp-validation-for="FooterBgColor" class="text-danger"></span>
+            </div>
+            <div class="form-group form-check">
+                <label class="form-check-label">
+                    <input class="form-check-input" asp-for="IsActive" /> @Html.DisplayNameFor(model => model.IsActive)
+                </label>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Oluştur" class="btn btn-primary mt-2" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index" class="btn btn-danger mt-2">Geri Dön</a>
+</div>
+
+@section Scripts {
+    <script src="~/admin/js/theme-colors.js"></script>
+
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

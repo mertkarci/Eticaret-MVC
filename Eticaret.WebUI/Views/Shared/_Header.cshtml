@@ -32,12 +32,14 @@
             .navbar-collapse .navbar-nav {
                 padding-left: 0;
                 padding-right: 0;
+                align-items: flex-end; /* Menü öğelerini sağa yasla */
             }
             .navbar-collapse .navbar-nav .nav-link,
             .navbar-collapse .navbar-nav .dropdown-toggle,
             .navbar-collapse .navbar-nav .dropdown-item {
                  padding-left: 1rem !important; 
-                 padding-right: 1rem !important;
+                 padding-right: 0 !important; /* Sağ boşluğu sıfırla */
+                 text-align: right; /* Metni sağa yasla */
             }
              .navbar-collapse .navbar-nav ul {
                 padding-left: 0 !important;
@@ -70,15 +72,16 @@
         .cart-item-row:hover { background-color: #f8f9fa; }
         
         .nav-badge {
-            font-size: 0.65rem;
-            transform: translate(-30%, -20%) !important;
+            font-size: 0.55rem; /* Font küçültüldü */
+            padding: 0.25em 0.45em; /* Boyut kompaktlaştırıldı */
+            transform: translate(-50%, -10%) !important;
             box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
         
         .fav-icon:hover i { color: #ff6b6b; transition: color 0.2s ease-in-out; }
 
         @@media (max-width: 576px) {
-            .cart-dropdown-menu { width: 300px; }
+            .cart-dropdown-menu { width: 92vw; max-width: 340px; }
             .mobile-icon-size { font-size: 1.25rem !important; } 
         }
     </style>

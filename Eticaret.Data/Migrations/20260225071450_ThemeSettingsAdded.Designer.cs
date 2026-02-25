@@ -3,6 +3,7 @@ using System;
 using Eticaret.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Eticaret.Data.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    partial class DatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20260225071450_ThemeSettingsAdded")]
+    partial class ThemeSettingsAdded
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.0");
@@ -512,56 +515,6 @@ namespace Eticaret.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("ThemeSettings");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            BackgroundColor = "#f8f9fa",
-                            FooterBgColor = "#343a40",
-                            IsActive = true,
-                            MainColor = "#0d6efd",
-                            Name = "Varsayılan Tema",
-                            NavbarBgColor = "#ffffff",
-                            SecondaryColor = "#6c757d",
-                            TextColor = "#212529"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            BackgroundColor = "#F8F9FA",
-                            FooterBgColor = "#1B4332",
-                            IsActive = false,
-                            MainColor = "#C1121F",
-                            Name = "Yılbaşı Teması",
-                            NavbarBgColor = "#2D6A4F",
-                            SecondaryColor = "#2D6A4F",
-                            TextColor = "#1B1B1B"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            BackgroundColor = "#0F172A",
-                            FooterBgColor = "#020617",
-                            IsActive = true,
-                            MainColor = "#6366F1",
-                            Name = "Dark Modern",
-                            NavbarBgColor = "#020617",
-                            SecondaryColor = "#22C55E",
-                            TextColor = "#E5E7EB"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            BackgroundColor = "#F1F8F4",
-                            FooterBgColor = "#E8F5E9",
-                            IsActive = true,
-                            MainColor = "#4CAF50",
-                            Name = "Soft Nature",
-                            NavbarBgColor = "#FFFFFF",
-                            SecondaryColor = "#A3D9A5",
-                            TextColor = "#263238"
-                        });
                 });
 
             modelBuilder.Entity("Eticaret.Core.Entities.Address", b =>

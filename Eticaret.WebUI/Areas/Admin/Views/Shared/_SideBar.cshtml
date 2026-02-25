@@ -1,51 +1,61 @@
             <div id="layoutSidenav_nav">
-                <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
+                <nav class="sb-sidenav accordion sb-sidenav-pastel" id="sidenavAccordion">
                     <div class="sb-sidenav-menu">
                         <div class="nav">
                             <div class="sb-sidenav-menu-heading">Ana</div>
                             <a class="nav-link" href="/Admin">
-                                <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
+                                <div class="sb-nav-link-icon"><i class="fas fa-home"></i></div>
                                 Ana Sayfa
                             </a>
                             <a class="nav-link" href="/Admin/AppUsers">
-                                <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
+                                <div class="sb-nav-link-icon"><i class="fas fa-users"></i></div>
                                 Kullanıcı Yönetimi
                             </a>
                             <a class="nav-link" href="/Admin/Brands">
-                                <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
+                                <div class="sb-nav-link-icon"><i class="fas fa-tags"></i></div>
                                 Marka Yönetimi
                             </a>
                             <a class="nav-link" href="/Admin/Categories">
-                                <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
+                                <div class="sb-nav-link-icon"><i class="fas fa-th-list"></i></div>
                                 Kategori Yönetimi
                             </a>
                             <a class="nav-link" href="/Admin/Addresses">
-                                <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
+                                <div class="sb-nav-link-icon"><i class="fas fa-map-marked-alt"></i></div>
                                 Adres Yönetimi
                             </a>
-                            <a class="nav-link" href="/Admin/Products">
-                                <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
+                            
+                            <!-- Ürün Yönetimi Dropdown -->
+                            <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseProducts" aria-expanded="false" aria-controls="collapseProducts">
+                                <div class="sb-nav-link-icon"><i class="fas fa-box-open"></i></div>
                                 Ürün Yönetimi
+                                <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
                             </a>
-                            <a class="nav-link" href="/Admin/ProductImages">
-                                <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
-                                Ürün Görsel Yönetimi
-                            </a>
+                            <div class="collapse" id="collapseProducts" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
+                                <nav class="sb-sidenav-menu-nested nav">
+                                    <a class="nav-link" href="/Admin/Products">Ürün Listesi</a>
+                                    <a class="nav-link" href="/Admin/ProductImages">Ürün Görselleri</a>
+                                </nav>
+                            </div>
+
                             <a class="nav-link" href="/Admin/News">
-                                <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
+                                <div class="sb-nav-link-icon"><i class="fas fa-bullhorn"></i></div>
                                 Kampanya ve Duyurular
                             </a>
                             <a class="nav-link" href="/Admin/Contacts">
-                                <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
+                                <div class="sb-nav-link-icon"><i class="fas fa-envelope-open-text"></i></div>
                                 İletişim Formları
                             </a>
                             <a class="nav-link" href="/Admin/Sliders">
-                                <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
+                                <div class="sb-nav-link-icon"><i class="fas fa-images"></i></div>
                                 Sliderlar
                             </a>
                             <a class="nav-link" href="/Admin/Orders">
-                                <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
+                                <div class="sb-nav-link-icon"><i class="fas fa-shopping-cart"></i></div>
                                 Siparişler
+                            </a>
+                            <a class="nav-link" href="/Admin/ThemeSettings">
+                                <div class="sb-nav-link-icon"><i class="fas fa-paint-brush"></i></div>
+                                Temayı Düzenle
                             </a>
                         </div>
                     </div>

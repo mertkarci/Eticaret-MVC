@@ -5,16 +5,15 @@
 }
 
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2 class="fw-bold text-dark m-0">Siparişler</h2>
-    <a asp-action="Create" class="btn btn-primary shadow-sm fw-medium">
-        <i class="bi bi-plus-lg me-1"></i> Yeni Sipariş Oluştur
+    <a asp-action="Create" class="btn btn-create shadow-sm">
+        <i class="bi bi-plus-lg me-1"></i> Yeni Sipariş Ekle
     </a>
 </div>
 
-<div class="card border-0 shadow-sm rounded-4 overflow-hidden">
-    <div class="table-responsive">
-        <table class="table table-hover align-middle mb-0">
-            <thead class="bg-light text-secondary">
+<div class="card card-admin">
+    <div class="card-body">
+        <table id="datatablesSimple" class="table-admin table-hover">
+            <thead>
                 <tr>
                     <th class="ps-4 py-3">@Html.DisplayNameFor(model => model.OrderNumber)</th>
                     <th class="py-3">Müşteri</th>
@@ -24,7 +23,7 @@
                     <th class="pe-4 py-3 text-end">İşlemler</th>
                 </tr>
             </thead>
-            <tbody class="border-top-0">
+            <tbody>
                 @foreach (var item in Model) {
                     <tr>
                         <td class="ps-4 py-3 fw-bold text-dark">
@@ -63,14 +62,14 @@
                             }
                         </td>
                         <td class="pe-4 py-3 text-end">
-                            <div class="btn-group shadow-sm" role="group">
-                                <a asp-action="Edit" class="btn btn-sm btn-outline-primary" asp-route-id="@item.Id" title="Düzenle">
+                            <div class="action-buttons">
+                                <a asp-action="Edit" class="btn btn-outline-primary" asp-route-id="@item.Id" title="Düzenle">
                                     <i class="bi bi-pencil-square"></i>
                                 </a>
-                                <a asp-action="Details" class="btn btn-sm btn-outline-info" asp-route-id="@item.Id" title="Detaylar">
+                                <a asp-action="Details" class="btn btn-outline-info" asp-route-id="@item.Id" title="Detaylar">
                                     <i class="bi bi-eye"></i>
                                 </a>
-                                <a asp-action="Delete" class="btn btn-sm btn-outline-danger" asp-route-id="@item.Id" title="Sil">
+                                <a asp-action="Delete" class="btn btn-outline-danger" asp-route-id="@item.Id" title="Sil">
                                     <i class="bi bi-trash"></i>
                                 </a>
                             </div>

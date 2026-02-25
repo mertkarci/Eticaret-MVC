@@ -1,27 +1,14 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
 
 /* --- GENEL AYARLAR --- */
-html {
-    font-size: 14px;
-    position: relative;
-    min-height: 100%;
-}
-
-@media (min-width: 768px) {
-    html {
-        font-size: 16px;
-    }
-}
-
 body {
-    margin-bottom: 0 !important;
-    font-family: 'Roboto', sans-serif;
-    background-color: #f8f9fa;
+    /* style.css içinde tanımlandı */
+    font-family: 'Roboto', system-ui, sans-serif;
 }
 
 /* Navbar vb. */
 .navbar-color {
-    background-color: #0e4792 !important;
+    background-color: var(--main-color) !important;
 }
 
 .navbar-nav .nav-link,
@@ -169,7 +156,7 @@ body {
 
 .price-new {
     font-weight: 700;
-    color: #0d6efd;
+    color: var(--main-color);
     display: block;
     font-size: clamp(0.9rem, 9cqw, 1.3rem);
 }
@@ -178,7 +165,7 @@ body {
 .btn-compact {
     width: 100%;
     border-radius: 0;
-    background-color: #212529;
+    background-color: var(--secondary-color);
     color: white;
     white-space: nowrap;
     border: none;
@@ -187,9 +174,45 @@ body {
 }
 
 .btn-compact:hover {
-    background-color: #000;
+    background-color: var(--main-color);
     color: #fff;
 }
 .dropdown:hover .dropdown-menu{
     display: block
+}
+
+/* --- SEPET SAYFASI (Cart) --- */
+.sticky-summary {
+    position: sticky;
+    top: 2rem;
+}
+
+.cart-item-row {
+    transition: background-color 0.2s;
+}
+
+.cart-item-row:hover {
+    background-color: #f8f9fa; /* Hafif gri hover efekti */
+}
+
+/* --- GİRİŞ & KAYIT SAYFALARI (Auth) --- */
+.login-card {
+    border-radius: 1.5rem;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+    overflow: hidden;
+    background-color: #fff;
+}
+
+.brand-icon-wrapper {
+    width: 70px;
+    height: 70px;
+    /* Temaya uygun gradient */
+    background: linear-gradient(135deg, var(--main-color) 0%, var(--secondary-color) 100%);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem auto;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }

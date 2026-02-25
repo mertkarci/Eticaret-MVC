@@ -1,25 +1,23 @@
-@model IEnumerable<Eticaret.Core.Entities.Category>
+@model IEnumerable<Eticaret.Core.Entities.ThemeSetting>
 
 @{
-    ViewData["Title"] = "Kategori Yönetimi";
+    ViewData["Title"] = "Tema Yönetimi";
 }
 
 <div class="d-flex justify-content-between align-items-center mb-4">
     <a asp-action="Create" class="btn btn-create shadow-sm">
-        <i class="bi bi-plus-lg me-1"></i> Yeni Kategori Ekle
+        <i class="bi bi-plus-lg me-1"></i> Yeni Tema Ekle
     </a>
 </div>
-
 <div class="card card-admin">
     <div class="card-body">
         <table id="datatablesSimple" class="table-admin table-hover">
             <thead>
                 <tr>
-                    <th class="ps-4">@Html.DisplayNameFor(model => model.Image)</th>
-                    <th>@Html.DisplayNameFor(model => model.Name)</th>
-                    <th>Üst Kategori</th>
-                    <th>@Html.DisplayNameFor(model => model.OrderNo)</th>
-                    <th>@Html.DisplayNameFor(model => model.isActive)</th>
+                    <th class="ps-4">@Html.DisplayNameFor(model => model.Name)</th>
+                    <th>@Html.DisplayNameFor(model => model.MainColor)</th>
+                    <th>@Html.DisplayNameFor(model => model.SecondaryColor)</th>
+                    <th>@Html.DisplayNameFor(model => model.IsActive)</th>
                     <th class="text-end pe-4">İşlemler</th>
                 </tr>
             </thead>
@@ -27,23 +25,27 @@
                 @foreach (var item in Model)
                 {
                     <tr>
-                        <td class="ps-4">
-                            @if (!string.IsNullOrEmpty(item.Image))
-                            {
-                                <img src="/img/categories/@item.Image" alt="@item.Name" class="rounded shadow-sm" style="width: 50px; height: 50px; object-fit: cover;" />
-                            }
-                            else
-                            {
-                                <span class="text-muted small">Resim Yok</span>
-                            }
+                        <td class="ps-4 fw-bold text-dark">
+                            @Html.DisplayFor(modelItem => item.Name)
                         </td>
-                        <td class="fw-bold text-dark">@Html.DisplayFor(modelItem => item.Name)</td>
                         <td>
-                            @(item.ParentId == 0 ? "Ana Kategori" : item.ParentId.ToString())
+                            <div class="d-flex align-items-center">
+                                <span
+                                    style="display: inline-block; width: 20px; height: 20px; border-radius: 50%; background-color: @item.MainColor; border: 1px solid #dee2e6;"
+                                    class="me-2 shadow-sm"></span>
+                                <span class="font-monospace text-muted small">@item.MainColor</span>
+                            </div>
                         </td>
-                        <td>@Html.DisplayFor(modelItem => item.OrderNo)</td>
                         <td>
-                            @if (item.isActive)
+                            <div class="d-flex align-items-center">
+                                <span
+                                    style="display: inline-block; width: 20px; height: 20px; border-radius: 50%; background-color: @item.SecondaryColor; border: 1px solid #dee2e6;"
+                                    class="me-2 shadow-sm"></span>
+                                <span class="font-monospace text-muted small">@item.SecondaryColor</span>
+                            </div>
+                        </td>
+                        <td>
+                            @if (item.IsActive)
                             {
                                 <span class="badge bg-success rounded-pill px-3 py-2">Aktif</span>
                             }

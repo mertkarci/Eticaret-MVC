@@ -46,7 +46,14 @@ public class CartService : ICartService
 
         if (_product != null)
         {
-            _product.Quantity = quantity;
+            if(_product.Quantity + quantity <=0)
+            {
+                CartLines.RemoveAll(p => p.Product.Id == product.Id);
+            }
+            else
+            {
+                _product.Quantity += quantity;
+            }
         }
         else
         {

@@ -3,49 +3,11 @@
     ViewData["Title"] = "Yeni Hesap Oluştur";
 }
 
-<style>
-    /* SignIn sayfasıyla uyumlu modern tasarım kodları */
-    body { background-color: #f8f9fa; }
-    
-    .login-card {
-        border-radius: 1.5rem;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.08);
-        overflow: hidden;
-    }
-
-    .form-floating > .form-control:focus ~ label,
-    .form-floating > .form-control:not(:placeholder-shown) ~ label {
-        color: #0d6efd;
-        font-weight: 600;
-    }
-
-    .form-control {
-        border-radius: 0.75rem;
-        border: 1px solid #dee2e6;
-        padding: 1rem 0.75rem;
-    }
-    
-    .form-control:focus { box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15); }
-
-    .brand-icon-wrapper {
-        width: 70px;
-        height: 70px;
-        background: linear-gradient(135deg, #198754 0%, #157347 100%); /* Kayıt olmaya özel yeşil ton */
-        color: white;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0 auto 1.5rem auto;
-        box-shadow: 0 5px 15px rgba(25, 135, 84, 0.3);
-    }
-</style>
-
 <div class="container py-4 my-md-5 d-flex flex-column justify-content-center align-items-center">
     
     <div class="col-12 col-md-8 col-lg-6 col-xl-5">
         
-        <div class="card login-card border-0 bg-white">
+        <div class="card login-card">
             <div class="card-body p-4 p-sm-5">
                 
                 <div class="brand-icon-wrapper">
@@ -58,7 +20,7 @@
                 </div>
 
                 <form asp-action="SignUp" method="post">
-                    <div asp-validation-summary="ModelOnly" class="alert alert-danger rounded-3 small"></div>
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger small"></div>
                     
                     <div class="row g-3 mb-3">
                         <div class="col-sm-6">
@@ -102,14 +64,14 @@
                         </label>
                     </div>
 
-                    <button class="btn btn-success btn-lg w-100 rounded-pill fw-bold shadow-sm" type="submit">
+                    <button class="btn btn-primary w-100 rounded-pill shadow-sm" type="submit">
                         Kayıt Ol <i class="bi bi-person-check-fill ms-1"></i>
                     </button>
                 </form>
 
             </div>
             
-            <div class="card-footer bg-light border-0 text-center py-4">
+            <div class="card-footer bg-light text-center py-4">
                 <span class="text-muted small">Zaten bir hesabınız var mı?</span>
                 <a asp-action="SignIn" asp-controller="Accounts" class="text-primary text-decoration-none fw-bold ms-1">
                     Giriş Yap

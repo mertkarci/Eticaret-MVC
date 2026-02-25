@@ -15,9 +15,11 @@
     #datatablesSimple tbody tr td:last-child {
         white-space: nowrap;
 </style>
-<p>
-    <a asp-action="Create" class="btn btn-outline-primary">Yeni Ürün Ekle</a>
-</p>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <a asp-action="Create" class="btn btn-create shadow-sm">
+        <i class="bi bi-plus-lg me-1"></i> Yeni Ürün Ekle
+    </a>
+</div>
 <table class="table table-striped table-hover" id="datatablesSimple">
     <thead>
         <tr>

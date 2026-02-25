@@ -8,185 +8,395 @@
     decimal finalTotal = Model.TotalPrice + shippingCost;
 }
 
-<div class="container mt-5">
+<style>
+    .address-card {
+        cursor: pointer;
+        transition: all 0.2s ease;
+        border: 2px solid transparent;
+        box-shadow: 0 0 0 1px #dee2e6;
+    }
 
-    <div class="text-center mb-5">
-        <h2 class="display-6">Satın Al</h2>
-    </div>
+    .address-card:hover {
+        box-shadow: 0 0 0 1px var(--secondary-color);
+    }
 
-    @if (Model.CartProducts != null && Model.CartProducts.Any())
-    {
-        <div class="row mb-5">
+    .address-card.selected {
+        border-color: var(--main-color);
+        background-color: #f8faff;
+        /* Hafif mavi ton */
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    }
 
-            <div class="col-md-8">
-                <table class="table table-borderless border-bottom">
-                    <thead class="border-bottom">
-                        <tr>
-                            <th>Ürün</th>
-                            <th>Fiyat</th>
-                            <th>Miktar</th>
-                            <th>Toplam</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var item in Model.CartProducts)
-                        {
-                            <tr class="border-bottom">
-                                <td class="py-3">
-                                    <img src="~/img/products/@item.Product.Image" width="40" class="me-2" />
-                                    @item.Product.Name
-                                </td>
-                                <td class="py-3">@item.Product.Price.ToString("c")</td>
-                                <td class="py-3">@item.Quantity</td>
-                                <td class="py-3">@((item.Product.Price * item.Quantity).ToString("c"))</td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
+    .form-check-input:checked {
+        background-color: var(--main-color);
+        border-color: var(--main-color);
+    }
+</style>
+
+<section class="py-4 py-md-5 mb-5 mb-lg-0">
+    <div class="container">
+
+        <!-- Başlık ve Geri Dön -->
+        <div class="d-flex align-items-center mb-4 mb-lg-5">
+            <a href="/Cart" class="btn btn-light rounded-circle shadow-sm me-3" title="Sepete Dön">
+                <i class="bi bi-arrow-left"></i>
+            </a>
+            <div>
+                <h1 class="display-6 fw-bold m-0">Ödeme</h1>
+                <p class="text-muted m-0 small">Siparişinizi güvenle tamamlayın.</p>
             </div>
-
-            <div class="col-md-4">
-                <h4 class="mb-3">Sipariş Özeti</h4>
-                <table class="table table-borderless">
-                    <tr>
-                        <td class="text-muted">Ürün Toplamı</td>
-                        <td class="text-end fw-bold">@Model.TotalPrice.ToString("c")</td>
-                    </tr>
-                    <tr class="border-bottom">
-                        <td class="text-muted">Kargo</td>
-                        <td class="text-end fw-bold">@(shippingCost == 0 ? "Ücretsiz" : shippingCost.ToString("c"))</td>
-                    </tr>
-                    <tr>
-                        <td class="fs-5 fw-bold pt-3">Sipariş Toplamı</td>
-                        <td class="fs-5 fw-bold text-end pt-3">@finalTotal.ToString("c")</td>
-                    </tr>
-                </table>
-            </div>
-
         </div>
 
-        <div class="row">
-            <div class="col-12">
+        @if (Model.CartProducts != null && Model.CartProducts.Any())
+        {
+            <form asp-action="Checkout" method="post" id="checkoutForm">
+                <div class="row g-4 g-lg-5">
 
-                @if (Model.Addresses == null || !Model.Addresses.Any())
-                {
-                    <div class="p-4 rounded" style="background-color: #e9ecef; border: 1px solid #dee2e6;">
-                        <h5 class="text-danger fw-bold">Kayıtlı Adresiniz Yok!</h5>
-                        <p class="text-dark mb-3">Sipariş verebilmek için en az 1 adres eklemelisiniz!</p>
+                    <!-- SOL KOLON: Adres ve Ödeme -->
+                    <div class="col-lg-8">
 
-                        <a href="/MyAddresses/Create" class="btn btn-danger">
-                            <i class="bi bi-person-plus-fill me-1"></i> Adres Ekle
-                        </a>
-                    </div>
-                }
-                else
-                {
-                    <form asp-action="Checkout">
-                        <div class="my-5">
-                            <h3>Teslimat Adresi</h3>
-                            <div class="row row-cols-3">
-                                @foreach (var item in Model.Addresses)
+                        <!-- 1. ADIM: TESLİMAT ADRESİ -->
+                        <div class="card shadow-sm border-0 mb-4 rounded-4 overflow-hidden">
+                            <div class="card-header bg-white py-3 px-4 border-bottom">
+                                <h5 class="mb-0 fw-bold d-flex align-items-center">
+                                    <span
+                                        class="badge bg-primary rounded-circle me-2 d-flex align-items-center justify-content-center"
+                                        style="width: 28px; height: 28px;">1</span>
+                                    Teslimat Adresi
+                                </h5>
+                            </div>
+                            <div class="card-body p-4">
+                                @if (Model.Addresses == null || !Model.Addresses.Any())
                                 {
-                                    <div class="col">
-                                        <div class="card">
-                                            <div class="card-header">
-                                                <div class="form-check">
-                                                    <label class="form-check-label">
-                                                        <input class="form-check-input" type="radio" name="DeliveryAddress"
-                                                            value="@item.AddressGuid" @(item.IsDeliveryAddress ? "checked" : "") />
-                                                        @item.Title
-                                                    </label>
-                                                </div>
+                                    <div class="text-center py-4">
+                                        <i class="bi bi-geo-alt-fill text-warning display-4 mb-3"></i>
+                                        <h5 class="fw-bold">Kayıtlı Adresiniz Yok</h5>
+                                        <p class="text-muted mb-4">Sipariş verebilmek için lütfen bir teslimat adresi ekleyin.
+                                        </p>
+                                        <a href="/MyAddresses/Create" class="btn btn-primary rounded-pill px-4">
+                                            <i class="bi bi-plus-lg me-1"></i> Yeni Adres Ekle
+                                        </a>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="row g-3">
+                                        @foreach (var item in Model.Addresses)
+                                        {
+                                            <div class="col-md-6">
+                                                <label
+                                                    class="card h-100 address-card rounded-3 position-relative p-3 @(item.IsDeliveryAddress ? "selected" : "")"
+                                                    onclick="selectAddress(this)">
+                                                    <div class="d-flex align-items-start">
+                                                        <div class="form-check mt-1">
+                                                            <input class="form-check-input" type="radio" name="DeliveryAddress"
+                                                                value="@item.AddressGuid" @(item.IsDeliveryAddress ? "checked" : "")
+                                                                required>
+                                                        </div>
+                                                        <div class="ms-2">
+                                                            <span class="fw-bold d-block text-dark">@item.Title</span>
+                                                            <small class="text-muted d-block text-truncate"
+                                                                style="max-width: 200px;">@item.City / @item.District</small>
+                                                            <small class="text-muted d-block text-truncate"
+                                                                style="max-width: 200px;">@item.OpenAddress</small>
+                                                        </div>
+                                                    </div>
+                                                </label>
                                             </div>
-                                            <div class="card-body">
-                                                <p> @item.OpenAddress @item.District @item.City</p>
-                                                <div class="form-check">
-                                                    <label class="form-check-label">
-                                                        <input class="form-check-input" type="radio" name="BillingAddress"
-                                                            value="@item.AddressGuid" @(item.IsBillingAddress ? "checked" : "") />
-                                                        Fatura Adresi
-                                                    </label>
-                                                </div>
-                                            </div>
+                                        }
+                                    </div>
+
+                                    <div class="mt-4 pt-3 border-top">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="sameAddress" checked
+                                                onchange="toggleBillingSection()">
+                                            <label class="form-check-label fw-medium user-select-none" for="sameAddress">
+                                                Fatura adresim teslimat adresimle aynı olsun.
+                                            </label>
                                         </div>
                                     </div>
+
+                                    <!-- Gizli Fatura Adresi Seçimi -->
+                                    <div id="billingSection" class="mt-4" style="display: none;">
+                                        <h6 class="fw-bold mb-3 text-secondary">Fatura Adresi Seçin</h6>
+                                        <div class="row g-3">
+                                            @foreach (var item in Model.Addresses)
+                                            {
+                                                <div class="col-md-6">
+                                                    <label class="card h-100 address-card rounded-3 position-relative p-3"
+                                                        onclick="selectBillingAddress(this)">
+                                                        <div class="d-flex align-items-start">
+                                                            <div class="form-check mt-1">
+                                                                <input class="form-check-input" type="radio" name="BillingAddress"
+                                                                    value="@item.AddressGuid">
+                                                            </div>
+                                                            <div class="ms-2">
+                                                                <span class="fw-bold d-block text-dark">@item.Title</span>
+                                                                <small class="text-muted d-block">@item.City /
+                                                                    @item.District</small>
+                                                            </div>
+                                                        </div>
+                                                    </label>
+                                                </div>
+                                            }
+                                        </div>
+                                    </div>
+
+                                    <!-- Default Billing Value (Hidden) -->
+                                    <input type="hidden" name="BillingAddressDefault" id="billingAddressDefault"
+                                        value="@Model.Addresses.FirstOrDefault(x => x.IsDeliveryAddress)?.AddressGuid">
                                 }
                             </div>
                         </div>
-                        <div class="my-5">
-                            <h2>Seçenekler</h2>
-                            <h3>Ödeme</h3>
-                            <h6>banka veya kredi</h6>
-                            <h6>kart bilgileri</h6>
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <label>Kart Üzerindeki İsim</label>
-                                    <input type="text" name="CardNameSurname" class="form-control" required />
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <label>Kart Numarası</label>
-                                    <input type="number" name="CardNumber" class="form-control" required />
-                                </div>
-                            </div>
-                            <div class="row">
-                                <label>Son kullanma</label>
-                                <div class="col-md-2">
-                                    <select class="form-select" name="CardMonth" required>
-                                        <option disabled value="">Ay</option>
-                                        <option value="1">01</option>
-                                        <option value="2">02</option>
-                                        <option value="3">03</option>
-                                        <option value="4">04</option>
-                                        <option value="5">05</option>
-                                        <option value="6">06</option>
-                                        <option value="7">07</option>
-                                        <option value="8">08</option>
-                                        <option value="9">09</option>
-                                        <option value="10">10</option>
-                                        <option value="11">11</option>
-                                        <option value="12">12</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-2">
-                                    <select class="form-select" name="CardYear" required>
-                                        <option disabled value="">Yıl</option>
-                                        <option value="2026">2026</option>
-                                        <option value="2027">2027</option>
-                                        <option value="2028">2028</option>
-                                        <option value="2029">2029</option>
-                                        <option value="2030">2030</option>
-                                        <option value="2031">2031</option>
-                                        <option value="2032">2032</option>
-                                        <option value="2033">2033</option>
-                                        <option value="2034">2034</option>
-                                        <option value="2035">2035</option>
-                                        <option value="2036">2036</option>
-                                        <option value="2037">2037</option>
-                                        <option value="2038">2038</option>
-                                        <option value="2039">2039</option>
-                                        <option value="2040">2040</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-2">
-                                    <label>CVV</label>
-                                    <input type="number" name="CVV" class="form-control" required />
-                                </div>
-                            </div>
-                            <button type="submit" class="btn btn-success mt-2">Ödeme Yap</button>
-                    </form>
-                }
 
+                        <!-- 2. ADIM: ÖDEME BİLGİLERİ -->
+                        <div class="card shadow-sm border-0 rounded-4 overflow-hidden">
+                            <div class="card-header bg-white py-3 px-4 border-bottom">
+                                <h5 class="mb-0 fw-bold d-flex align-items-center">
+                                    <span
+                                        class="badge bg-primary rounded-circle me-2 d-flex align-items-center justify-content-center"
+                                        style="width: 28px; height: 28px;">2</span>
+                                    Kart Bilgileri
+                                </h5>
+                            </div>
+                            <div class="card-body p-4">
+                                <div class="row g-4">
+                                    <div class="col-12">
+                                        <label class="form-label fw-bold text-muted small">Kart Üzerindeki İsim</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-light border-end-0 text-muted"><i
+                                                    class="bi bi-person"></i></span>
+                                            <input type="text" name="CardNameSurname"
+                                                class="form-control border-start-0 ps-0 py-2" maxlength="50"
+                                                placeholder="Ad Soyad" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label fw-bold text-muted small">Kart Numarası</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-light border-end-0 text-muted"><i
+                                                    class="bi bi-credit-card-2-front"></i></span>
+                                            <input type="text" inputmode="numeric" pattern="[0-9 ]*" maxlength="19"
+                                                name="CardNumber" class="form-control border-start-0 ps-0 py-2"
+                                                placeholder="0000 0000 0000 0000" required
+                                                oninput="this.value = this.value.replace(/[^0-9]/g, '').replace(/(.{4})/g, '$1 ').trim()">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label fw-bold text-muted small">Ay</label>
+                                        <select class="form-select py-2" name="CardMonth" required>
+                                            <option value="" selected disabled>Seçiniz</option>
+                                            @for (int i = 1; i <= 12; i++)
+                                            {
+                                                <option value="@i">@i.ToString("00")</option>
+                                            }
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label fw-bold text-muted small">Yıl</label>
+                                        <select class="form-select py-2" name="CardYear" required>
+                                            <option value="" selected disabled>Seçiniz</option>
+                                            @for (int i = DateTime.Now.Year; i <= DateTime.Now.Year + 15; i++)
+                                            {
+                                                <option value="@i">@i</option>
+                                            }
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label fw-bold text-muted small">CVV</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-light border-end-0 text-muted"><i
+                                                    class="bi bi-lock"></i></span>
+                                            <input type="text" name="CVV" class="form-control border-start-0 ps-0 py-2"
+                                                inputmode="numeric" pattern="[0-9 ]*"
+                                                oninput="this.value = this.value.replace(/[^0-9]/g, '').replace(/(.{4})/g, '$1 ').trim()"
+                                                placeholder="***" maxlength="3" required>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="alert alert-light border mt-4 mb-0 d-flex align-items-center gap-3">
+                                    <i class="bi bi-shield-check text-success fs-2"></i>
+                                    <div class="small text-muted">
+                                        Ödeme bilgileriniz <strong>256-bit SSL</strong> sertifikası ile şifrelenmektedir.
+                                        Kart bilgileriniz sistemimizde saklanmaz.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- SAĞ KOLON: Sipariş Özeti (Sticky) -->
+                    <div class="col-lg-4">
+                        <div class="sticky-summary">
+                            <div class="card shadow-sm border-0 rounded-4 overflow-hidden">
+                                <div class="card-header bg-white py-3 px-4 border-bottom">
+                                    <h5 class="mb-0 fw-bold">Sipariş Özeti</h5>
+                                </div>
+
+                                <!-- Ürün Listesi (Scrollable) -->
+                                <div class="card-body p-0">
+                                    <div style="max-height: 350px; overflow-y: auto;">
+                                        <ul class="list-group list-group-flush">
+                                            @foreach (var item in Model.CartProducts)
+                                            {
+                                                <li class="list-group-item d-flex align-items-center gap-3 py-3 px-4">
+                                                    <div class="position-relative flex-shrink-0">
+                                                        <img src="~/img/products/@item.Product.Image" alt="@item.Product.Name"
+                                                            class="rounded shadow-sm object-fit-cover"
+                                                            style="width: 56px; height: 56px;">
+                                                        <span
+                                                            class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-secondary border border-white"
+                                                            style="font-size: 0.7rem;">@item.Quantity</span>
+                                                    </div>
+                                                    <div class="flex-grow-1" style="min-width: 0;">
+                                                        <h6 class="mb-1 text-truncate fw-bold text-dark"
+                                                            style="font-size: 0.9rem;">@item.Product.Name</h6>
+                                                        <small class="text-muted">Birim:
+                                                            @item.Product.Price.ToString("c")</small>
+                                                    </div>
+                                                    <div class="fw-bold text-primary">
+                                                        @((item.Product.Price * item.Quantity).ToString("c"))
+                                                    </div>
+                                                </li>
+                                            }
+                                        </ul>
+                                    </div>
+                                </div>
+
+                                <!-- Toplamlar -->
+                                <div class="card-footer bg-light p-4">
+                                    <div class="d-flex justify-content-between mb-2 small text-muted">
+                                        <span>Ara Toplam</span>
+                                        <span class="fw-medium text-dark">@Model.TotalPrice.ToString("c")</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between mb-3 small text-muted">
+                                        <span>Kargo Ücreti</span>
+                                        @if (shippingCost == 0)
+                                        {
+                                            <span class="text-success fw-bold">Ücretsiz</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="fw-medium text-dark">@shippingCost.ToString("c")</span>
+                                        }
+                                    </div>
+
+                                    <hr class="text-muted opacity-25 my-3">
+
+                                    <div class="d-flex justify-content-between align-items-center mb-4">
+                                        <span class="fs-5 fw-bold text-dark">Toplam Tutar</span>
+                                        <span class="fs-4 fw-bold text-primary">@finalTotal.ToString("c")</span>
+                                    </div>
+
+                                    <button type="submit"
+                                        class="btn btn-primary w-100 rounded-pill py-3 fw-bold shadow-sm transition-all d-none d-lg-block">
+                                        Ödemeyi Tamamla <i class="bi bi-chevron-right ms-1"></i>
+                                    </button>
+
+                                    <div class="text-center mt-3">
+                                        <small class="text-muted" style="font-size: 0.75rem;">
+                                            "Ödemeyi Tamamla" butonuna tıklayarak <a href="#"
+                                                class="text-decoration-none">Mesafeli Satış Sözleşmesi</a>'ni kabul etmiş
+                                            olursunuz.
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </form>
+        }
+        else
+        {
+            <div class="text-center py-5">
+                <div class="mb-4">
+                    <i class="bi bi-cart-x text-muted opacity-25" style="font-size: 5rem;"></i>
+                </div>
+                <h3 class="fw-bold text-dark">Sepetiniz Boş</h3>
+                <p class="text-muted mb-4">Ödeme yapabilmek için sepetinize ürün eklemelisiniz.</p>
+                <a href="/Products" class="btn btn-primary rounded-pill px-5 py-2">Alışverişe Başla</a>
             </div>
-        </div>
+        }
+    </div>
+</section>
+
+<script>
+    // Adres Kartı Seçim Efekti
+    function selectAddress(element) {
+        // Tüm kartlardan selected sınıfını kaldır
+        document.querySelectorAll('input[name="DeliveryAddress"]').forEach(input => {
+            input.closest('.address-card').classList.remove('selected');
+        });
+        // Seçilene ekle
+        element.classList.add('selected');
+
+        // Radyo butonunu işaretle (Label'a tıklandığında otomatik olur ama garanti olsun)
+        const radio = element.querySelector('input[type="radio"]');
+        radio.checked = true;
+
+        // Eğer fatura adresi aynı ise hidden inputu güncelle
+        updateBillingInput();
     }
-    else
-    {
-        <div class="text-center py-5">
-            <h3 class="text-muted">Sepetinizde ürün bulunmuyor.</h3>
-        </div>
+
+    function selectBillingAddress(element) {
+        document.querySelectorAll('input[name="BillingAddress"]').forEach(input => {
+            input.closest('.address-card').classList.remove('selected');
+        });
+        element.classList.add('selected');
+        element.querySelector('input[type="radio"]').checked = true;
     }
+
+    function toggleBillingSection() {
+        const checkbox = document.getElementById('sameAddress');
+        const section = document.getElementById('billingSection');
+
+        if (checkbox.checked) {
+            section.style.display = 'none';
+            // Fatura adresi seçimlerini temizle
+            document.querySelectorAll('input[name="BillingAddress"]').forEach(r => r.checked = false);
+            updateBillingInput();
+        } else {
+            section.style.display = 'block';
+            // Hidden inputu devre dışı bırak, artık radyo butonları geçerli
+            document.getElementById('billingAddressDefault').name = "";
+        }
+    }
+
+    function updateBillingInput() {
+        const checkbox = document.getElementById('sameAddress');
+        if (checkbox.checked) {
+            const selectedDelivery = document.querySelector('input[name="DeliveryAddress"]:checked');
+            const hiddenInput = document.getElementById('billingAddressDefault');
+
+            // Hidden inputu aktif et ve değerini güncelle
+            hiddenInput.name = "BillingAddress";
+            if (selectedDelivery) {
+                hiddenInput.value = selectedDelivery.value;
+            }
+        }
+    }
+
+    // Sayfa yüklendiğinde çalıştır
+    document.addEventListener('DOMContentLoaded', function () {
+        updateBillingInput();
+    });
+</script>
+
+<!-- MOBİL SABİT ALT BAR -->
+<div class="fixed-bottom bg-white border-top shadow-lg p-3 d-lg-none" style="z-index: 1040;">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <small class="text-muted d-block" style="font-size: 0.8rem;">Toplam Tutar</small>
+                <span class="fs-4 fw-bold text-primary">@finalTotal.ToString("c")</span>
+            </div>
+            <button type="submit" form="checkoutForm" class="btn btn-primary rounded-pill px-4 py-2 fw-bold shadow-sm">
+                Ödemeyi Tamamla <i class="bi bi-chevron-right ms-1"></i>
+            </button>
+        </div>
+    </div>
 </div>

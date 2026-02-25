@@ -1,0 +1,208 @@
+:root {
+    /* --- Admin Panel Tema Değişkenleri (Pastel Turuncu) --- */
+    --adm-bg-sidebar: #FFF3E0;
+    /* Sidebar Arkaplan */
+    --adm-bg-header: #FFE0B2;
+    /* Header/Footer Arkaplan */
+    --adm-bg-hover: #FFE0B2;
+    /* Hover Arkaplan */
+
+    --adm-text-main: #5D4037;
+    /* Ana Metin Rengi */
+    --adm-text-link: #6D4C41;
+    /* Link Rengi */
+    --adm-text-brand: #4E342E;
+    /* Marka/Logo Rengi */
+    --adm-text-heading: #A1887F;
+    /* Başlık Rengi */
+
+    --adm-accent: #FF9800;
+    /* Vurgu Rengi (İkonlar, Butonlar) */
+    --adm-accent-hover: #E65100;
+    /* Vurgu Hover */
+    --adm-accent-border: #FB8C00;
+    /* Kenarlık */
+    --adm-accent-active: #EF6C00;
+    /* Aktif Durum */
+}
+
+/* --- SIDEBAR (Yan Menü) --- */
+.sb-sidenav-pastel {
+    background-color: var(--adm-bg-sidebar) !important;
+    color: var(--adm-text-main) !important;
+}
+
+.sb-sidenav-pastel .nav-link {
+    color: var(--adm-text-link) !important;
+    transition: all 0.3s;
+}
+
+.sb-sidenav-pastel .nav-link:hover {
+    color: var(--adm-accent-hover) !important;
+    background-color: var(--adm-bg-hover) !important;
+}
+
+.sb-sidenav-pastel .nav-link .sb-nav-link-icon {
+    color: var(--adm-accent) !important;
+}
+
+.sb-sidenav-pastel .sb-sidenav-menu-heading {
+    color: var(--adm-text-heading) !important;
+}
+
+.sb-sidenav-pastel .sb-sidenav-footer {
+    background-color: var(--adm-bg-header) !important;
+    color: var(--adm-text-brand) !important;
+}
+
+/* --- TOPBAR (Üst Menü) --- */
+.sb-topnav-pastel {
+    background-color: var(--adm-bg-header) !important;
+    color: var(--adm-text-main) !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.sb-topnav-pastel .navbar-brand {
+    color: var(--adm-text-brand) !important;
+    font-weight: bold;
+}
+
+.sb-topnav-pastel .nav-link {
+    color: var(--adm-text-main) !important;
+}
+
+.sb-topnav-pastel .nav-link:hover {
+    color: var(--adm-accent-hover) !important;
+}
+
+.sb-topnav-pastel #sidebarToggle {
+    color: var(--adm-text-main) !important;
+}
+
+/* --- BUTONLAR --- */
+.btn-pastel-search {
+    background-color: var(--adm-accent);
+    border-color: var(--adm-accent-border);
+    color: white;
+}
+
+.btn-pastel-search:hover {
+    background-color: var(--adm-accent-active);
+    color: white;
+}
+
+/* --- TABLO DÜZENLEMELERİ --- */
+td.fixed-height {
+    max-width: 180px;
+    height: 22px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+#datatablesSimple tbody tr td:last-child {
+    white-space: nowrap;
+}
+
+/* --- GENEL KART YAPISI --- */
+.card-admin {
+    border: none;
+    border-radius: 0.75rem;
+    /* 12px */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+}
+
+/* --- YÖNETİCİ TABLOLARI --- */
+.table-admin {
+    margin-bottom: 0 !important;
+}
+
+.table-admin thead {
+    background-color: #f8f9fa;
+    color: var(--adm-text-heading);
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.5px;
+}
+
+.table-admin th,
+.table-admin td {
+    vertical-align: middle !important;
+    /* Dikeyde tam orta (Center) */
+    text-align: center !important;
+    /* Yatayda tam orta (Center) */
+}
+
+.table-admin th {
+    font-weight: 600;
+    border-bottom-width: 1px !important;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+}
+
+/* --- DATATABLES STYLING --- */
+.datatable-search,
+.datatable-dropdown {
+    margin-bottom: 1rem;
+}
+
+.datatable-input {
+    border-radius: 0.375rem;
+    border: 1px solid #ddd;
+    padding: 0.5rem 0.75rem;
+    background-color: var(--adm-bg-sidebar);
+}
+
+.datatable-input:focus {
+    border-color: var(--adm-accent);
+    box-shadow: 0 0 0 0.25rem rgba(255, 152, 0, 0.25);
+}
+
+/* --- YENİ İŞLEM BUTONLARI --- */
+.action-buttons {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    /* Sağ yaslamayı iptal edip merkeze çektik */
+    align-items: center;
+    /* Dikeyde hizalamayı garantiye aldık */
+}
+
+.action-buttons .btn {
+    width: 36px;
+    height: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    padding: 0;
+    transition: all 0.2s ease;
+}
+
+
+/* --- METİNLİ ANA İŞLEM BUTONLARI (Yeni Ekle vb.) --- */
+/* --- METİNLİ ANA İŞLEM BUTONLARI (Yeni Ekle vb.) --- */
+.btn-create {
+    background-color: var(--adm-accent) !important;
+    color: white !important;
+    border: none;
+    padding: 0.5rem 1.25rem; /* Metnin rahatça sığması için iç boşluk */
+    border-radius: 0.5rem; /* Tatlı, hafif yuvarlak köşeler */
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    transition: all 0.3s ease;
+}
+
+.btn-create:hover {
+    background-color: var(--adm-accent-hover) !important;
+    color: white !important;
+    transform: translateY(-2px); /* Üzerine gelince hafif yukarı kalkma efekti */
+    box-shadow: 0 4px 8px rgba(230, 81, 0, 0.2) !important; /* Turuncu bir gölge */
+}
+
+/* İkonun da beyaz kalmasını garantiye alalım */
+.btn-create i {
+    color: white;
+}
