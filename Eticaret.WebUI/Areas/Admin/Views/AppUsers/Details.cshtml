@@ -1,77 +1,72 @@
 @model Eticaret.Core.Entities.AppUser
 
 @{
-    ViewData["Title"] = "Detaylar";
+    ViewData["Title"] = "Kullanıcı Detayları";
 }
 
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="card card-admin">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Kişisel Bilgiler</h5>
+            </div>
+            <div class="card-body">
+                <dl class="row mb-0">
+                    <dt class="col-sm-3 text-muted">Ad Soyad</dt>
+                    <dd class="col-sm-9 fw-bold text-dark">@Model.Name @Model.Surname</dd>
 
-<div>
+                    <dt class="col-sm-3 text-muted">Kullanıcı Adı</dt>
+                    <dd class="col-sm-9">@Model.Username</dd>
 
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Name)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Name)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Surname)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Surname)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Email)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Email)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Phone)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Phone)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Password)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Password)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Username)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Username)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.isActive)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.isActive)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.isAdmin)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.isAdmin)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.CreateDate)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.CreateDate)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.UserGuid)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.UserGuid)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" class="btn btn-primary mt-2" asp-route-id="@Model?.Id">Düzenle</a>
-    <a asp-action="Index" class="btn btn-danger mt-2">Geri Dön</a>
+                    <dt class="col-sm-3 text-muted">E-Posta</dt>
+                    <dd class="col-sm-9"><a href="mailto:@Model.Email" class="text-decoration-none">@Model.Email</a></dd>
+
+                    <dt class="col-sm-3 text-muted">Telefon</dt>
+                    <dd class="col-sm-9"><a href="tel:@Model.Phone" class="text-decoration-none">@Model.Phone</a></dd>
+
+                    <dt class="col-sm-3 text-muted">Kayıt Tarihi</dt>
+                    <dd class="col-sm-9">@Model.CreateDate.ToString("dd.MM.yyyy HH:mm")</dd>
+                    
+                    <dt class="col-sm-3 text-muted">User Guid</dt>
+                    <dd class="col-sm-9 text-muted small font-monospace">@Model.UserGuid</dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="sticky-form-sidebar">
+            <div class="card card-admin">
+                <div class="card-header"><h5 class="card-title mb-0">Yetki ve Durum</h5></div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-3 border-bottom pb-2">
+                        <span>Rol:</span>
+                        @if (Model.isAdmin)
+                        {
+                            <span class="badge bg-danger">Yönetici</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-info text-dark">Kullanıcı</span>
+                        }
+                    </div>
+                    <div class="d-flex justify-content-between mb-4">
+                        <span>Durum:</span>
+                        @if (Model.isActive)
+                        {
+                            <span class="badge bg-success">Aktif</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">Pasif</span>
+                        }
+                    </div>
+                    <div class="d-grid gap-2">
+                        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary shadow-sm"><i class="bi bi-pencil-square me-2"></i> Düzenle</a>
+                        <a asp-action="Index" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-2"></i> Listeye Dön</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

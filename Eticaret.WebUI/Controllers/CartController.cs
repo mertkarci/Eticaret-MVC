@@ -237,7 +237,7 @@ namespace Eticaret.WebUI.Controllers
             buyer.RegistrationDate = appUser.CreateDate.ToString("yyyy-MM-dd HH:mm:ss");
             buyer.RegistrationAddress = order.DeliveryAddress;
 
-            buyer.Ip = "85.34.78.112";
+            buyer.Ip =  HttpContext.Connection.RemoteIpAddress?.ToString();//"85.34.78.112";
             buyer.City = deliveryAddress.City ?? "Istanbul";
             buyer.Country = "Turkey";
             buyer.ZipCode = "34732";

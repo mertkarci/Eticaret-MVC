@@ -1,98 +1,145 @@
 @model Eticaret.Core.Entities.Product
 
 @{
-    ViewData["Title"] = "Düzenle";
+    ViewData["Title"] = "Ürün Düzenle";
 }
 
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit" enctype="multipart/form-data">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="Id" />
-            <input type="hidden" asp-for="Image" />
-            <div class="form-group">
-                <label asp-for="ParentId" class="control-label"></label>
-                <input asp-for="ParentId" class="form-control" />
-                <span asp-validation-for="ParentId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="OrderNo" class="control-label"></label>
-                <input asp-for="OrderNo" class="form-control" />
-                <span asp-validation-for="OrderNo" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Stock" class="control-label"></label>
-                <input asp-for="Stock" class="form-control" />
-                <span asp-validation-for="Stock" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="CategoryId" class="control-label"></label>
-                <select asp-for="CategoryId" class="form-control" asp-items="ViewBag.CategoryId"></select>
-                <span asp-validation-for="CategoryId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="BrandId" class="control-label"></label>
-                <select asp-for="BrandId" class="form-control" asp-items="ViewBag.BrandId"></select>
-                <span asp-validation-for="BrandId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Price" class="control-label"></label>
-                <input asp-for="Price" class="form-control" />
-                <span asp-validation-for="Price" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ProductCode" class="control-label"></label>
-                <input asp-for="ProductCode" class="form-control" />
-                <span asp-validation-for="ProductCode" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Description" class="control-label"></label>
-                <input asp-for="Description" class="form-control" />
-                <span asp-validation-for="Description" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Name" class="control-label"></label>
-                <input asp-for="Name" class="form-control" />
-                <span asp-validation-for="Name" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Image" class="control-label"></label>
-                <input asp-for="Image" class="form-control"type="file"  />
-                <span asp-validation-for="Image" class="text-danger"></span>
-                                                @if(Model.Image != null && !string.IsNullOrWhiteSpace(Model.Image))
-                {
-                    <img src="/img/products/@Model.Image" alt="" height="30"/>
-                <label class="form-check-label">
-                    @Html.CheckBox("cbResmiSil") Logoyu Sil
-                </label>
-                }
-                else
-                {
+<form asp-action="Edit" enctype="multipart/form-data">
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+    <input type="hidden" asp-for="Id" />
+    <input type="hidden" asp-for="Image" />
+    <input type="hidden" asp-for="CreateDate" />
 
-                }
+    <div class="row g-4">
+        <!-- SOL KOLON: Ana İçerik -->
+        <div class="col-lg-8">
+            <!-- Ürün Detayları -->
+            <div class="card card-admin">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Ürün Detayları</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label asp-for="Name" class="form-label"></label>
+                        <input asp-for="Name" class="form-control form-control-lg" />
+                        <span asp-validation-for="Name" class="text-danger small"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Description" class="form-label"></label>
+                        <textarea asp-for="Description" class="form-control" rows="4"></textarea>
+                        <span asp-validation-for="Description" class="text-danger small"></span>
+                    </div>
+                    <div class="mb-0">
+                        <label asp-for="ProductCode" class="form-label"></label>
+                        <input asp-for="ProductCode" class="form-control" />
+                        <span asp-validation-for="ProductCode" class="text-danger small"></span>
+                    </div>
+                </div>
             </div>
-            <div class="form-group form-check">
-                <label class="form-check-label">
-                    <input class="form-check-input" asp-for="isActive" /> @Html.DisplayNameFor(model => model.isActive)
-                </label>
+
+            <!-- Görsel Yükleme -->
+            <div class="card card-admin mt-4">
+                <div class="card-header"><h5 class="card-title mb-0">Ürün Görseli</h5></div>
+                <div class="card-body">
+                    <label for="file-upload" class="custom-file-upload-container">
+                        <div class="icon"><i class="bi bi-cloud-arrow-up-fill"></i></div>
+                        <div class="text">
+                            <span>Görsel değiştirmek için tıklayın</span>
+                        </div>
+                        <input id="file-upload" asp-for="Image" type="file" onchange="previewImage(event)" />
+                    </label>
+                    
+                    <div class="mt-3 text-center">
+                        <img id="image-preview" src="@(string.IsNullOrEmpty(Model.Image) ? "" : "/img/products/" + Model.Image)" 
+                             alt="Görsel Önizleme" 
+                             style="max-width: 100%; max-height: 200px; border-radius: 0.5rem; display: @(string.IsNullOrEmpty(Model.Image) ? "none" : "inline-block");" />
+                    </div>
+                    <span asp-validation-for="Image" class="text-danger small mt-2 d-block"></span>
+                </div>
             </div>
-            <div class="form-group form-check">
-                <label class="form-check-label">
-                    <input class="form-check-input" asp-for="isHome" /> @Html.DisplayNameFor(model => model.isHome)
-                </label>
+
+            <!-- Fiyatlandırma ve Stok -->
+            <div class="card card-admin mt-4">
+                <div class="card-header"><h5 class="card-title mb-0">Fiyat ve Stok</h5></div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label asp-for="Price" class="form-label"></label>
+                            <div class="input-group">
+                                <span class="input-group-text">₺</span>
+                                <input asp-for="Price" class="form-control" />
+                            </div>
+                            <span asp-validation-for="Price" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="Stock" class="form-label"></label>
+                            <input asp-for="Stock" class="form-control" />
+                            <span asp-validation-for="Stock" class="text-danger small"></span>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="form-group">
-                <input type="submit" value="Kaydet" class="btn btn-primary" />
+
+            <!-- Organizasyon -->
+            <div class="card card-admin mt-4">
+                <div class="card-header"><h5 class="card-title mb-0">Organizasyon</h5></div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label asp-for="CategoryId" class="form-label"></label>
+                            <select asp-for="CategoryId" class="form-select" asp-items="ViewBag.CategoryId">
+                                <option value="">Kategori Seçiniz</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="BrandId" class="form-label"></label>
+                            <select asp-for="BrandId" class="form-select" asp-items="ViewBag.BrandId">
+                                <option value="">Marka Seçiniz</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </form>
+        </div>
+
+        <!-- SAĞ KOLON: Eylemler ve Durum -->
+        <div class="col-lg-4">
+            <div class="sticky-form-sidebar">
+                <!-- Eylemler -->
+                <div class="card card-admin">
+                    <div class="card-header"><h5 class="card-title mb-0">Eylemler</h5></div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-submit shadow-sm">
+                                <i class="bi bi-check-circle me-2"></i> Değişiklikleri Kaydet
+                            </button>
+                            <a asp-action="Index" class="btn btn-outline-secondary">
+                                <i class="bi bi-x-lg me-2"></i> İptal
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Durum -->
+                <div class="card card-admin mt-4">
+                    <div class="card-header"><h5 class="card-title mb-0">Durum</h5></div>
+                    <div class="card-body">
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" asp-for="isActive" />
+                            <label class="form-check-label" asp-for="isActive">@Html.DisplayNameFor(model => model.isActive)</label>
+                        </div>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" asp-for="isHome" />
+                            <label class="form-check-label" asp-for="isHome">@Html.DisplayNameFor(model => model.isHome)</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-</div>
-
-<div>
-    <a asp-action="Index" class="btn btn-danger mt-2">Geri Dön</a>
-</div>
+</form>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>function previewImage(e){const r=new FileReader;r.onload=function(){const o=document.getElementById("image-preview");o.src=r.result,o.style.display="inline-block"},r.readAsDataURL(e.target.files[0])}</script>
 }

@@ -1,41 +1,51 @@
 @model Eticaret.Core.Entities.News
 
 @{
-    ViewData["Title"] = "Detaylar";
+    ViewData["Title"] = "Duyuru Detayları";
 }
 
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="card card-admin mb-4">
+            <div class="card-header"><h5 class="card-title mb-0">Duyuru İçeriği</h5></div>
+            <div class="card-body">
+                <h3 class="mb-3">@Model.Name</h3>
+                <p class="text-muted mb-4">@Model.CreateDate.ToString("dd MMMM yyyy")</p>
+                
+                @if (!string.IsNullOrEmpty(Model.Image))
+                {
+                    <img src="/img/news/@Model.Image" alt="@Model.Name" class="img-fluid rounded mb-4 w-100" />
+                }
+                
+                <div class="p-3 bg-light rounded border">
+                    @Model.Description
+                </div>
+            </div>
+        </div>
+    </div>
 
-<div>
-
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Name)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Name)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Description)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Description)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Image)
-        </dt>
-        <dd class = "col-sm-10">
-                <img src="/img/news/@Model.Image" height="100">
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.isActive)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.isActive)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" class="btn btn-primary mt-2" sp-route-id="@Model?.Id">Düzenle</a>
-    <a asp-action="Index" class="btn btn-danger mt-2">Geri Dön</a>
+    <div class="col-lg-4">
+        <div class="sticky-form-sidebar">
+            <div class="card card-admin">
+                <div class="card-header"><h5 class="card-title mb-0">Durum ve İşlemler</h5></div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-4">
+                        <span>Yayın Durumu:</span>
+                        @if (Model.isActive)
+                        {
+                            <span class="badge bg-success">Yayında</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">Yayında Değil</span>
+                        }
+                    </div>
+                    <div class="d-grid gap-2">
+                        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary shadow-sm"><i class="bi bi-pencil-square me-2"></i> Düzenle</a>
+                        <a asp-action="Index" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-2"></i> Listeye Dön</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

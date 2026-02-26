@@ -1,48 +1,84 @@
 @model Eticaret.Core.Entities.News
 
 @{
-    ViewData["Title"] = "Düzenle";
+    ViewData["Title"] = "Duyuru Düzenle";
 }
 
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit"enctype="multipart/form-data">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="Id" />
-            <input type="hidden" asp-for="Image" />
-            <div class="form-group">
-                <label asp-for="Name" class="control-label"></label>
-                <input asp-for="Name" class="form-control" />
-                <span asp-validation-for="Name" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Description" class="control-label"></label>
-                <input asp-for="Description" class="form-control" />
-                <span asp-validation-for="Description" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Image" class="control-label"></label>
-                <img src="/img/news/@Model.Image" height="100">
-                <input asp-for="Image" class="form-control" type="file" />
-                <span asp-validation-for="Image" class="text-danger"></span>
-            </div>
-            <div class="form-group form-check">
-                <label class="form-check-label">
-                    <input class="form-check-input" asp-for="isActive" /> @Html.DisplayNameFor(model => model.isActive)
-                </label>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Kaydet" class="btn btn-primary mt-2" />
-            </div>
-        </form>
-    </div>
-</div>
+<form asp-action="Edit" enctype="multipart/form-data">
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+    <input type="hidden" asp-for="Id" />
+    <input type="hidden" asp-for="Image" />
+    <input type="hidden" asp-for="CreateDate" />
 
-<div>
-    <a asp-action="Index" class="btn btn-danger mt-2">Geri Dön</a>
-</div>
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="card card-admin">
+                <div class="card-header"><h5 class="card-title mb-0">Duyuru İçeriği</h5></div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label asp-for="Name" class="form-label">Başlık</label>
+                        <input asp-for="Name" class="form-control form-control-lg" />
+                        <span asp-validation-for="Name" class="text-danger small"></span>
+                    </div>
+                    <div class="mb-0">
+                        <label asp-for="Description" class="form-label"></label>
+                        <textarea asp-for="Description" class="form-control" rows="6"></textarea>
+                        <span asp-validation-for="Description" class="text-danger small"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card card-admin mt-4">
+                <div class="card-header"><h5 class="card-title mb-0">Kapak Görseli</h5></div>
+                <div class="card-body">
+                    <label for="file-upload" class="custom-file-upload-container">
+                        <div class="icon"><i class="bi bi-card-image"></i></div>
+                        <div class="text">Görsel değiştirmek için tıklayın</div>
+                        <input id="file-upload" asp-for="Image" type="file" onchange="previewImage(event)" />
+                    </label>
+                    <div class="mt-3 text-center">
+                        <img id="image-preview" src="@(string.IsNullOrEmpty(Model.Image) ? "" : "/img/news/" + Model.Image)" 
+                             alt="Önizleme" 
+                             style="max-width: 100%; max-height: 200px; border-radius: 0.5rem; display: @(string.IsNullOrEmpty(Model.Image) ? "none" : "inline-block");" />
+                    </div>
+                    <span asp-validation-for="Image" class="text-danger small mt-2 d-block"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="sticky-form-sidebar">
+                <div class="card card-admin">
+                    <div class="card-header"><h5 class="card-title mb-0">Yayınla</h5></div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-submit shadow-sm">
+                                <i class="bi bi-check-circle me-2"></i> Güncelle
+                            </button>
+                            <a asp-action="Index" class="btn btn-outline-secondary">
+                                <i class="bi bi-x-lg me-2"></i> İptal
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card card-admin mt-4">
+                    <div class="card-header"><h5 class="card-title mb-0">Durum</h5></div>
+                    <div class="card-body">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" asp-for="isActive" />
+                            <label class="form-check-label" asp-for="isActive">Aktif</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        function previewImage(event) { const reader = new FileReader(); reader.onload = function(){ const output = document.getElementById('image-preview'); output.src = reader.result; output.style.display = 'inline-block'; }; reader.readAsDataURL(event.target.files[0]); }
+    </script>
 }

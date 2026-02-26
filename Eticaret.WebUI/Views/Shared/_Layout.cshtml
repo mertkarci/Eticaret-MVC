@@ -1,5 +1,6 @@
 ﻿﻿<!DOCTYPE html>
 <html lang="tr">
+
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -13,9 +14,11 @@
 
     <!-- Dinamik Tema Ayarları (ViewComponent) -->
     @await Component.InvokeAsync("Theme")
+    @await RenderSectionAsync("Styles", required: false)
 </head>
+
 <body>
-<partial name="_Header"></partial>
+    <partial name="_Header"></partial>
     <div class="d-flex flex-column flex-grow-1">
         <main role="main" class="pb-3 main-page flex-grow-1">
             @RenderBody()
@@ -27,10 +30,12 @@
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
+
     @if (ViewData["ShowCart"] as bool? == true)
     {
         <partial name="_FloatingCart" />
     }
 
 </body>
+
 </html>

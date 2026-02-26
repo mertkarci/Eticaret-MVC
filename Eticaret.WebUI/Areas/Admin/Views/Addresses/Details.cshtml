@@ -1,64 +1,62 @@
 @model Eticaret.Core.Entities.Address
 
 @{
-    ViewData["Title"] = "Detaylar";
+    ViewData["Title"] = "Adres Detayları";
 }
 
-<div>
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="card card-admin">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Adres Bilgileri</h5>
+            </div>
+            <div class="card-body">
+                <dl class="row mb-0">
+                    <dt class="col-sm-3 text-muted">Başlık</dt>
+                    <dd class="col-sm-9 fw-bold text-dark">@Model.Title</dd>
 
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Title)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Title)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.City)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.City)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.District)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.District)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.OpenAddress)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.OpenAddress)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.IsActive)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.IsActive)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.IsBillingAddress)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.IsBillingAddress)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.IsDeliveryAddress)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.IsDeliveryAddress)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.AppUser)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.AppUser.Email)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" class="btn btn-primary mt-2" asp-route-id="@Model?.Id">Düzenle</a>
-    <a asp-action="Index" class="btn btn-danger mt-2">Geri Dön</a>
+                    <dt class="col-sm-3 text-muted">Şehir / İlçe</dt>
+                    <dd class="col-sm-9">@Model.City / @Model.District</dd>
+
+                    <dt class="col-sm-3 text-muted">Açık Adres</dt>
+                    <dd class="col-sm-9">@Model.OpenAddress</dd>
+
+                    <dt class="col-sm-3 text-muted">Kullanıcı</dt>
+                    <dd class="col-sm-9">@Model.AppUser?.Name @Model.AppUser?.Surname</dd>
+
+                    <dt class="col-sm-3 text-muted">Oluşturulma</dt>
+                    <dd class="col-sm-9">@Model.CreateDate.ToString("dd.MM.yyyy HH:mm")</dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="sticky-form-sidebar">
+            <div class="card card-admin">
+                <div class="card-header"><h5 class="card-title mb-0">Adres Türü ve Durum</h5></div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Teslimat Adresi:</span>
+                            @if (Model.IsDeliveryAddress) { <i class="bi bi-check-circle-fill text-success"></i> } else { <i class="bi bi-circle text-muted"></i> }
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Fatura Adresi:</span>
+                            @if (Model.IsBillingAddress) { <i class="bi bi-check-circle-fill text-success"></i> } else { <i class="bi bi-circle text-muted"></i> }
+                        </div>
+                        <div class="d-flex justify-content-between border-top pt-2 mt-2">
+                            <span>Aktiflik:</span>
+                            @if (Model.IsActive) { <span class="badge bg-success">Aktif</span> } else { <span class="badge bg-secondary">Pasif</span> }
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2 mt-4">
+                        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary shadow-sm"><i class="bi bi-pencil-square me-2"></i> Düzenle</a>
+                        <a asp-action="Index" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-2"></i> Listeye Dön</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

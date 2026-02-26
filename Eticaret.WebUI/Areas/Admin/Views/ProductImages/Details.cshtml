@@ -1,39 +1,50 @@
 @model Eticaret.Core.Entities.ProductImage
 
 @{
-    ViewData["Title"] = "Detaylar";
+    ViewData["Title"] = "Görsel Detayı";
 }
 
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="card card-admin mb-4">
+            <div class="card-header"><h5 class="card-title mb-0">Görsel Önizleme</h5></div>
+            <div class="card-body text-center bg-light">
+                @if (!string.IsNullOrEmpty(Model.Name))
+                {
+                    <img src="/img/products/@Model.Name" alt="@Model.Alt" class="img-fluid rounded shadow-sm" style="max-height: 400px;" />
+                }
+                else
+                {
+                    <div class="text-muted py-5">Görsel Bulunamadı</div>
+                }
+            </div>
+        </div>
+    </div>
 
-<div>
-    <hr />
-    <dl class="row">
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Name)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Name)
-        </dd>
-        <dt class="col-sm-2">
-        </dt>
-        <dd class="col-sm-10">
-            <img src="/img/products/@Html.DisplayFor(model => model.Name)" height="100" alt="">
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Alt)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Alt)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Product)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Product.Id)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" class="btn btn-primary mt-2" asp-route-id="@Model?.Id">Düzenle</a>
-    <a asp-action="Index" class="btn btn-danger mt-2">Geri Dön</a>
+    <div class="col-lg-4">
+        <div class="sticky-form-sidebar">
+            <div class="card card-admin">
+                <div class="card-header"><h5 class="card-title mb-0">Görsel Bilgileri</h5></div>
+                <div class="card-body">
+                    <dl class="row mb-4">
+                        <dt class="col-sm-4 text-muted">Dosya Adı</dt>
+                        <dd class="col-sm-8 text-break">@Model.Name</dd>
+
+                        <dt class="col-sm-4 text-muted">Alt Etiketi</dt>
+                        <dd class="col-sm-8">@(string.IsNullOrEmpty(Model.Alt) ? "-" : Model.Alt)</dd>
+
+                        <dt class="col-sm-4 text-muted">Ürün</dt>
+                        <dd class="col-sm-8">
+                            <a href="/Admin/Products/Details/@Model.ProductId" class="text-decoration-none">@Model.Product?.Name</a>
+                        </dd>
+                    </dl>
+                    
+                    <div class="d-grid gap-2">
+                        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary shadow-sm"><i class="bi bi-pencil-square me-2"></i> Düzenle</a>
+                        <a asp-action="Index" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-2"></i> Listeye Dön</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

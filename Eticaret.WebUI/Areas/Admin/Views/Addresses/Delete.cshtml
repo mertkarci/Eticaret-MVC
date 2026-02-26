@@ -4,65 +4,32 @@
     ViewData["Title"] = "Adresi Sil";
 }
 
-
-<h3>Adresi silmek istediğinize emin misiniz?</h3>
-<div>
-    <h4>Address</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Title)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Title)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.City)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.City)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.District)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.District)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.OpenAddress)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.OpenAddress)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.IsActive)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.IsActive)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.IsBillingAddress)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.IsBillingAddress)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.IsDeliveryAddress)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.IsDeliveryAddress)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.AppUser)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.AppUser.Email)
-        </dd>
-    </dl>
-    
-    <form asp-action="Delete">
-        <input type="hidden" asp-for="Id" />
-        <input type="submit" value="Sil" class="btn btn-danger" />
-        <a asp-action="Index" class="btn btn-outline-primary">Geri Dön</a>
-    </form>
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card card-admin border-danger shadow">
+            <div class="card-header bg-danger text-white">
+                <h4 class="mb-0"><i class="bi bi-exclamation-triangle-fill me-2"></i> Silme İşlemini Onayla</h4>
+            </div>
+            <div class="card-body p-4">
+                <p class="fs-5">
+                    Aşağıdaki adresi kalıcı olarak silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.
+                </p>
+                <hr>
+                <dl class="row">
+                    <dt class="col-sm-4 text-muted">Adres Başlığı</dt>
+                    <dd class="col-sm-8 fw-bold">@Model.Title</dd>
+                    <dt class="col-sm-4 text-muted">Kullanıcı</dt>
+                    <dd class="col-sm-8">@Model.AppUser?.Name @Model.AppUser?.Surname</dd>
+                </dl>
+                <hr>
+                <form asp-action="Delete">
+                    <input type="hidden" asp-for="Id" />
+                    <div class="d-flex justify-content-end gap-2">
+                        <a asp-action="Index" class="btn btn-secondary"><i class="bi bi-x-lg me-2"></i> İptal</a>
+                        <button type="submit" class="btn btn-danger"><i class="bi bi-trash-fill me-2"></i> Evet, Sil</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>

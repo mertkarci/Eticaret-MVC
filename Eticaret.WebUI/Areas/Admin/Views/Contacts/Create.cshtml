@@ -1,0 +1,59 @@
+@model Eticaret.Core.Entities.Contact
+
+@{
+    ViewData["Title"] = "Yeni İletişim Kaydı";
+}
+
+<form asp-action="Create">
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="card card-admin">
+                <div class="card-header"><h5 class="card-title mb-0">İletişim Bilgileri</h5></div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label asp-for="Name" class="form-label"></label>
+                            <input asp-for="Name" class="form-control" />
+                            <span asp-validation-for="Name" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="Surname" class="form-label"></label>
+                            <input asp-for="Surname" class="form-control" />
+                            <span asp-validation-for="Surname" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="Email" class="form-label"></label>
+                            <input asp-for="Email" class="form-control" type="email" />
+                            <span asp-validation-for="Email" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="Phone" class="form-label"></label>
+                            <input asp-for="Phone" class="form-control" type="tel" />
+                            <span asp-validation-for="Phone" class="text-danger small"></span>
+                        </div>
+                        <div class="col-12">
+                            <label asp-for="Message" class="form-label"></label>
+                            <textarea asp-for="Message" class="form-control" rows="5"></textarea>
+                            <span asp-validation-for="Message" class="text-danger small"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card card-admin">
+                <div class="card-body">
+                    <button type="submit" class="btn btn-submit shadow-sm mb-2">
+                        <i class="bi bi-save me-2"></i> Kaydet
+                    </button>
+                    <a asp-action="Index" class="btn btn-outline-secondary w-100">İptal</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+@section Scripts { @{await Html.RenderPartialAsync("_ValidationScriptsPartial");} }

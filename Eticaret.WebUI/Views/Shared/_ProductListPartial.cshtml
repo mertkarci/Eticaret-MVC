@@ -1,0 +1,16 @@
+@model List<Eticaret.Core.Entities.Product>
+
+@if (Model.Any())
+{
+    @foreach (var item in Model)
+    {
+        <partial name="_ProductView" model="item"></partial>
+    }
+}
+else
+{
+    <div class="col-12 text-center my-5">
+        <h5 class="text-muted">Bu filtreye uygun ürün bulunamadı.</h5>
+        <p class="small">Lütfen farklı markalar seçmeyi deneyin.</p>
+    </div>
+}

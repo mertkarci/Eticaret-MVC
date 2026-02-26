@@ -32,7 +32,12 @@
         border-color: var(--main-color);
     }
 </style>
-
+@if (TempData["Message"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["Message"]
+    </div>
+}
 <section class="py-4 py-md-5 mb-5 mb-lg-0">
     <div class="container">
 

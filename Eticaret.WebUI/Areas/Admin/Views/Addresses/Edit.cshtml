@@ -1,66 +1,91 @@
 @model Eticaret.Core.Entities.Address
 
 @{
-    ViewData["Title"] = "Düzenle";
+    ViewData["Title"] = "Adres Düzenle";
 }
 
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="Id" />
-            <div class="form-group">
-                <label asp-for="Title" class="control-label"></label>
-                <input asp-for="Title" class="form-control" />
-                <span asp-validation-for="Title" class="text-danger"></span>
+<form asp-action="Edit">
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+    <input type="hidden" asp-for="Id" />
+    <input type="hidden" asp-for="AddressGuid" />
+    <input type="hidden" asp-for="CreateDate" />
+
+    <div class="row g-4">
+        <!-- SOL KOLON: Adres Bilgileri -->
+        <div class="col-lg-8">
+            <div class="card card-admin">
+                <div class="card-header"><h5 class="card-title mb-0">Adres Detayları</h5></div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label asp-for="Title" class="form-label">Adres Başlığı</label>
+                        <input asp-for="Title" class="form-control form-control-lg" />
+                        <span asp-validation-for="Title" class="text-danger small"></span>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label asp-for="City" class="form-label"></label>
+                            <input asp-for="City" class="form-control" />
+                            <span asp-validation-for="City" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="District" class="form-label"></label>
+                            <input asp-for="District" class="form-control" />
+                            <span asp-validation-for="District" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-12">
+                            <label asp-for="AppUserId" class="form-label">Kullanıcı</label>
+                            <select asp-for="AppUserId" class="form-select" asp-items="ViewBag.AppUserId">
+                                <option value="">Kullanıcı Seçiniz</option>
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <label asp-for="OpenAddress" class="form-label"></label>
+                            <textarea asp-for="OpenAddress" class="form-control" rows="3"></textarea>
+                            <span asp-validation-for="OpenAddress" class="text-danger small"></span>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="City" class="control-label"></label>
-                <input asp-for="City" class="form-control" />
-                <span asp-validation-for="City" class="text-danger"></span>
+        </div>
+
+        <!-- SAĞ KOLON: Ayarlar ve Kaydet -->
+        <div class="col-lg-4">
+            <div class="sticky-form-sidebar">
+                <div class="card card-admin">
+                    <div class="card-header"><h5 class="card-title mb-0">İşlemler</h5></div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-submit shadow-sm">
+                                <i class="bi bi-check-circle me-2"></i> Güncelle
+                            </button>
+                            <a asp-action="Index" class="btn btn-outline-secondary">
+                                <i class="bi bi-x-lg me-2"></i> İptal
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card card-admin mt-4">
+                    <div class="card-header"><h5 class="card-title mb-0">Adres Türü ve Durum</h5></div>
+                    <div class="card-body">
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" asp-for="IsDeliveryAddress" />
+                            <label class="form-check-label" asp-for="IsDeliveryAddress">Teslimat Adresi</label>
+                        </div>
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" asp-for="IsBillingAddress" />
+                            <label class="form-check-label" asp-for="IsBillingAddress">Fatura Adresi</label>
+                        </div>
+                        <hr />
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" asp-for="IsActive" />
+                            <label class="form-check-label" asp-for="IsActive">Aktif</label>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="District" class="control-label"></label>
-                <input asp-for="District" class="form-control" />
-                <span asp-validation-for="District" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="OpenAddress" class="control-label"></label>
-                <textarea asp-for="OpenAddress" class="form-control"></textarea>
-                <span asp-validation-for="OpenAddress" class="text-danger"></span>
-            </div>
-            <div class="form-group form-check">
-                <label class="form-check-label">
-                    <input class="form-check-input" asp-for="IsActive" /> @Html.DisplayNameFor(model => model.IsActive)
-                </label>
-            </div>
-            <div class="form-group form-check">
-                <label class="form-check-label">
-                    <input class="form-check-input" asp-for="IsBillingAddress" /> @Html.DisplayNameFor(model => model.IsBillingAddress)
-                </label>
-            </div>
-            <div class="form-group form-check">
-                <label class="form-check-label">
-                    <input class="form-check-input" asp-for="IsDeliveryAddress" /> @Html.DisplayNameFor(model => model.IsDeliveryAddress)
-                </label>
-            </div>
-            <div class="form-group">
-                <label asp-for="AppUserId" class="control-label"></label>
-                <select asp-for="AppUserId" class="form-select" asp-items="ViewBag.AppUserId"></select>
-                <span asp-validation-for="AppUserId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Kaydet" class="btn btn-primary mt-2" />
-            </div>
-        </form>
+        </div>
     </div>
-</div>
+</form>
 
-<div>
-    <a asp-action="Index"class="btn btn-danger mt-2">Geri Dön</a>
-</div>
-
-@section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-}
+@section Scripts { @{await Html.RenderPartialAsync("_ValidationScriptsPartial");} }

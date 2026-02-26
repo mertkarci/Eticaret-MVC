@@ -1,44 +1,33 @@
 @model Eticaret.Core.Entities.Slider
 
 @{
-    ViewData["Title"] = "Sil";
+    ViewData["Title"] = "Slider'ı Sil";
 }
 
-
-<h3>Sliderı silmek istediğinize emin misiniz?</h3>
-<div>
-    <h4>Slider</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Title)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Title)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Description)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Description)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Image)
-        </dt>
-        <dd class = "col-sm-10">
-       <img src="/img/sliders/@Model.Image" height="100" alt="">
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Link)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Link)
-        </dd>
-    </dl>
-    
-    <form asp-action="Delete">
-        <input type="hidden" asp-for="Id" />
-        <input type="submit" value="Sil" class="btn btn-danger" />
-        <a asp-action="Index" class="btn btn-outline-primary">Geri Dön</a>
-    </form>
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card card-admin border-danger shadow">
+            <div class="card-header bg-danger text-white">
+                <h4 class="mb-0"><i class="bi bi-exclamation-triangle-fill me-2"></i> Silme İşlemini Onayla</h4>
+            </div>
+            <div class="card-body p-4">
+                <p class="fs-5">
+                    Aşağıdaki slider'ı kalıcı olarak silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.
+                </p>
+                <hr>
+                <dl class="row">
+                    <dt class="col-sm-4 text-muted">Slider Başlığı</dt>
+                    <dd class="col-sm-8 fw-bold">@Model.Title</dd>
+                </dl>
+                <hr>
+                <form asp-action="Delete">
+                    <input type="hidden" asp-for="Id" />
+                    <div class="d-flex justify-content-end gap-2">
+                        <a asp-action="Index" class="btn btn-secondary"><i class="bi bi-x-lg me-2"></i> İptal</a>
+                        <button type="submit" class="btn btn-danger"><i class="bi bi-trash-fill me-2"></i> Evet, Sil</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>

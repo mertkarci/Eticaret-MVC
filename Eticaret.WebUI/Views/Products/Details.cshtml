@@ -4,8 +4,22 @@
 }
 
 <style>
+    /* --- TEMA ENTEGRASYONU --- */
+    /* Bootstrap sınıflarını tema değişkenlerine bağlayalım */
+    .text-primary {
+        color: var(--main-color, #0d6efd) !important;
+    }
+    .btn-primary {
+        background-color: var(--main-color, #0d6efd) !important;
+        border-color: var(--main-color, #0d6efd) !important;
+    }
+    .btn-primary:hover {
+        background-color: var(--secondary-color, #0b5ed7) !important;
+        border-color: var(--secondary-color, #0a58ca) !important;
+    }
+
     .product-image-wrapper {
-        background: #ffffff;
+        background: var(--navbar-bg-color, #ffffff);
         border-radius: 1.5rem;
         padding: 2rem;
         box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
@@ -17,14 +31,15 @@
     }
 
     .description-box {
-        background: #f8f9fa;
-        border-left: 4px solid #0d6efd;
+        background: var(--bg-color, #f8f9fa);
+        border-left: 4px solid var(--main-color, #0d6efd);
+        color: var(--text-color, #212529);
         border-radius: 0 1rem 1rem 0;
         padding: 1.5rem;
     }
 
     .related-section {
-        background: linear-gradient(180deg, #ffffff 0%, #f8f9fa 100%);
+        background: linear-gradient(180deg, var(--navbar-bg-color, #ffffff) 0%, var(--bg-color, #f8f9fa) 100%);
         border-top: 1px solid #eaeaea;
     }
 
@@ -33,7 +48,7 @@
         font-weight: bold;
         background: #f1f2f6;
         border: none;
-        color: #2f3542;
+        color: var(--text-color, #2f3542);
         transition: all 0.2s;
     }
 
@@ -64,6 +79,30 @@
 
         /* Yeni Nesil CSS: Uzun başlıkları en dengeli şekilde alt satıra atar */
         text-wrap: balance;
+    }
+
+    /* Mobil Alt Bar */
+    .mobile-bottom-bar {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        background: var(--navbar-bg-color, #fff);
+        padding: 1rem 1.5rem;
+        box-shadow: 0 -4px 20px rgba(0,0,0,0.08);
+        z-index: 1040;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        border-top-left-radius: 1.5rem;
+        border-top-right-radius: 1.5rem;
+    }
+
+    @@media (max-width: 991.98px) {
+        body {
+            padding-bottom: 100px !important;
+        }
     }
 </style>
 
@@ -127,7 +166,27 @@
                     </p>
                 </div>
 
-                <div class="d-flex align-items-center gap-3">
+                <!-- Mobil İçin Miktar ve Favori Alanı (Main Flow) -->
+                <div class="d-lg-none mb-4">
+                    <div class="d-flex align-items-center justify-content-between gap-3">
+                        <div class="input-group shadow-sm rounded-pill overflow-hidden" style="width: 140px; border: 1px solid #e2e8f0;">
+                            <button class="btn qty-btn" type="button" onclick="decreaseQty()">-</button>
+                            <input class="form-control text-center qty-input px-0" type="number" value="1" min="1" readonly />
+                            <button class="btn qty-btn" type="button" onclick="increaseQty()">+</button>
+                        </div>
+
+                        <form asp-action="Add" asp-controller="Favourites" method="post" class="m-0">
+                            <input type="hidden" name="productId" value="@Model.Product.Id">
+                            <button class="btn btn-outline-danger shadow-sm rounded-circle d-flex align-items-center justify-content-center"
+                                    type="submit" style="width: 50px; height: 50px;">
+                                <i class="bi bi-heart fs-4"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Masaüstü İçin Sepete Ekle Alanı -->
+                <div class="d-none d-lg-flex align-items-center gap-3">
 
                     <form asp-action="Add" asp-controller="Cart" method="post"
                         class="d-flex align-items-center gap-3 flex-fill">
@@ -136,7 +195,7 @@
                         <div class="input-group shadow-sm rounded-pill overflow-hidden flex-shrink-0"
                             style="width: 130px; border: 1px solid #e2e8f0;">
                             <button class="btn qty-btn" type="button" onclick="decreaseQty()">-</button>
-                            <input class="form-control text-center qty-input px-0" id="inputQuantity" name="quantity"
+                            <input class="form-control text-center qty-input px-0" name="quantity"
                                 type="number" value="1" min="1" readonly />
                             <button class="btn qty-btn" type="button" onclick="increaseQty()">+</button>
                         </div>
@@ -204,18 +263,43 @@
     </div>
 </section>
 
+<!-- Mobil Sticky Bottom Bar -->
+<div class="mobile-bottom-bar d-lg-none">
+    <div>
+        <span class="d-block text-muted small" style="font-size: 0.75rem;">Toplam Tutar</span>
+        <span class="fw-bold text-primary fs-4">@Model.Product.Price.ToString("c")</span>
+    </div>
+    <form asp-action="Add" asp-controller="Cart" method="post" class="flex-fill">
+        <input type="hidden" name="ProductId" value="@Model.Product.Id">
+        <input type="hidden" name="quantity" id="mobileQtyInput" value="1">
+        <button class="btn btn-primary w-100 rounded-pill py-2 fw-bold shadow-sm" type="submit" onclick="syncQty()">
+            Sepete Ekle
+        </button>
+    </form>
+</div>
+
 <script>
     function increaseQty() {
-        var input = document.getElementById('inputQuantity');
-        var value = parseInt(input.value);
-        input.value = value + 1;
+        var inputs = document.querySelectorAll('.qty-input');
+        inputs.forEach(function(input) {
+            var value = parseInt(input.value);
+            input.value = value + 1;
+        });
     }
 
     function decreaseQty() {
-        var input = document.getElementById('inputQuantity');
-        var value = parseInt(input.value);
-        if (value > 1) {
-            input.value = value - 1;
-        }
+        var inputs = document.querySelectorAll('.qty-input');
+        inputs.forEach(function(input) {
+            var value = parseInt(input.value);
+            if (value > 1) {
+                input.value = value - 1;
+            }
+        });
+    }
+
+    function syncQty() {
+        // Mobildeki sticky bar butonuna basıldığında, ekrandaki miktar inputunun değerini al
+        var mainQty = document.querySelector('.qty-input').value;
+        document.getElementById('mobileQtyInput').value = mainQty;
     }
 </script>

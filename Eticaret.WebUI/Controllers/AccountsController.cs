@@ -183,11 +183,11 @@ public class AccountsController : Controller
                         new("UserGuid", account.UserGuid.ToString()),
                         new("ReturnUrl", loginViewModel.ReturnUrl ?? "/")
                     };
-                    
+
                     var userIdentity = new ClaimsIdentity(claims, "Login");
                     ClaimsPrincipal userPrincipal = new ClaimsPrincipal(userIdentity);
                     await HttpContext.SignInAsync(userPrincipal);
-                    
+
                     return Redirect(string.IsNullOrEmpty(loginViewModel.ReturnUrl) ? "/" : loginViewModel.ReturnUrl);
                 }
             }
@@ -245,14 +245,14 @@ public class AccountsController : Controller
             await HttpContext.SignOutAsync();
             return RedirectToAction("SignIn");
         }
-        
+
         // Eager Loading (Include ve ThenInclude) ile Siparişleri Çekme
         var model = await _serviceOrder.GetQueryable()
             .Where(p => p.AppUserId == user.Id)
             .Include(p => p.OrderLines)
                 .ThenInclude(p => p.Product)
             .ToListAsync();
-            
+
         return View(model);
     }
 
@@ -271,17 +271,17 @@ public class AccountsController : Controller
             ModelState.AddModelError("", "Email alanı boş olamaz!");
             return View();
         }
-        
+
         AppUser user = await _service.GetAsync(p => p.Email == email);
         if (user is null)
         {
             ModelState.AddModelError("", "Geçersiz bir email girdiniz.");
             return View();
         }
-        
+
         string message = $"Şifrenizi bağlantıyı kullanarak sıfırlayınız: <a href='http://localhost:5292/Accounts/PasswordChange?user={user.UserGuid.ToString()}'>Buraya tıklayınız</a>";
         var result = await MailHelper.SendmMailAsync(email, "Şifreyi Yenile", message);
-        
+
         if (result)
         {
             TempData["Message"] = "Şifre sıfırlama bağlantınız mail adresinize başarıyla gönderilmiştir.";
@@ -290,7 +290,7 @@ public class AccountsController : Controller
         {
             TempData["Message"] = "Mail gönderilirken bir hata oluştu!";
         }
-        
+
         return View();
     }
 
@@ -309,12 +309,12 @@ public class AccountsController : Controller
         }
 
         AppUser appUser = await _service.GetAsync(p => p.UserGuid == parsedGuid);
-        
+
         if (appUser is null)
         {
             return NotFound("Geçersiz veya süresi dolmuş değer.");
         }
-        
+
         return View();
     }
 
@@ -332,33 +332,33 @@ public class AccountsController : Controller
         }
 
         AppUser appUser = await _service.GetAsync(p => p.UserGuid == parsedGuid);
-        
+
         if (appUser is null)
         {
             ModelState.AddModelError("", "Kullanıcı bulunamadı.");
             return View();
         }
-        
+
         appUser.Password = password;
 
         // Servis Update
         _service.Update(appUser);
         var result = await _service.SaveChangesAsync();
-        
+
         if (result > 0)
         {
             TempData["Message"] = @"<div class='alert alert-success alert-dismissible fade show rounded-0' role='alert'>
                             Şifreniz başarıyla güncellenmiştir! Lütfen yeni şifrenizle giriş yapın.
                             <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
                         </div>";
-                        
+
             return RedirectToAction("SignIn");
         }
         else
         {
             ModelState.AddModelError("", "Güncelleme başarısız veya aynı şifreyi girdiniz!");
         }
-        
+
         return View();
     }
 }

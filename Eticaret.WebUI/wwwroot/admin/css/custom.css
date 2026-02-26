@@ -206,3 +206,76 @@ td.fixed-height {
 .btn-create i {
     color: white;
 }
+
+/* --- YENİ/DÜZENLEME SAYFALARI --- */
+.form-label {
+    font-weight: 500;
+    color: #555;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.form-control,
+.form-select {
+    border-radius: 0.5rem;
+    padding: 0.75rem 1rem;
+    border: 1px solid #ddd;
+    transition: all 0.2s ease-in-out;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--adm-accent);
+    box-shadow: 0 0 0 0.25rem rgba(255, 152, 0, 0.2);
+}
+
+.form-check-input:checked {
+    background-color: var(--adm-accent);
+    border-color: var(--adm-accent);
+}
+
+.form-switch .form-check-input {
+    height: 1.5rem;
+    width: 2.75rem;
+}
+
+.sticky-form-sidebar {
+    position: sticky;
+    top: 24px; /* _LayoutAdmin'deki h1'in margin-top'u ile uyumlu */
+}
+
+.btn-submit {
+    background-color: var(--adm-accent) !important;
+    color: white !important;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    width: 100%;
+}
+
+.btn-submit:hover {
+    background-color: var(--adm-accent-hover) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(230, 81, 0, 0.2) !important;
+}
+
+/* Custom File Upload */
+.custom-file-upload-container {
+    border: 2px dashed #ddd;
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+}
+.custom-file-upload-container:hover {
+    border-color: var(--adm-accent);
+    background-color: #fffaf0;
+}
+.custom-file-upload-container .icon { font-size: 2.5rem; color: var(--adm-accent); }
+.custom-file-upload-container .text { margin-top: 1rem; font-weight: 500; color: #777; }
+.custom-file-upload-container input[type="file"] { display: none; }
+#image-preview { max-width: 100%; max-height: 200px; border-radius: 0.5rem; margin-top: 1rem; display: none; }

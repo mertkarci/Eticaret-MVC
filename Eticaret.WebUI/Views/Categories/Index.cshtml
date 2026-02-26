@@ -1,15 +1,185 @@
-@model Category 
+@model CategoryFilterViewModel
+
 @{
-    ViewData["Title"] = Model.Name;
+    ViewData["Title"] = Model.CurrentCategory.Name;
 }
 
-<div class="my-5">
-    <h1 class="my-5 text-center">@Model.Name</h1>
-    <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center  ">
-        @foreach (var item in Model.Products)
-        {
-            <partial name="_ProductView" model="item"></partial>
-        }
+<link rel="stylesheet" href="~/css/category-filter.css" asp-append-version="true" />
+
+<div class="bg-light py-4 mb-5 border-bottom">
+    <div class="container">
+        <h1 class="h3 mb-0 text-dark fw-bold">@Model.CurrentCategory.Name</h1>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0 mt-2 small">
+                <li class="breadcrumb-item"><a href="/" class="text-decoration-none text-muted">Ana Sayfa</a></li>
+                <li class="breadcrumb-item active" aria-current="page">@Model.CurrentCategory.Name</li>
+            </ol>
+        </nav>
     </div>
 </div>
 
+<div class="container mb-5">
+    <div class="row">
+
+        <aside class="col-lg-3 mb-4">
+            <div class="filter-sidebar">
+                <div class="filter-card">
+
+                    <div class="mb-4">
+                        <div class="filter-title">Ürün Ara</div>
+                        <div class="input-group">
+                            <input type="text" id="searchInput" class="form-control form-control-sm bg-light border-0"
+                                placeholder="Kelime yazın...">
+                            <button class="btn btn-light border-0" type="button"><i class="bi bi-search"></i></button>
+                        </div>
+                    </div>
+
+                    @if (Model.AvailableBrands != null && Model.AvailableBrands.Any())
+                    {
+                        <div>
+                            <div class="filter-title">Markalar</div>
+                            <div class="filter-brand-list">
+                                @foreach (var brand in Model.AvailableBrands)
+                                {
+                                    <div class="form-check custom-checkbox mb-2">
+                                        <input class="form-check-input filter-checkbox" type="checkbox" name="SelectedBrands"
+                                            value="@brand.Id" id="brand_@brand.Id">
+                                        <label class="form-check-label d-flex justify-content-between align-items-center"
+                                            for="brand_@brand.Id">
+                                            <span>@brand.Name</span>
+                                        </label>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
+
+                    @if (Model.SubCategories != null && Model.SubCategories.Any())
+                    {
+                        <div class="mt-4">
+                            <div class="filter-title">Alt Kategoriler</div>
+                            <div class="filter-categories-list">
+                                @foreach (var subCategory in Model.SubCategories)
+                                {
+                                    <div class="form-check custom-checkbox mb-2">
+                                        <input class="form-check-input filter-checkbox" type="checkbox"
+                                            name="SelectedCategories" value="@subCategory.Id" id="subCategory_@subCategory.Id">
+                                        <label class="form-check-label d-flex justify-content-between align-items-center"
+                                            for="subCategory_@subCategory.Id">
+                                            <span>@subCategory.Name</span>
+                                        </label>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
+
+                    <div class="mb-4 mt-4">
+                        <div class="filter-title">Fiyat Aralığı</div>
+
+                        <div class="d-flex align-items-center gap-2 filter-price-inputs">
+                            <div class="input-group input-group-sm shadow-sm">
+                                <span class="input-group-text bg-white">₺</span>
+                                <input type="number" id="minPriceInput" name="minPrice" class="form-control border-start-0"
+                                    placeholder="Min" min="0">
+                            </div>
+                            <span class="text-muted fw-bold">-</span>
+                            <div class="input-group input-group-sm shadow-sm">
+                                <span class="input-group-text bg-white">₺</span>
+                                <input type="number" id="maxPriceInput" name="maxPrice" class="form-control border-start-0"
+                                    placeholder="Max" min="0">
+                            </div>
+                        </div>
+                        <small class="text-muted mt-2 d-block" style="font-size: 0.7rem;">* Yazdıkça otomatik filtrelenir.</small>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <main class="col-lg-9">
+            <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
+                <span class="text-muted small fw-medium">
+                    <i class="bi bi-box-seam me-1"></i> Toplam <strong
+                        class="text-dark">@Model.FilteredProducts.Count</strong> ürün listeleniyor.
+                </span>
+
+                <select class="form-select form-select-sm border-0 bg-light w-auto fw-medium shadow-none">
+                    <option value="recommended">Önerilen Sıralama</option>
+                    <option value="price_asc">En Düşük Fiyat</option>
+                    <option value="price_desc">En Yüksek Fiyat</option>
+                    <option value="newest">En Yeniler</option>
+                </select>
+            </div>
+
+            <div id="productListContainer" class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4">
+                <partial name="_ProductListPartial" model="Model.FilteredProducts"></partial>
+            </div>
+        </main>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const minInput = document.getElementById('minPriceInput');
+            const maxInput = document.getElementById('maxPriceInput');
+            const searchInput = document.getElementById('searchInput');
+            const productContainer = document.getElementById('productListContainer');
+
+            let typingTimer;
+            const doneTypingInterval = 500;
+
+            function applyFilters() {
+                let catId = "@Model.CurrentCategory.Id";
+                let formData = new FormData();
+
+                formData.append('categoryId', catId);
+                formData.append('minPrice', minInput.value || 0);
+                formData.append('maxPrice', maxInput.value || 999999);
+                formData.append('searchTerm', searchInput.value || "");
+
+                document.querySelectorAll('input[name="SelectedBrands"]:checked').forEach(cb => {
+                    formData.append('selectedBrands', cb.value);
+                });
+                document.querySelectorAll('input[name="SelectedCategories"]:checked').forEach(cb => {
+                    formData.append('selectedCategories', cb.value);
+                });
+
+                productContainer.style.opacity = "0.5";
+
+                fetch('/Categories/FilterProducts', {
+                    method: 'POST',
+                    body: formData
+                })
+                    .then(response => {
+                        if (!response.ok) throw new Error("Ağ hatası");
+                        return response.text();
+                    })
+                    .then(html => {
+                        productContainer.innerHTML = html;
+                        productContainer.style.opacity = "1";
+                    })
+                    .catch(error => {
+                        console.error('Filtreleme hatası:', error);
+                        productContainer.style.opacity = "1";
+                    });
+            }
+
+            [minInput, maxInput, searchInput].forEach(input => {
+                input.addEventListener('keyup', () => {
+                    clearTimeout(typingTimer);
+                    typingTimer = setTimeout(applyFilters, doneTypingInterval);
+                });
+
+                input.addEventListener('change', () => {
+                    clearTimeout(typingTimer);
+                    applyFilters();
+                });
+            });
+
+            document.querySelectorAll('.filter-checkbox').forEach(box => {
+                box.addEventListener('change', applyFilters);
+            });
+        });
+    </script>
+}

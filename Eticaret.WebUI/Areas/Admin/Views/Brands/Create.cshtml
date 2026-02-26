@@ -1,48 +1,81 @@
 @model Eticaret.Core.Entities.Brand
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Yeni Marka Ekle";
 }
 
-<h1>Create</h1>
+<form asp-action="Create" enctype="multipart/form-data">
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
 
-<h4>Brand</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create" enctype="multipart/form-data">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Description" class="control-label"></label>
-                <input asp-for="Description" class="form-control" />
-                <span asp-validation-for="Description" class="text-danger"></span>
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="card card-admin">
+                <div class="card-header"><h5 class="card-title mb-0">Marka Detayları</h5></div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label asp-for="Name" class="form-label"></label>
+                        <input asp-for="Name" class="form-control form-control-lg" />
+                        <span asp-validation-for="Name" class="text-danger small"></span>
+                    </div>
+                    <div class="mb-0">
+                        <label asp-for="Description" class="form-label"></label>
+                        <textarea asp-for="Description" class="form-control" rows="4"></textarea>
+                        <span asp-validation-for="Description" class="text-danger small"></span>
+                    </div>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="Name" class="control-label"></label>
-                <input asp-for="Name" class="form-control" />
-                <span asp-validation-for="Name" class="text-danger"></span>
+
+            <div class="card card-admin mt-4">
+                <div class="card-header"><h5 class="card-title mb-0">Marka Logosu</h5></div>
+                <div class="card-body">
+                    <label for="file-upload" class="custom-file-upload-container">
+                        <div class="icon"><i class="bi bi-cloud-arrow-up-fill"></i></div>
+                        <div class="text">Logo seçmek için tıklayın</div>
+                        <input id="file-upload" asp-for="Logo" type="file" onchange="previewImage(event)" />
+                    </label>
+                    <img id="image-preview" src="#" alt="Logo Önizleme" style="max-height: 150px; object-fit: contain; background: #f8f9fa; padding: 10px;" />
+                    <span asp-validation-for="Logo" class="text-danger small mt-2 d-block"></span>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="Logo" class="control-label"></label>
-                <input asp-for="Logo" class="form-control" type = "file"/>
-                <span asp-validation-for="Logo" class="text-danger"></span>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="sticky-form-sidebar">
+                <div class="card card-admin">
+                    <div class="card-header"><h5 class="card-title mb-0">Eylemler</h5></div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-submit shadow-sm">
+                                <i class="bi bi-plus-circle me-2"></i> Markayı Oluştur
+                            </button>
+                            <a asp-action="Index" class="btn btn-outline-secondary">
+                                <i class="bi bi-x-lg me-2"></i> İptal
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card card-admin mt-4">
+                    <div class="card-header"><h5 class="card-title mb-0">Durum</h5></div>
+                    <div class="card-body">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" asp-for="isActive" />
+                            <label class="form-check-label" asp-for="isActive">Aktif</label>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="form-group form-check">
-                <label class="form-check-label">
-                    <input class="form-check-input" asp-for="isActive" /> @Html.DisplayNameFor(model => model.isActive)
-                </label>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Oluştur" class="btn btn-primary" />
-            </div>
-        </form>
+        </div>
     </div>
-</div>
-
-<div>
-    <a asp-action="Index" class="btn btn-danger mt-2">Geri Dön</a>
-</div>
+</form>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        function previewImage(event) {
+            const reader = new FileReader();
+            reader.onload = function(){ const output = document.getElementById('image-preview'); output.src = reader.result; output.style.display = 'block'; };
+            reader.readAsDataURL(event.target.files[0]);
+        }
+    </script>
 }

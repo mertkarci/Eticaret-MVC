@@ -1,0 +1,96 @@
+/* --- GENEL FİLTRE PANELİ TASARIMI --- */
+.filter-sidebar {
+    position: sticky;
+    top: 2rem; 
+    z-index: 10;
+}
+
+.filter-card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05); 
+    background-color: #fff;
+    padding: 1.5rem;
+}
+
+.filter-title {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #333;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 1.25rem;
+    border-bottom: 2px solid #f8f9fa;
+    padding-bottom: 0.75rem;
+}
+
+/* Marka Listesi Kaydırma Alanı */
+.filter-brand-list {
+    max-height: 250px;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+.filter-brand-list::-webkit-scrollbar {
+    width: 5px;
+}
+.filter-brand-list::-webkit-scrollbar-track {
+    background: #f1f1f1; 
+}
+.filter-brand-list::-webkit-scrollbar-thumb {
+    background: #ddd; 
+    border-radius: 10px;
+}
+
+/* --- CUSTOM CHECKBOX --- */
+.custom-checkbox .form-check-input {
+    width: 1.15em;
+    height: 1.15em;
+    border: 1.5px solid #d1d5db;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.custom-checkbox .form-check-input:checked {
+    background-color: #FF9800; /* Marka Rengin */
+    border-color: #FF9800;
+}
+
+/* --- YENİ FİYAT GİRİŞ KUTULARI --- */
+.filter-price-inputs .input-group {
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #dee2e6;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.filter-price-inputs .input-group:focus-within {
+    border-color: #FF9800;
+    box-shadow: 0 0 0 3px rgba(255, 152, 0, 0.1);
+}
+
+.filter-price-inputs input {
+    border: none !important;
+    font-size: 0.9rem;
+    padding: 0.4rem 0.6rem;
+    font-weight: 500;
+}
+
+.filter-price-inputs input:focus {
+    box-shadow: none !important;
+}
+
+.filter-price-inputs .input-group-text {
+    background-color: #fff;
+    border: none;
+    color: #999;
+    padding-right: 0;
+    font-size: 0.8rem;
+}
+
+/* Sayı oklarını (spinner) gizle */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
