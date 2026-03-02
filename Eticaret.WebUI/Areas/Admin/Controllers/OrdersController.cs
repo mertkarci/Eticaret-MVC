@@ -73,56 +73,33 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
         // GET: Admin/Orders/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
             var order = await _context.Orders.FindAsync(id);
-            if (order == null)
-            {
-                return NotFound();
-            }
-            ViewBag.OrderStates = new SelectList(Enum.GetValues(typeof(EnumOrderState)));
+            if (order == null) return NotFound();
+
+            // Müşteri listesini ViewBag'e ekle (Yoksa sayfa hata verince dropdown boşalır)
+            ViewData["AppUserId"] = new SelectList(_context.AppUsers, "Id", "Name", order.AppUserId);
             return View(order);
         }
 
-        // POST: Admin/Orders/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,OrderNumber,TotalPrice,OrderDate,AppUserId,CustomerId,BillingAddress,DeliveryAddress,OrderState")] Order order)
         {
-            if (id != order.Id)
-            {
-                return NotFound();
-            }
+            if (id != order.Id) return NotFound();
 
             if (ModelState.IsValid)
             {
-                try
-                {
-                    _context.Update(order);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!OrderExists(order.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        ModelState.AddModelError("","Hata oluştu"); 
-                    }
-                }
+                _context.Update(order);
+                await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewBag.OrderStates = new SelectList(Enum.GetValues(typeof(EnumOrderState)));
+
+            // Hata varsa listeleri tekrar doldur
+            ViewData["AppUserId"] = new SelectList(_context.AppUsers, "Id", "Name", order.AppUserId);
             return View(order);
         }
-
         // GET: Admin/Orders/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {

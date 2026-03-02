@@ -229,7 +229,7 @@ namespace Eticaret.WebUI.Controllers
             buyer.Id = "BY" + appUser.Id;
             buyer.Name = appUser.Name ?? "Müşteri";
             buyer.Surname = appUser.Surname ?? "Müşteri";
-            buyer.GsmNumber = "+905350000000";
+            buyer.GsmNumber = "+90" + appUser.Phone;
             buyer.Email = appUser.Email;
             buyer.IdentityNumber = "11111111111";
 

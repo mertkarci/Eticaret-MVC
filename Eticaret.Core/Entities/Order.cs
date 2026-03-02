@@ -15,9 +15,9 @@ public class Order : IEntity
     public int AppUserId { get; set; }
     [Display(Name = "Müşteri"), StringLength(50)]
     public string CustomerId { get; set; }
-    [Display(Name = "Fatura Adresi"), StringLength(50)]
+    [Display(Name = "Fatura Adresi"), StringLength(250)]
     public string BillingAddress { get; set; }
-    [Display(Name = "Teslimat Adresi"), StringLength(50)]
+    [Display(Name = "Teslimat Adresi"), StringLength(250)]
     public string DeliveryAddress { get; set; }
     [Display(Name = "Ürünler"), StringLength(50)]
 

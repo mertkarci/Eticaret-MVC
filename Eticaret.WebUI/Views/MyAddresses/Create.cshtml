@@ -4,52 +4,100 @@
     ViewData["Title"] = "Adres Ekle";
 }
 
-<h1>Yeni Adres Oluştur</h1>
+<div class="container py-4 py-md-5">
+    <div class="row justify-content-center align-items-center" style="min-height: 75vh;">
+        <div class="col-12 col-md-10 col-lg-8">
+            <div class="shadow p-3 p-md-4" style="border-radius: 3rem;">
+                <div class="d-flex align-items-center mb-3 mb-md-4">
+                    <a href="@Url.Action("Index")"
+                        class="btn btn-outline-secondary rounded-circle me-3 d-flex align-items-center justify-content-center flex-shrink-0"
+                        style="width: 40px; height: 40px;">
+                        <i class="bi bi-arrow-left"></i>
+                    </a>
+                    <div>
+                        <h2 class="fw-bold text-dark mb-0 fs-3 fs-md-2">Yeni Adres Oluştur</h2>
+                        <p class="text-muted small mb-0 text-break">Siparişleriniz için yeni bir teslimat veya fatura
+                            adresi ekleyin.</p>
+                    </div>
+                </div>
 
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Title" class="control-label"></label>
-                <input asp-for="Title" class="form-control" />
-                <span asp-validation-for="Title" class="text-danger"></span>
+                <form asp-action="Create">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                    <div class="card border-0">
+                        <div class="card-body p-3 p-md-4">
+                            <div class="mb-4">
+                                <label asp-for="Title" class="form-label fw-bold"></label>
+                                <input asp-for="Title" class="form-control form-control-lg"
+                                    placeholder="Örn: Ev Adresim, İş Adresim" />
+                                <span asp-validation-for="Title" class="text-danger small"></span>
+                            </div>
+
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-6">
+                                    <label asp-for="City" class="form-label fw-bold"></label>
+                                    <input asp-for="City" class="form-control" />
+                                    <span asp-validation-for="City" class="text-danger small"></span>
+                                </div>
+                                <div class="col-md-6">
+                                    <label asp-for="District" class="form-label fw-bold"></label>
+                                    <input asp-for="District" class="form-control" />
+                                    <span asp-validation-for="District" class="text-danger small"></span>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label asp-for="OpenAddress" class="form-label fw-bold"></label>
+                                <textarea asp-for="OpenAddress" class="form-control" rows="3"
+                                    placeholder="Mahalle, sokak, bina ve daire no..."></textarea>
+                                <span asp-validation-for="OpenAddress" class="text-danger small"></span>
+                            </div>
+
+                            <hr class="my-4">
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6 class="fw-bold mb-3">Adres Türü</h6>
+                                    <div class="form-check form-switch mb-2">
+                                        <input class="form-check-input" asp-for="IsDeliveryAddress" />
+                                        <label class="form-check-label" asp-for="IsDeliveryAddress">Teslimat
+                                            Adresi</label>
+                                    </div>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" asp-for="IsBillingAddress" />
+                                        <label class="form-check-label" asp-for="IsBillingAddress">Fatura Adresi</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mt-3 mt-md-0">
+                                    <h6 class="fw-bold mb-3">Durum</h6>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" asp-for="IsActive" />
+                                        <label class="form-check-label" asp-for="IsActive">Bu adresi aktif olarak
+                                            kullan</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-light p-3 d-flex flex-column flex-md-row justify-content-end gap-2">
+                            <a asp-action="Index"
+                                class="btn btn-outline-secondary rounded-pill px-4 w-100 w-md-auto order-1 order-md-0">İptal</a>
+                            <button type="submit" value="Oluştur"
+                                class="btn btn-primary rounded-pill px-4 w-100 w-md-auto order-0 order-md-1">
+                                <i class="bi bi-plus-lg me-1"></i> Adresi Oluştur
+                            </button>
+                        </div>
+                    </div>
+                </form>
             </div>
-            <div class="form-group">
-                <label asp-for="City" class="control-label"></label>
-                <input asp-for="City" class="form-control" />
-                <span asp-validation-for="City" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="District" class="control-label"></label>
-                <input asp-for="District" class="form-control" />
-                <span asp-validation-for="District" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="OpenAddress" class="control-label"></label>
-                <textarea asp-for="OpenAddress" class="form-control"></textarea>
-                <span asp-validation-for="OpenAddress" class="text-danger"></span>
-            </div>
-            <div class="form-group form-check">
-                <label class="form-check-label">
-                    <input class="form-check-input" asp-for="IsActive" /> @Html.DisplayNameFor(model => model.IsActive)
-                </label>
-            </div>
-            <div class="form-group form-check">
-                <label class="form-check-label">
-                    <input class="form-check-input" asp-for="IsBillingAddress" /> @Html.DisplayNameFor(model => model.IsBillingAddress)
-                </label>
-            </div>
-            <div class="form-group form-check">
-                <label class="form-check-label">
-                    <input class="form-check-input" asp-for="IsDeliveryAddress" /> @Html.DisplayNameFor(model => model.IsDeliveryAddress)
-                </label>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Oluştur" class="btn btn-primary mt-2" />
-            </div>
-        </form>
+        </div>
     </div>
 </div>
 
+<style>
+    .letter-paper {
+        background-color: #fdfbf7;
+        border: 1px solid #e8e6e1;
+        border-radius: 0.5rem;
+        position: relative;
+    }
+</style>

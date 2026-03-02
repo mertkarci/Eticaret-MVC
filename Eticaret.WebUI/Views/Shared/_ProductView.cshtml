@@ -1,16 +1,36 @@
 @model Product
+@using Microsoft.AspNetCore.Http
+@using System.Text.Json
+@using Eticaret.WebUI.ExtensionMethods @* GetJson metodun buradaysa ekle *@
+
+@{
+    // Session'dan "GetFavourites" anahtarlı listeyi oku
+    var sessionData = Context.Session.GetString("GetFavourites");
+    var isFavorite = false;
+
+    if (!string.IsNullOrEmpty(sessionData))
+    {
+        // Session'daki JSON'ı ürün listesine geri döndür
+        var favoriteProducts = JsonSerializer.Deserialize<List<Product>>(sessionData);
+        
+        // Mevcut ürün ID'si listede var mı kontrol et
+        if (favoriteProducts != null && favoriteProducts.Any(p => p.Id == Model.Id))
+        {
+            isFavorite = true;
+        }
+    }
+}
 
 <div class="col mb-4">
-
     <div class="product-card-wrapper">
-
         <div class="card product-card">
-
-            <div class="badge-discount position-absolute">
-                <form asp-action="Add" asp-controller="Favourites">
-                    <input type="hidden" name="ProductId" value="@Model.Id">
+            
+            @* isFavorite durumuna göre class değişimi *@
+            <div class="@(isFavorite ? "badge-discount-yes" : "badge-discount") position-absolute">
+                <form asp-action="Add" asp-controller="Favourites" method="post">
+                    <input type="hidden" name="productId" value="@Model.Id">
                     <button class="btn btn-transparent" type="submit" style="box-shadow: none">
-                        <i class="bi bi-heart"></i>
+                        <i class="bi @(isFavorite ? "bi-heart-fill text-danger" : "bi-heart")"></i>
                     </button>
                 </form>
             </div>
@@ -20,26 +40,23 @@
             </a>
 
             <div class="card-body-compact text-center">
-
                 <h6 class="mb-1">
                     <a href="/Products/Details/@Model.Id" class="title-compact d-block" title="@Model.Name">
                         @Model.Name
                     </a>
                 </h6>
-
                 <div class="price-area">
                     <span class="price-old">@((Model.Price + 500).ToString("c"))</span>
                     <span class="price-new">@Model.Price.ToString("c")</span>
                 </div>
             </div>
+
             <form action="/Cart/Add" method="post">
                 <input type="hidden" name="ProductId" value="@Model.Id">
-                <button class="btn btn-compact" type="submit" style="box-shadow: none"">
-                        <i class=" bi bi-cart-plus me-1"></i> SEPETE EKLE
+                <button class="btn btn-compact" type="submit" style="box-shadow: none">
+                    <i class="bi bi-cart-plus me-1"></i> SEPETE EKLE
                 </button>
             </form>
-
-
         </div>
     </div>
 </div>

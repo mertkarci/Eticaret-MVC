@@ -7,11 +7,16 @@
 <form asp-action="Edit">
     <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
     <input type="hidden" asp-for="Id" />
+    <input type="hidden" asp-for="BillingAddress" />
+    <input type="hidden" asp-for="DeliveryAddress" />
+    <input type="hidden" asp-for="CustomerId" />
 
     <div class="row g-4">
         <div class="col-lg-8">
             <div class="card card-admin">
-                <div class="card-header"><h5 class="card-title mb-0">Sipariş Detayları</h5></div>
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Sipariş Detayları</h5>
+                </div>
                 <div class="card-body">
                     <div class="row g-3">
                         <div class="col-md-6">
@@ -27,7 +32,7 @@
                         </div>
                         <div class="col-md-6">
                             <label asp-for="OrderDate" class="form-label"></label>
-                            <input asp-for="OrderDate" class="form-control" />
+                            <input asp-for="OrderDate" class="form-control" asp-format="{0:yyyy-MM-ddTHH:mm}" type="datetime-local" />
                             <span asp-validation-for="OrderDate" class="text-danger small"></span>
                         </div>
                         <div class="col-md-6">
@@ -46,11 +51,14 @@
         <div class="col-lg-4">
             <div class="sticky-form-sidebar">
                 <div class="card card-admin">
-                    <div class="card-header"><h5 class="card-title mb-0">İşlemler</h5></div>
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">İşlemler</h5>
+                    </div>
                     <div class="card-body">
                         <div class="mb-3">
                             <label asp-for="OrderState" class="form-label">Sipariş Durumu</label>
-                            <select asp-for="OrderState" class="form-select" asp-items="Html.GetEnumSelectList<Eticaret.Core.Entities.EnumOrderState>()"></select>
+                            <select asp-for="OrderState" class="form-select"
+                                asp-items="Html.GetEnumSelectList<Eticaret.Core.Entities.EnumOrderState>()"></select>
                             <span asp-validation-for="OrderState" class="text-danger small"></span>
                         </div>
                         <hr />
@@ -69,4 +77,9 @@
     </div>
 </form>
 
-@section Scripts { @{await Html.RenderPartialAsync("_ValidationScriptsPartial");} }
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+}

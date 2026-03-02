@@ -70,27 +70,42 @@ body {
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15) !important;
 }
 
-/* 3. İNDİRİM ROZETİ (TAM ORANSAL KÜÇÜLME) */
+/* Favoride olmayan (Varsayılan) */
 .badge-discount {
-    position: absolute;
-    z-index: 10;
-    top: 5%;
-    right: 5%;
+    top: 10px;
+    right: 10px;
+    z-index: 5;
+}
 
-    background-color: #dc3545;
-    color: white;
-    font-weight: 700;
-    border-radius: 4px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+.badge-discount i {
+    color: #ccc;
+    /* Gri/Beyaz kalp */
+    transition: 0.3s;
+}
 
-    /* Font: Kartın %12'si. Min: 9px, Max: 13px */
-    font-size: clamp(9px, 12cqw, 13px);
+.badge-discount i:hover {
+    color: #f24d4d;
+    /* Gri/Beyaz kalp */
+    transition: 0.3s;
+}
 
-    /* Padding: Oransal (em). Font küçülürse kutu da küçülür. */
-    padding: 0.25em 0.6em;
+/* Favoride olan (Kırmızı) */
+.badge-discount-yes {
+    top: 10px;
+    right: 10px;
+    z-index: 5;
+}
 
-    line-height: 1;
-    white-space: nowrap;
+.badge-discount-yes i {
+    color: #ff0000 !important;
+    /* Kırmızı kalp */
+
+}
+.badge-discount-yes i:hover {
+    color: #ff7c7c !important;
+    transition: 0.3s;
+    scale: 100px;
+
 }
 
 /* 4. RESİM ALANI (1:1 KARE) */
@@ -165,7 +180,7 @@ body {
 .btn-compact {
     width: 100%;
     border-radius: 0;
-    background-color: var(--secondary-color);
+    background-color: var(--main-color);
     color: white;
     white-space: nowrap;
     border: none;
@@ -174,10 +189,11 @@ body {
 }
 
 .btn-compact:hover {
-    background-color: var(--main-color);
+    background-color: var(--secondary-color);
     color: #fff;
 }
-.dropdown:hover .dropdown-menu{
+
+.dropdown:hover .dropdown-menu {
     display: block
 }
 
@@ -192,13 +208,14 @@ body {
 }
 
 .cart-item-row:hover {
-    background-color: #f8f9fa; /* Hafif gri hover efekti */
+    background-color: #f8f9fa;
+    /* Hafif gri hover efekti */
 }
 
 /* --- GİRİŞ & KAYIT SAYFALARI (Auth) --- */
 .login-card {
     border-radius: 1.5rem;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
     overflow: hidden;
     background-color: #fff;
 }
@@ -215,4 +232,19 @@ body {
     justify-content: center;
     margin: 0 auto 1.5rem auto;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.mycard {
+    background: linear-gradient(180deg, var(--main-color) 0%, rgb(255, 255, 255) 400%);
+}
+
+.mytext {
+    color: White;
+}
+
+.bg-myapproved {
+    background-color: rgb(6, 32, 232);
+    color: #ffffff;
+    border-color: rgb(26, 50, 237) !important;
+    border-width: 0.2rem !important;
 }

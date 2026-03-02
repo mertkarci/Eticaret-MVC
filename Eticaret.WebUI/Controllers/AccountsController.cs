@@ -361,4 +361,39 @@ public class AccountsController : Controller
 
         return View();
     }
+    public async Task<IActionResult> MyOrderDetails(int? id)
+    {
+        // 1. Cookie'deki String Guid'i al
+        var userGuidClaim = HttpContext.User.FindFirst("UserGuid");
+
+        if (userGuidClaim == null) return RedirectToAction("SignIn");
+
+        // 2. String'i C# GUID nesnesine çevir (Güvenlik ve Performans için)
+        if (!Guid.TryParse(userGuidClaim.Value, out Guid guidFromCookie))
+        {
+            await HttpContext.SignOutAsync();
+            return RedirectToAction("SignIn");
+        }
+
+        // 3. SERVICE İLE ÇAĞIRMA (Async)
+        AppUser user = await _service.GetAsync(p => p.UserGuid == guidFromCookie);
+
+        // 4. Kullanıcı kontrolü
+        if (user is null)
+        {
+            await HttpContext.SignOutAsync();
+            return RedirectToAction("SignIn");
+        }
+
+        var order = await _serviceOrder.GetQueryable().Include(x => x.OrderLines).ThenInclude(x => x.Product)
+        .FirstOrDefaultAsync(x => x.Id == id && x.AppUserId == user.Id);
+        if (order == null)
+        {
+            return NotFound("Sipariş bulunamadı!");
+        }
+        return View(order);
+
+    }
+
+
 }

@@ -1,0 +1,167 @@
+@model Eticaret.Core.Entities.Order
+
+@{
+    ViewData["Title"] = "Sipariş Detayı #" + Model.OrderNumber;
+}
+
+<div class="container py-5">
+    <!-- Üst Başlık ve Geri Dön Butonu -->
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <div class="d-flex align-items-center">
+            <a href="/Accounts/MyOrders"
+                class="btn btn-outline-secondary rounded-circle me-3 d-flex align-items-center justify-content-center"
+                style="width: 40px; height: 40px;">
+                <i class="bi bi-arrow-left"></i>
+            </a>
+            <div>
+                <h2 class="fw-bold m-0">Sipariş Detayı</h2>
+                <small class="text-muted">Sipariş No: #@Model.OrderNumber</small>
+            </div>
+        </div>
+
+        <!-- Durum Badge'i (MyOrders ile aynı mantık) -->
+        @{
+            string badgeClass = "bg-secondary bg-opacity-10 text-secondary border-secondary";
+            string statusIcon = "circle";
+            var statusStr = Model.OrderState.ToString();
+
+            if (statusStr == "Waiting")
+            {
+                badgeClass = "bg-warning bg-opacity-90 mytext border-warning";
+                statusIcon = "hourglass-split";
+            }
+            else if (statusStr == "Shipped")
+            {
+                badgeClass = "bg-info bg-opacity-90 mytext border-info";
+                statusIcon = "truck";
+            }
+            else if (statusStr == "Approved")
+            {
+                badgeClass = "bg-myapproved mytext border-info";
+                statusIcon = "box2-fill";
+            }
+            else if (statusStr == "Completed")
+            {
+                badgeClass = "bg-success bg-opacity-20 mytext border-success";
+                statusIcon = "check-circle-fill";
+            }
+            else if (statusStr == "Rejected")
+            {
+                badgeClass = "bg-danger bg-opacity-20 mytext mytext border-danger";
+                statusIcon = "x-circle-fill";
+            }
+        }
+        <span class="badge @badgeClass border px-3 py-2 rounded-pill fs-6">
+            <i class="bi bi-@statusIcon me-1"></i> @Html.DisplayFor(model => model.OrderState)
+        </span>
+    </div>
+
+    <div class="row g-4">
+        <!-- SOL KOLON: Ürün Listesi -->
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
+                <div class="card-header bg-light border-bottom-0 p-4">
+                    <h5 class="mb-0 fw-bold"><i class="bi bi-basket me-2 text-primary"></i>Sipariş İçeriği</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-borderless mb-0 align-middle">
+                            <thead class="bg-white border-bottom text-muted small text-uppercase">
+                                <tr>
+                                    <th class="ps-4 py-3">Ürün</th>
+                                    <th class="text-center py-3">Birim Fiyat</th>
+                                    <th class="text-center py-3">Adet</th>
+                                    <th class="text-end pe-4 py-3">Toplam</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var line in Model.OrderLines)
+                                {
+                                    <tr class="border-bottom">
+                                        <td class="ps-4 py-3">
+                                            <div class="d-flex align-items-center">
+                                                <div class="flex-shrink-0 border rounded-3 p-1 bg-white"
+                                                    style="width: 60px; height: 60px;">
+                                                    <img src="~/img/products/@line.Product.Image"
+                                                        class="w-100 h-100 object-fit-cover rounded-2"
+                                                        alt="@line.Product.Name">
+                                                </div>
+                                                <div class="ms-3">
+                                                    <h6 class="mb-1 fw-semibold text-dark">
+                                                        <a href="/Products/Details/@line.Product.Id"
+                                                            class="text-decoration-none text-dark">
+                                                            @line.Product.Name
+                                                        </a>
+                                                    </h6>
+                                                    <small class="text-muted">Kod: @line.Product.ProductCode</small>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="text-center py-3 text-muted">@line.UnitPrice.ToString("c")</td>
+                                        <td class="text-center py-3">
+                                            <span
+                                                class="badge bg-light text-dark border rounded-pill px-3">@line.Quantity</span>
+                                        </td>
+                                        <td class="text-end pe-4 py-3 fw-bold text-dark">
+                                            @((line.UnitPrice * line.Quantity).ToString("c"))
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SAĞ KOLON: Özet ve Bilgiler -->
+        <div class="col-lg-4">
+            <!-- Sipariş Özeti Kartı -->
+            <div class="card border-0 shadow-sm rounded-4 mb-4">
+                <div class="card-header bg-light border-bottom-0 p-4">
+                    <h5 class="mb-0 fw-bold">Sipariş Özeti</h5>
+                </div>
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Ara Toplam</span>
+                        <span class="fw-medium">@Model.TotalPrice.ToString("c")</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-3">
+                        <span class="text-muted">Kargo</span>
+                        <span class="fw-medium text-success">Ücretsiz</span>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="fw-bold fs-5">Genel Toplam</span>
+                        <span class="fw-bold fs-4 text-primary">@Model.TotalPrice.ToString("c")</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Teslimat Bilgileri Kartı -->
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-header bg-light border-bottom-0 p-4">
+                    <h5 class="mb-0 fw-bold">Teslimat Bilgileri</h5>
+                </div>
+                <div class="card-body p-4">
+                    <div class="mb-4">
+                        <h6 class="fw-bold text-dark mb-2"><i class="bi bi-geo-alt me-2 text-primary"></i>Teslimat
+                            Adresi</h6>
+                        <p class="text-muted small mb-0">
+                            @(string.IsNullOrEmpty(Model.DeliveryAddress) ? "Adres bilgisi bulunamadı." :
+                                                        Model.DeliveryAddress)
+                        </p>
+                    </div>
+
+                    <div>
+                        <h6 class="fw-bold text-dark mb-2"><i class="bi bi-calendar-check me-2 text-primary"></i>Sipariş
+                            Tarihi</h6>
+                        <p class="text-muted small mb-0">
+                            @Model.OrderDate.ToString("dd MMMM yyyy dddd HH:mm")
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
