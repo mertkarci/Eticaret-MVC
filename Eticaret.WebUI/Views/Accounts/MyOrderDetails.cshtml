@@ -71,7 +71,7 @@
                                     <th class="ps-4 py-3">Ürün</th>
                                     <th class="text-center py-3">Birim Fiyat</th>
                                     <th class="text-center py-3">Adet</th>
-                                    <th class="text-end pe-4 py-3">Toplam</th>
+                                    <th class="text-end pe-4 py-3 d-none d-md-table-cell">Toplam</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -87,7 +87,15 @@
                                                         alt="@line.Product.Name">
                                                 </div>
                                                 <div class="ms-3">
-                                                    <h6 class="mb-1 fw-semibold text-dark">
+                                                    <h6 class="mb-1 fw-semibold text-dark" style="max-width: 200px; 
+                                                           display: -webkit-box; 
+                                                           -webkit-line-clamp: 2; 
+                                                           -webkit-box-orient: vertical; 
+                                                           overflow: hidden; 
+                                                           text-overflow: ellipsis;
+                                                           height: auto; 
+                                                           line-height: 1.4em; 
+                                                           max-height: 2.8em;">
                                                         <a href="/Products/Details/@line.Product.Id"
                                                             class="text-decoration-none text-dark">
                                                             @line.Product.Name
@@ -96,13 +104,18 @@
                                                     <small class="text-muted">Kod: @line.Product.ProductCode</small>
                                                 </div>
                                             </div>
+                                            <div class="d-md-none mt-2 bg-light bg-opacity-50 rounded border border-light">
+                                                <small class="text-muted me-1">Toplam:</small>
+                                                <span class="fw-bold text-dark">@((line.UnitPrice *
+                                                                                                    line.Quantity).ToString("c"))</span>
+                                            </div>
                                         </td>
                                         <td class="text-center py-3 text-muted">@line.UnitPrice.ToString("c")</td>
                                         <td class="text-center py-3">
                                             <span
                                                 class="badge bg-light text-dark border rounded-pill px-3">@line.Quantity</span>
                                         </td>
-                                        <td class="text-end pe-4 py-3 fw-bold text-dark">
+                                        <td class="text-end pe-4 py-3 fw-bold text-dark d-none d-md-table-cell">
                                             @((line.UnitPrice * line.Quantity).ToString("c"))
                                         </td>
                                     </tr>

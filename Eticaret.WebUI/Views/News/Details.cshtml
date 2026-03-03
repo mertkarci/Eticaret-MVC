@@ -3,60 +3,137 @@
     ViewData["Title"] = Model.Name;
 }
 
-<section class="py-5 bg-white">
+<section class="py-5" style="background-color: #f4f6f9;">
     <div class="container">
-        
+
         <nav aria-label="breadcrumb" class="mb-4">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="/" class="text-decoration-none text-muted">Ana Sayfa</a></li>
-                <li class="breadcrumb-item"><a href="/News" class="text-decoration-none text-muted">Haberler</a></li>
-                <li class="breadcrumb-item active text-dark" aria-current="page">@Model.Name</li>
+            <ol class="breadcrumb bg-transparent p-0 m-0 justify-content-center">
+                <li class="breadcrumb-item"><a href="/" class="text-decoration-none text-muted small"><i
+                            class="bi bi-house-door"></i> Ana Sayfa</a></li>
+                <li class="breadcrumb-item"><a href="/News" class="text-decoration-none text-muted small">Haberler</a>
+                </li>
+                <li class="breadcrumb-item active text-dark small fw-bold" aria-current="page">@Model.Name</li>
             </ol>
         </nav>
 
         <div class="row justify-content-center">
-            <div class="col-lg-8">
-                
-                <div class="text-center mb-4">
-                    <h1 class="fw-bold display-5 mb-3">@Model.Name</h1>
-                    
-                    <div class="d-flex justify-content-center align-items-center text-muted small">
-                        <div class="d-flex align-items-center me-3">
-                            <i class="bi bi-calendar-event me-2"></i>
-                            <span>@Model.CreateDate.ToString("dd MMMM yyyy")</span>
+            <div class="col-12 col-md-10 col-lg-8">
+
+                <article class="news-paper shadow-lg">
+                    <header class="text-center mb-2">
+
+                    </header>
+
+                    <div class="photo-frame mb-5">
+                        <img src="/img/news/@Model.Image" alt="@Model.Name" class="img-fluid w-70">
+                    </div>
+
+                    <div class="content-surface shadow-sm">
+                        <div class="article-content text-secondary">
+                            @Model.Description
                         </div>
-                        <div class="d-flex align-items-center">
-                            <i class="bi bi-person-circle me-2"></i>
-                            <span>Admin</span> </div>
                     </div>
-                </div>
 
-                <div class="mb-5">
-                    <img src="/img/news/@Model.Image" 
-                         alt="@Model.Name" 
-                         class="img-fluid rounded-3 shadow w-100"
-                         style="max-height: 500px; object-fit: cover;">
-                </div>
+                    <hr class="my-5 border-secondary opacity-10">
 
-                <div class="article-content fs-5 text-secondary" style="line-height: 1.8;">
-                    @Model.Description
-                </div>
+                    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-center gap-3">
+                        <a asp-action="Index" class="btn btn-outline-primary rounded-pill px-4 w-100 w-sm-auto">
+                            <i class="bi bi-arrow-left me-2"></i> Haberlere Dön
+                        </a>
 
-                <hr class="my-5 text-muted">
-
-                <div class="d-flex justify-content-between align-items-center">
-                    <a asp-action="Index" class="btn btn-outline-dark">
-                        <i class="bi bi-arrow-left me-2"></i> Haberlere Dön
-                    </a>
-                    
-                    <div class="d-flex gap-2">
-                        <button class="btn btn-sm btn-light rounded-circle"><i class="bi bi-twitter"></i></button>
-                        <button class="btn btn-sm btn-light rounded-circle"><i class="bi bi-facebook"></i></button>
-                        <button class="btn btn-sm btn-light rounded-circle"><i class="bi bi-whatsapp"></i></button>
+                        <div class="d-flex justify-content-center align-items-center text-muted small">
+                            <div class="d-flex align-items-center me-4">
+                                <i class="bi bi-calendar-event me-2 text-primary"></i>
+                                <span>@Model.CreateDate.ToString("dd MMMM yyyy")</span>
+                            </div>
+                        </div>
                     </div>
-                </div>
+                </article>
 
             </div>
         </div>
     </div>
 </section>
+
+<style>
+    /* Ana Kart (Gövde) */
+    .news-paper {
+        background: #ffffff;
+        border-radius: 2rem;
+        padding: 3rem 2rem;
+        position: relative;
+        /* Üst kısma dekoratif renkli çizgi */
+        border-top: 8px solid var(--main-color, #0d6efd);
+    }
+
+    /* Fotoğraf Çerçevesi Efekti */
+    .photo-frame {
+        padding: 1rem;
+        background-color: #fff;
+        border-radius: 1rem;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+        /* Derin gölge */
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        transform: rotate(-1deg);
+        /* Hafif eğim ile çerçeve hissi */
+        transition: transform 0.3s ease;
+    }
+
+    .photo-frame:hover {
+        transform: rotate(0deg);
+    }
+
+    .photo-frame img {
+        border-radius: 0.5rem;
+    }
+
+    /* Yazı Yüzeyi */
+    .content-surface {
+        background: linear-gradient(180deg, #f8f9fa 0%, #ffffff 100%);
+        border-radius: 1.5rem;
+        padding: 2.5rem;
+        border: 1px solid #edf2f7;
+        position: relative;
+    }
+
+    /* Sol tarafa dekoratif çizgi */
+    .content-surface::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 2rem;
+        bottom: 2rem;
+        width: 4px;
+        background-color: var(--main-color, #0d6efd);
+        border-radius: 0 4px 4px 0;
+    }
+
+    .article-title {
+        font-size: clamp(1.75rem, 4vw, 2.5rem);
+        line-height: 1.3;
+        letter-spacing: -0.5px;
+    }
+
+    .article-content {
+        font-size: 1.15rem;
+        line-height: 1.9;
+        color: #4a4a4a;
+        font-family: 'Georgia', serif;
+        /* Okuma için daha şık bir font */
+    }
+
+    .object-fit-cover {
+        object-fit: cover;
+    }
+
+    /* Mobil Düzenlemeler */
+    @@media (max-width: 768px) {
+        .news-paper {
+            padding: 1.5rem;
+        }
+
+        .content-surface {
+            padding: 1.5rem;
+        }
+    }
+</style>

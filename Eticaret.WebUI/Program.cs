@@ -7,8 +7,7 @@ using Microsoft.EntityFrameworkCore; // UseSqlite için gerekli
 
 var builder = WebApplication.CreateBuilder(args);
 
-// --- 1. VERİTABANI YOLU AYARI (KRİTİK KISIM) ---
-// Mevcut WebUI klasörünün yolunu alıyoruz
+
 var webUiPath = builder.Environment.ContentRootPath;
 
 // Bir üst klasöre çıkıp (..) "Eticaret.Data" klasörünü hedefliyoruz.
@@ -90,7 +89,6 @@ app.UseSession();
 app.UseAuthentication(); // Önce kimlik doğrulama
 app.UseAuthorization();  // Sonra yetkilendirme
 
-// Rotalar
 app.MapControllerRoute(
     name: "admin",
     pattern: "{area:exists}/{controller=Main}/{action=Index}/{id?}"

@@ -17,6 +17,7 @@ namespace Eticaret.WebUI.Controllers
         public ActionResult Index()
         {
             var favourites = GetFavourites();
+            ViewData["IsFavouritesPage"] = true;
             return View(favourites);
         }
 

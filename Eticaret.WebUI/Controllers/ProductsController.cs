@@ -1,5 +1,6 @@
 using Eticaret.Core.Entities;
 using Eticaret.Service.Abstract;
+using Eticaret.WebUI.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore; 
 
@@ -8,16 +9,20 @@ namespace Eticaret.WebUI.Controllers
     public class ProductsController : Controller
     {
         private readonly IService<Product> _service;
+        private readonly IService<Brand> _brandService;
+        private readonly IService<Category> _categoryService;
 
-        public ProductsController(IService<Product> service)
+        // TEK VE GÜNCEL YAPICI METOT (CONSTRUCTOR) BU OLMALI:
+        public ProductsController(IService<Product> service, IService<Brand> brandService, IService<Category> categoryService)
         {
             _service = service;
+            _brandService = brandService;
+            _categoryService = categoryService;
         }
 
         public async Task<IActionResult> Index(string q = "")
         {
             // 1. ADIM: Servisten "Henüz Çalışmamış" sorguyu (IQueryable) alıyoruz.
-            // _context.Products.AsQueryable() YERİNE:
             var productQuery = _service.GetQueryable();
 
             // 2. ADIM: Filtreleme (Arama mantığı)
@@ -33,13 +38,54 @@ namespace Eticaret.WebUI.Controllers
                 productQuery = productQuery.Where(p => p.isActive);
             }
 
-            // 3. ADIM: İlişkili tabloları (Brand, Category) dahil et ve veritabanına git
-            var result = await productQuery
+            var products = await productQuery
                                 .Include(p => p.Brand)
                                 .Include(p => p.Category)
-                                .ToListAsync(); // Veritabanı sorgusu BURADA çalışır
+                                .ToListAsync();
 
-            return View(result);
+            // Sidebar için verileri çek
+            var brands = await _brandService.GetAllAsync(b => b.isActive);
+            var categories = await _categoryService.GetAllAsync(c => c.isActive && c.ParentId == 0); // Ana kategoriler
+
+            // ViewModel oluştur
+            var model = new CategoryFilterViewModel
+            {
+                CurrentCategory = new Category { Name = "Tüm Ürünler", Id = 0 }, // Dummy kategori
+                SubCategories = categories.ToList(),
+                FilteredProducts = products,
+                AvailableBrands = brands.ToList()
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> FilterProducts(List<int> selectedBrands, List<int> selectedCategories, decimal? minPrice, decimal? maxPrice, string searchTerm)
+        {
+            var productQuery = _service.GetQueryable().Where(p => p.isActive);
+
+            // Marka Filtresi
+            if (selectedBrands != null && selectedBrands.Any())
+                productQuery = productQuery.Where(p => p.BrandId != 0 && selectedBrands.Contains(p.BrandId));
+
+            // Kategori Filtresi
+            if (selectedCategories != null && selectedCategories.Any())
+                productQuery = productQuery.Where(p => p.CategoryId.HasValue && selectedCategories.Contains(p.CategoryId.Value));
+
+            // Fiyat Filtresi
+            if (minPrice.HasValue) productQuery = productQuery.Where(p => p.Price >= minPrice.Value);
+            if (maxPrice.HasValue) productQuery = productQuery.Where(p => p.Price <= maxPrice.Value);
+
+            // Arama Filtresi
+            if (!string.IsNullOrEmpty(searchTerm))
+            {
+                searchTerm = searchTerm.ToLower().Trim();
+                productQuery = productQuery.Where(p => p.Name.ToLower().Contains(searchTerm));
+            }
+
+            var products = await productQuery.Include(p => p.Brand).Include(p => p.Category).ToListAsync();
+
+            return PartialView("_ProductListPartial", products);
         }
 
         public async Task<IActionResult> Details(int? id)
@@ -50,7 +96,6 @@ namespace Eticaret.WebUI.Controllers
             }
 
             // 1. Ürünü Detaylarıyla Çekme
-            // _context... YERİNE _service.GetQueryable()...
             var product = await _service.GetQueryable()
                 .Include(p => p.Brand)
                 .Include(p => p.Category)

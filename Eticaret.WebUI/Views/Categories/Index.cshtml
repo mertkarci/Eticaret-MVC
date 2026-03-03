@@ -22,8 +22,11 @@
     <div class="row">
 
         <aside class="col-lg-3 mb-4">
-            <div class="filter-sidebar">
+            <!-- ID ve DATA-ATTRIBUTE EKLENDİ -->
+            <div class="filter-sidebar" id="filter-container" data-filter-url="/Categories/FilterProducts">
                 <div class="filter-card">
+                    <!-- Kategori ID Hidden Input -->
+                    <input type="hidden" id="categoryIdHidden" value="@Model.CurrentCategory.Id" />
 
                     <div class="mb-4">
                         <div class="filter-title">Ürün Ara</div>
@@ -119,67 +122,5 @@
 </div>
 
 @section Scripts {
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const minInput = document.getElementById('minPriceInput');
-            const maxInput = document.getElementById('maxPriceInput');
-            const searchInput = document.getElementById('searchInput');
-            const productContainer = document.getElementById('productListContainer');
-
-            let typingTimer;
-            const doneTypingInterval = 500;
-
-            function applyFilters() {
-                let catId = "@Model.CurrentCategory.Id";
-                let formData = new FormData();
-
-                formData.append('categoryId', catId);
-                formData.append('minPrice', minInput.value || 0);
-                formData.append('maxPrice', maxInput.value || 999999);
-                formData.append('searchTerm', searchInput.value || "");
-
-                document.querySelectorAll('input[name="SelectedBrands"]:checked').forEach(cb => {
-                    formData.append('selectedBrands', cb.value);
-                });
-                document.querySelectorAll('input[name="SelectedCategories"]:checked').forEach(cb => {
-                    formData.append('selectedCategories', cb.value);
-                });
-
-                productContainer.style.opacity = "0.5";
-
-                fetch('/Categories/FilterProducts', {
-                    method: 'POST',
-                    body: formData
-                })
-                    .then(response => {
-                        if (!response.ok) throw new Error("Ağ hatası");
-                        return response.text();
-                    })
-                    .then(html => {
-                        productContainer.innerHTML = html;
-                        productContainer.style.opacity = "1";
-                    })
-                    .catch(error => {
-                        console.error('Filtreleme hatası:', error);
-                        productContainer.style.opacity = "1";
-                    });
-            }
-
-            [minInput, maxInput, searchInput].forEach(input => {
-                input.addEventListener('keyup', () => {
-                    clearTimeout(typingTimer);
-                    typingTimer = setTimeout(applyFilters, doneTypingInterval);
-                });
-
-                input.addEventListener('change', () => {
-                    clearTimeout(typingTimer);
-                    applyFilters();
-                });
-            });
-
-            document.querySelectorAll('.filter-checkbox').forEach(box => {
-                box.addEventListener('change', applyFilters);
-            });
-        });
-    </script>
+    <script src="~/js/product-filter.js"></script>
 }

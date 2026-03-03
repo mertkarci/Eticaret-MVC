@@ -1,6 +1,8 @@
+@using Eticaret.WebUI.ExtensionMethods
 @model ProductDetailViewModel
 @{
     ViewData["Title"] = Model.Product.Name;
+    var favourites = Context.Session.GetJson<List<Product>>("GetFavourites");
 }
 
 <style>
@@ -9,10 +11,12 @@
     .text-primary {
         color: var(--main-color, #0d6efd) !important;
     }
+
     .btn-primary {
         background-color: var(--main-color, #0d6efd) !important;
         border-color: var(--main-color, #0d6efd) !important;
     }
+
     .btn-primary:hover {
         background-color: var(--secondary-color, #0b5ed7) !important;
         border-color: var(--secondary-color, #0a58ca) !important;
@@ -89,7 +93,7 @@
         width: 100%;
         background: var(--navbar-bg-color, #fff);
         padding: 1rem 1.5rem;
-        box-shadow: 0 -4px 20px rgba(0,0,0,0.08);
+        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
         z-index: 1040;
         display: flex;
         align-items: center;
@@ -129,7 +133,7 @@
 
                     @if (Model.Product.ProductImages?.Count > 0)
                     {
-                                <partial name="_ProductDetailSlider" model="Model.Product.ProductImages"></partial>
+                        <partial name="_ProductDetailSlider" model="Model.Product.ProductImages"></partial>
                     }
                     else
                     {
@@ -169,16 +173,20 @@
                 <!-- Mobil İçin Miktar ve Favori Alanı (Main Flow) -->
                 <div class="d-lg-none mb-4">
                     <div class="d-flex align-items-center justify-content-between gap-3">
-                        <div class="input-group shadow-sm rounded-pill overflow-hidden" style="width: 140px; border: 1px solid #e2e8f0;">
+                        <div class="input-group shadow-sm rounded-pill overflow-hidden"
+                            style="width: 140px; border: 1px solid #e2e8f0;">
                             <button class="btn qty-btn" type="button" onclick="decreaseQty()">-</button>
-                            <input class="form-control text-center qty-input px-0" type="number" value="1" min="1" readonly />
+                            <input class="form-control text-center qty-input px-0" type="number" value="1" min="1"
+                                readonly />
                             <button class="btn qty-btn" type="button" onclick="increaseQty()">+</button>
                         </div>
 
                         <form asp-action="Add" asp-controller="Favourites" method="post" class="m-0">
                             <input type="hidden" name="productId" value="@Model.Product.Id">
-                            <button class="btn btn-outline-danger shadow-sm rounded-circle d-flex align-items-center justify-content-center"
-                                    type="submit" style="width: 50px; height: 50px;">
+                            <button
+                                class="btn btn-outline-danger shadow-sm rounded-circle d-flex align-items-center justify-content-center"
+                                type="submit" style="width: 50px; height: 50px;">
+
                                 <i class="bi bi-heart fs-4"></i>
                             </button>
                         </form>
@@ -195,8 +203,8 @@
                         <div class="input-group shadow-sm rounded-pill overflow-hidden flex-shrink-0"
                             style="width: 130px; border: 1px solid #e2e8f0;">
                             <button class="btn qty-btn" type="button" onclick="decreaseQty()">-</button>
-                            <input class="form-control text-center qty-input px-0" name="quantity"
-                                type="number" value="1" min="1" readonly />
+                            <input class="form-control text-center qty-input px-0" name="quantity" type="number"
+                                value="1" min="1" readonly />
                             <button class="btn qty-btn" type="button" onclick="increaseQty()">+</button>
                         </div>
 
@@ -208,12 +216,25 @@
 
                     <form asp-action="Add" asp-controller="Favourites" method="post" class="m-0">
                         <input type="hidden" name="productId" value="@Model.Product.Id">
+                        @if(favourites.Any(x => x.Id == Model.Product.Id))
+                        {
+                        <button
+                            class="btn btn-outline-danger shadow-sm rounded-circle d-flex align-items-center justify-content-center transition-all"
+                            type="submit" style="width: 54px; height: 54px;" data-bs-toggle="tooltip"
+                            data-bs-placement="top" title="Bu ürün zaten favorilerinizde!">
+                            <i class="bi bi-heart-fill fs-4"></i>
+                        </button>
+                        }
+                        else
+                        {
                         <button
                             class="btn btn-outline-danger shadow-sm rounded-circle d-flex align-items-center justify-content-center transition-all"
                             type="submit" style="width: 54px; height: 54px;" data-bs-toggle="tooltip"
                             data-bs-placement="top" title="Favorilere Ekle">
                             <i class="bi bi-heart fs-4"></i>
                         </button>
+                        }
+
                     </form>
 
                 </div>
@@ -281,7 +302,7 @@
 <script>
     function increaseQty() {
         var inputs = document.querySelectorAll('.qty-input');
-        inputs.forEach(function(input) {
+        inputs.forEach(function (input) {
             var value = parseInt(input.value);
             input.value = value + 1;
         });
@@ -289,7 +310,7 @@
 
     function decreaseQty() {
         var inputs = document.querySelectorAll('.qty-input');
-        inputs.forEach(function(input) {
+        inputs.forEach(function (input) {
             var value = parseInt(input.value);
             if (value > 1) {
                 input.value = value - 1;

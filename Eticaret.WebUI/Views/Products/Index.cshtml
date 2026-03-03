@@ -1,14 +1,124 @@
-@model IEnumerable<Product>
+@model CategoryFilterViewModel
+
 @{
-    ViewData["Title"] = "Ürünlerimiz";
+    ViewData["Title"] = "Tüm Ürünler";
 }
-<div class="my-5">
-    <h1 class="my-5 text-center">Ürünlerimiz</h1>
-    <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
-        @foreach (var item in Model)
-        {
-            <partial name="_ProductView" model="item"></partial>
-        }
+
+<link rel="stylesheet" href="~/css/category-filter.css" asp-append-version="true" />
+
+<div class="bg-light py-4 mb-5 border-bottom">
+    <div class="container">
+        <h1 class="h3 mb-0 text-dark fw-bold">Tüm Ürünler</h1>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0 mt-2 small">
+                <li class="breadcrumb-item"><a href="/" class="text-decoration-none text-muted">Ana Sayfa</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Ürünler</li>
+            </ol>
+        </nav>
     </div>
 </div>
 
+<div class="container mb-5 ">
+    <div class="row">
+
+        <aside class="col-lg-3 mb-4">
+            <!-- Mobil Filtre Butonu -->
+            <button class="btn btn-primary w-100 d-md-none mb-3 rounded-pill shadow-sm" type="button" data-bs-toggle="offcanvas" data-bs-target="#filterOffcanvas" aria-controls="filterOffcanvas">
+                <i class="bi bi-funnel-fill me-2"></i> Filtrele
+            </button>
+
+            <!-- Filtre Paneli (Mobilde Offcanvas, Masaüstünde Normal) -->
+            <div class="offcanvas-md offcanvas-start" tabindex="-1" id="filterOffcanvas" aria-labelledby="filterOffcanvasLabel">
+                <div class="offcanvas-header border-bottom">
+                    <h5 class="offcanvas-title fw-bold" id="filterOffcanvasLabel">Filtrele</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#filterOffcanvas" aria-label="Close"></button>
+                </div>
+                <div class="offcanvas-body p-0">
+                    <!-- ID ve DATA-ATTRIBUTE EKLENDİ -->
+                    <div class="filter-sidebar w-100" id="filter-container" data-filter-url="/Products/FilterProducts">
+                        <div class="filter-card">
+                            
+                            <!-- Kategori ID Hidden Input (Burada 0 veya boş olabilir) -->
+                            <input type="hidden" id="categoryIdHidden" value="0" />
+
+                            <div class="mb-4">
+                                <div class="filter-title">Ürün Ara</div>
+                                <div class="input-group">
+                                    <input type="text" id="searchInput" class="form-control form-control-sm bg-light border-0"
+                                        placeholder="Kelime yazın...">
+                                    <button class="btn btn-light border-0" type="button"><i class="bi bi-search"></i></button>
+                                </div>
+                            </div>
+
+                            @if (Model.AvailableBrands != null && Model.AvailableBrands.Any())
+                            {
+                                <div>
+                                    <div class="filter-title">Markalar</div>
+                                    <div class="filter-brand-list">
+                                        @foreach (var brand in Model.AvailableBrands)
+                                        {
+                                            <div class="form-check custom-checkbox mb-2">
+                                                <input class="form-check-input filter-checkbox" type="checkbox" name="SelectedBrands"
+                                                    value="@brand.Id" id="brand_@brand.Id">
+                                                <label class="form-check-label d-flex justify-content-between align-items-center"
+                                                    for="brand_@brand.Id">
+                                                    <span>@brand.Name</span>
+                                                </label>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            }
+
+                            @if (Model.SubCategories != null && Model.SubCategories.Any())
+                            {
+                                <div class="mt-4">
+                                    <div class="filter-title">Kategoriler</div>
+                                    <div class="filter-categories-list">
+                                        @foreach (var subCategory in Model.SubCategories)
+                                        {
+                                            <div class="form-check custom-checkbox mb-2">
+                                                <input class="form-check-input filter-checkbox" type="checkbox"
+                                                    name="SelectedCategories" value="@subCategory.Id" id="subCategory_@subCategory.Id">
+                                                <label class="form-check-label d-flex justify-content-between align-items-center"
+                                                    for="subCategory_@subCategory.Id">
+                                                    <span>@subCategory.Name</span>
+                                                </label>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            }
+
+                            <div class="mb-2 mt-4">
+                                <div class="filter-title">Fiyat Aralığı</div>
+                                <div class="d-flex align-items-center gap-2 filter-price-inputs">
+                                    <div class="input-group input-group-sm shadow-sm">
+                                        <span class="input-group-text bg-white">₺</span>
+                                        <input type="number" id="minPriceInput" name="minPrice" class="form-control border-start-0" placeholder="Min" min="0">
+                                    </div>
+                                    <span class="text-muted fw-bold">-</span>
+                                    <div class="input-group input-group-sm shadow-sm">
+                                        <span class="input-group-text bg-white">₺</span>
+                                        <input type="number" id="maxPriceInput" name="maxPrice" class="form-control border-start-0" placeholder="Max" min="0">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="d-grid gap-2 mb-2 mt-4"> <button class="btn btn-danger filter-clear" name="ClearFilter">Filtreleri Temizle</button></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <main class="col-lg-9">
+            <div id="productListContainer" class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4">
+                <partial name="_ProductListPartial" model="Model.FilteredProducts"></partial>
+            </div>
+        </main>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/product-filter.js"></script>
+}

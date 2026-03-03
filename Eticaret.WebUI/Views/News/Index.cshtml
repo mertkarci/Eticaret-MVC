@@ -1,14 +1,119 @@
-@model IEnumerable<News>
+@model IEnumerable<Eticaret.Core.Entities.News>
+
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Kampanyalar";
 }
 
-<div class="my-5">
-    <h1 class="text-center">Kampanyalarımız</h1>
-    <div class="row gx-4 gx-lg-5 row-cols-2 justify-content-center">
-        @foreach (var item in Model)
-        {
-            <partial name="_NewsView" model="item"></partial>
-        }
+<div class="container py-4 py-md-5">
+    <div class="d-flex align-items-center justify-content-between mb-4 mb-md-5">
+        <div>
+            <h2 class="fw-bold text-dark mb-1">Kampanyalar & Duyurular</h2>
+            <p class="text-muted small mb-0">En güncel haberler ve fırsatları buradan takip edebilirsiniz.</p>
+        </div>
     </div>
+
+    @if (!Model.Any())
+    {
+        <div class="d-flex flex-column justify-content-center align-items-center text-center py-5" style="min-height: 65vh;">
+            <div class="mb-3">
+                <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                    <i class="bi bi-megaphone text-muted fs-1"></i>
+                </div>
+            </div>
+            <h4 class="fw-bold text-dark">Henüz kampanya bulunmuyor</h4>
+            <p class="text-muted mb-4">Yeni fırsatlar eklendiğinde burada görünecektir.</p>
+        </div>
+    }
+    else
+    {
+        <div class="letter-paper shadow-sm p-3 p-md-5" style="min-height: 65vh;">
+            <div class="row g-4">
+                @foreach (var item in Model)
+                {
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card h-100 border-0 shadow-sm news-card position-relative" onclick="location.href='@Url.Action("Details", new { id = item.Id })'">
+                            
+                            @if (!string.IsNullOrEmpty(item.Image))
+                            {
+                                <div class="card-img-top overflow-hidden position-relative" style="height: 220px;">
+                                    <img src="/img/news/@item.Image" class="w-100 h-100 object-fit-cover transition-scale" alt="@item.Name">
+                                    <div class="position-absolute top-0 end-0 m-3">
+                                        <span class="badge bg-white text-dark shadow-sm rounded-pill px-3 py-2">
+                                            <i class="bi bi-calendar-event me-1 text-primary"></i> @item.CreateDate.ToString("dd.MM.yyyy")
+                                        </span>
+                                    </div>
+                                </div>
+                            }
+                            else 
+                            {
+                                 <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 220px;">
+                                    <i class="bi bi-image text-muted fs-1"></i>
+                                </div>
+                            }
+
+                            <div class="card-body p-4 d-flex flex-column">
+                                <h5 class="fw-bold text-dark mb-3 line-clamp-2">@item.Name</h5>
+                                
+                                <div class="mb-4 flex-grow-1">
+                                    <p class="text-secondary small mb-0 line-clamp-3" style="line-height: 1.6;">
+                                        @item.Description
+                                    </p>
+                                </div>
+
+                                <div class="d-flex align-items-center justify-content-between pt-3 border-top border-light mt-auto">
+                                    <span class="text-primary fw-bold small">Devamını Oku <i class="bi bi-arrow-right ms-1"></i></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
 </div>
+
+<style>
+    .letter-paper {
+        background-color: #fdfbf7;
+        border: 1px solid #e8e6e1;
+        border-radius: 0.5rem;
+        position: relative;
+    }
+
+    .news-card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        border-radius: 1rem;
+        cursor: pointer;
+        overflow: hidden;
+        background-color: #fff;
+    }
+    .news-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.08) !important;
+    }
+    
+    .news-card:hover .transition-scale {
+        transform: scale(1.05);
+    }
+
+    .transition-scale {
+        transition: transform 0.5s ease;
+    }
+
+    .object-fit-cover {
+        object-fit: cover;
+    }
+
+    .line-clamp-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    .line-clamp-3 {
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+</style>

@@ -37,9 +37,9 @@
 </section>
 
 <!-- Kampanyalar / Haberler -->
-<section class="py-5 bg-light bg-opacity-25">
+<section class="py-5 bg-light bg-opacity-25 custom-section-bg">
     <div class="container">
-        <h2 class="fw-bold mb-4">Kampanyalar & Duyurular</h2>
+        <h2 class="fw-bold mb-4 text-center">Kampanyalar & Duyurular</h2>
         <div class="row gx-4 gx-lg-5 row-cols-1 row-cols-md-2 justify-content-center">
             @if (Model.News != null && Model.News.Any())
             {
@@ -59,3 +59,7 @@
         </div>
     </div>
 </section>
+<style>
+    .custom-section-bg {
+   
+    }</style>

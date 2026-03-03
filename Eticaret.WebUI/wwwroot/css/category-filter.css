@@ -94,3 +94,20 @@ input::-webkit-inner-spin-button {
     -webkit-appearance: none;
     margin: 0;
 }
+
+/* --- RESPONSIVE OFFCANVAS RESET (MD ve Üzeri için) --- */
+@media (min-width: 768px) {
+    .offcanvas-md {
+        position: static !important;
+        z-index: auto !important;
+        background-color: transparent !important;
+        width: auto !important;
+        height: auto !important;
+        visibility: visible !important;
+        transform: none !important;
+        border: none !important;
+        box-shadow: none !important;
+    }
+    .offcanvas-md .offcanvas-header { display: none !important; }
+    .offcanvas-md .offcanvas-body { padding: 0 !important; overflow: visible !important; }
+}

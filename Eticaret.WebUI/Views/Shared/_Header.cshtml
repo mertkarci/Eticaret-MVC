@@ -9,8 +9,10 @@
     int cartCount = cart?.CartLines.Sum(x => x.Quantity) ?? 0;
     decimal cartTotal = cart?.CartLines.Sum(x => x.Quantity * x.Product.Price) ?? 0;
 
-    var favourites = Context.Session.GetJson<List<Product>>("Favourites");
+    var favourites = Context.Session.GetJson<List<Product>>("GetFavourites");
     int favCount = favourites?.Count ?? 0;
+    var isFavPage = ViewData["IsFavouritesPage"] as bool? ?? false;
+
 }
 
 <head>
@@ -19,7 +21,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 
     <style>
-        /* --- Frontendci Dokunuşları --- */
+
 
         /* 1. Hover ve Taşma Düzeltmesi */
         .dropdown-menu-end {
@@ -51,6 +53,7 @@
                 list-style: none;
             }
         }
+
 
         /* 3. Çok Dar Ekranlarda Logoyu Gizleme (YENİ) */
         @@media (max-width: 320px) {
@@ -135,25 +138,48 @@
                     data-bs-target="#mobileSearchBox">
                     <i class="bi bi-search mobile-icon-size"></i>
                 </button>
+                
+                <!-- 1200px Altı İçin (Tablet/Laptop) - Genişlik 200px -->
+                <form action="/Products" class="d-none d-lg-flex d-xl-none position-relative me-2" role="search" style="width:150px;">
+                    <input name="q" class="form-control rounded-pill ps-4 pe-5 bg-light border-0" type="search" placeholder="Ara...">
+                    <button type="submit" class="btn btn-link text-muted position-absolute end-0 top-50 translate-middle-y text-decoration-none">
+                        <i class="bi bi-search"></i>
+                    </button>
+                </form>
 
-                <form action="/Products" class="d-none d-lg-flex position-relative me-2" role="search">
-                    <input name="q" class="form-control rounded-pill ps-4 pe-5 bg-light border-0" type="search"
-                        placeholder="Sitede Ara..." style="width: 250px;">
+                <!-- 1200px ve Üzeri İçin (Geniş Ekran) - Genişlik 280px -->
+                <form action="/Products" class="d-none d-xl-flex position-relative me-2" role="search" style="width: 280px;">
+                    <input name="q" class="form-control rounded-pill ps-4 pe-5 bg-light border-0" type="search" placeholder="Sitede Ara...">
                     <button type="submit"
                         class="btn btn-link text-muted position-absolute end-0 top-50 translate-middle-y text-decoration-none">
                         <i class="bi bi-search"></i>
                     </button>
                 </form>
+                @if (isFavPage)
+                {
+                    <a class="nav-link text-white position-relative p-1 p-lg-2 fav-icon" asp-controller="Favourites"
+                        asp-action="Index" title="Favorilerim">
+                        <i class="bi bi-heart-fill fs-5 fs-lg-4 mobile-icon-size"></i>
+                        @if (favCount > 0)
+                        {
+                            <span
+                                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-2 border-dark nav-badge">@favCount</span>
+                        }
+                    </a>
+                }
+                else
+                {
+                    <a class="nav-link text-white position-relative p-1 p-lg-2 fav-icon" asp-controller="Favourites"
+                        asp-action="Index" title="Favorilerim">
+                        <i class="bi bi-heart fs-5 fs-lg-4 mobile-icon-size"></i>
+                        @if (favCount > 0)
+                        {
+                            <span
+                                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-2 border-dark nav-badge">@favCount</span>
+                        }
+                    </a>
+                }
 
-                <a class="nav-link text-white position-relative p-1 p-lg-2 fav-icon" asp-controller="Favourites"
-                    asp-action="Index" title="Favorilerim">
-                    <i class="bi bi-heart fs-5 fs-lg-4 mobile-icon-size"></i>
-                    @if (favCount > 0)
-                    {
-                        <span
-                            class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-2 border-dark nav-badge">@favCount</span>
-                    }
-                </a>
 
                 <div class="dropdown">
                     <a class="nav-link text-white position-relative p-1 p-lg-2" href="#" role="button"

@@ -208,7 +208,7 @@ public class AccountsController : Controller
     [HttpPost]
     public async Task<IActionResult> SignUpAsync(AppUser appUser)
     {
-        appUser.isAdmin = false;
+        appUser.isAdmin = false; // başlangıçta nolursa olsun admin olmasın
         appUser.isActive = true;
         if (ModelState.IsValid)
         {
@@ -263,16 +263,15 @@ public class AccountsController : Controller
     }
 
     [HttpPost]
-    public async Task<IActionResult> PasswordRenew(string email)
+    public async Task<IActionResult> PasswordRenew(string Email)
     {
-        // Bug Fix: '!' kaldırıldı
-        if (string.IsNullOrWhiteSpace(email))
+        if (string.IsNullOrWhiteSpace(Email))
         {
             ModelState.AddModelError("", "Email alanı boş olamaz!");
             return View();
         }
 
-        AppUser user = await _service.GetAsync(p => p.Email == email);
+        AppUser user = await _service.GetAsync(p => p.Email == Email);
         if (user is null)
         {
             ModelState.AddModelError("", "Geçersiz bir email girdiniz.");
@@ -280,7 +279,7 @@ public class AccountsController : Controller
         }
 
         string message = $"Şifrenizi bağlantıyı kullanarak sıfırlayınız: <a href='http://localhost:5292/Accounts/PasswordChange?user={user.UserGuid.ToString()}'>Buraya tıklayınız</a>";
-        var result = await MailHelper.SendmMailAsync(email, "Şifreyi Yenile", message);
+        var result = await MailHelper.SendmMailAsync(Email, "Şifreyi Yenile", message);
 
         if (result)
         {
@@ -375,10 +374,8 @@ public class AccountsController : Controller
             return RedirectToAction("SignIn");
         }
 
-        // 3. SERVICE İLE ÇAĞIRMA (Async)
         AppUser user = await _service.GetAsync(p => p.UserGuid == guidFromCookie);
 
-        // 4. Kullanıcı kontrolü
         if (user is null)
         {
             await HttpContext.SignOutAsync();
