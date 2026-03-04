@@ -4,6 +4,10 @@
     <ProjectReference Include="..\Eticaret.Data\Eticaret.Data.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Iyzipay" Version="2.1.78" />
+  </ItemGroup>
+
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>

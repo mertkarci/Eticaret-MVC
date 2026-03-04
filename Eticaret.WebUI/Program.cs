@@ -37,8 +37,9 @@ builder.Services.AddSession(options =>
 });
 
 
-;
+
 builder.Services.AddScoped(typeof(IService<>),typeof(Service<>));
+builder.Services.AddScoped<IOrderService, OrderService>();
 // Authentication (Giriş) Ayarları
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie
 (p =>

@@ -1,4 +1,5 @@
-﻿using Eticaret.Core.Entities;
+﻿using Eticaret.Core;
+using Eticaret.Core.Entities;
 
 namespace Eticaret.Service;
 
