@@ -2,7 +2,7 @@ using Eticaret.Core.Entities;
 using Eticaret.Service.Abstract;
 using Eticaret.WebUI.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore; 
+using Microsoft.EntityFrameworkCore;
 
 namespace Eticaret.WebUI.Controllers
 {
@@ -88,33 +88,35 @@ namespace Eticaret.WebUI.Controllers
             return PartialView("_ProductListPartial", products);
         }
 
-        public async Task<IActionResult> Details(int? id)
+        [Route("/urun/{slug}", Name = "ProductDetail")]
+        public async Task<IActionResult> Details(string slug)
         {
-            if (id == null)
+            if (string.IsNullOrEmpty(slug)) return NotFound();
+
+            // 1. ADIM: Servis kontrolü
+            var queryable = _service.GetQueryable();
+            if (queryable == null)
             {
-                return NotFound();
+                // Eğer servis null dönüyorsa hata buradadır
+                return Content("Hata: Veritabanı sorgu kaynağı (GetQueryable) boş döndü.");
             }
 
-            // 1. Ürünü Detaylarıyla Çekme
-            var product = await _service.GetQueryable()
+            // 2. ADIM: Ürün çekme (Await ve Null kontrolü)
+            var product = await queryable
                 .Include(p => p.Brand)
                 .Include(p => p.Category)
                 .Include(p => p.ProductImages)
-                .FirstOrDefaultAsync(m => m.Id == id);
+                .FirstOrDefaultAsync(m => m.Slug == slug);
 
-            if (product == null)
-            {
-                return NotFound();
-            }
+            if (product == null) return NotFound();
 
-            // 2. Benzer Ürünleri Çekme (Related Products)
-            // Aynı kategorideki, kendisi haricindeki aktif 4 ürünü getir.
-            var relatedProducts = await _service.GetQueryable()
+            // 3. ADIM: İlgili ürünler (Burada isActive'in NULL kontrolüne dikkat)
+            // Eğer veritabanında 'isActive' null olan kayıtlar varsa queryable patlayabilir.
+            var relatedProducts = await queryable
                 .Where(p => p.isActive && p.CategoryId == product.CategoryId && p.Id != product.Id)
                 .Take(4)
-                .ToListAsync();
+                .ToListAsync() ?? new List<Product>(); // Liste null gelirse boş liste ata
 
-            // ViewModel Doldurma
             var model = new ProductDetailViewModel()
             {
                 Product = product,
@@ -124,4 +126,5 @@ namespace Eticaret.WebUI.Controllers
             return View(model);
         }
     }
+
 }

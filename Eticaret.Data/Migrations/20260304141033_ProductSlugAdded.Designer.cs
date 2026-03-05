@@ -3,6 +3,7 @@ using System;
 using Eticaret.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Eticaret.Data.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    partial class DatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20260304141033_ProductSlugAdded")]
+    partial class ProductSlugAdded
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.0");
@@ -203,10 +206,6 @@ namespace Eticaret.Data.Migrations
                     b.Property<int>("ParentId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("Slug")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
                     b.Property<bool>("isActive")
                         .HasColumnType("INTEGER");
 
@@ -225,7 +224,6 @@ namespace Eticaret.Data.Migrations
                             Name = "Elektronik",
                             OrderNo = 1,
                             ParentId = 0,
-                            Slug = "elektronik",
                             isActive = true,
                             isTopMenu = true
                         });
@@ -408,11 +406,6 @@ namespace Eticaret.Data.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Slug")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("TEXT");
-
                     b.Property<int>("Stock")
                         .HasColumnType("INTEGER");
 
@@ -422,14 +415,15 @@ namespace Eticaret.Data.Migrations
                     b.Property<bool>("isHome")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("slug")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.HasKey("Id");
 
                     b.HasIndex("BrandId");
 
                     b.HasIndex("CategoryId");
-
-                    b.HasIndex("Slug")
-                        .IsUnique();
 
                     b.ToTable("Products");
                 });

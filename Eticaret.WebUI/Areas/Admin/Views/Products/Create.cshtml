@@ -18,9 +18,25 @@
                 <div class="card-body">
                     <div class="mb-3">
                         <label asp-for="Name" class="form-label"></label>
-                        <input asp-for="Name" class="form-control form-control-lg" />
+                        @* id="ProductName" eklendi *@
+                        <input asp-for="Name" id="ProductName" class="form-control form-control-lg"
+                            placeholder="Ürün adını giriniz..." />
                         <span asp-validation-for="Name" class="text-danger small"></span>
                     </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Slug" class="form-label">Kalıcı Bağlantı (Slug)</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light text-muted small">/urun/</span>
+                            @* id="ProductSlug" eklendi *@
+                            <input asp-for="Slug" id="ProductSlug" class="form-control"
+                                placeholder="urun-adi-formatinda" />
+                        </div>
+                        <div class="form-text small text-muted">URL'de görünecek olan benzersiz metin. Boş bırakırsanız
+                            isimden üretilir.</div>
+                        <span asp-validation-for="Slug" class="text-danger small"></span>
+                    </div>
+
                     <div class="mb-3">
                         <label asp-for="Description" class="form-label"></label>
                         <textarea asp-for="Description" class="form-control" rows="4"></textarea>
@@ -36,7 +52,9 @@
 
             <!-- Görsel Yükleme -->
             <div class="card card-admin mt-4">
-                <div class="card-header"><h5 class="card-title mb-0">Ürün Görseli</h5></div>
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Ürün Görseli</h5>
+                </div>
                 <div class="card-body">
                     <label for="file-upload" class="custom-file-upload-container">
                         <div class="icon"><i class="bi bi-cloud-arrow-up-fill"></i></div>
@@ -52,7 +70,9 @@
 
             <!-- Fiyatlandırma ve Stok -->
             <div class="card card-admin mt-4">
-                <div class="card-header"><h5 class="card-title mb-0">Fiyat ve Stok</h5></div>
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Fiyat ve Stok</h5>
+                </div>
                 <div class="card-body">
                     <div class="row g-3">
                         <div class="col-md-6">
@@ -74,7 +94,9 @@
 
             <!-- Organizasyon -->
             <div class="card card-admin mt-4">
-                <div class="card-header"><h5 class="card-title mb-0">Organizasyon</h5></div>
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Organizasyon</h5>
+                </div>
                 <div class="card-body">
                     <div class="row g-3">
                         <div class="col-md-6">
@@ -99,7 +121,9 @@
             <div class="sticky-form-sidebar">
                 <!-- Eylemler -->
                 <div class="card card-admin">
-                    <div class="card-header"><h5 class="card-title mb-0">Eylemler</h5></div>
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Eylemler</h5>
+                    </div>
                     <div class="card-body">
                         <div class="d-grid gap-2">
                             <button type="submit" class="btn btn-submit shadow-sm">
@@ -114,15 +138,19 @@
 
                 <!-- Durum -->
                 <div class="card card-admin mt-4">
-                    <div class="card-header"><h5 class="card-title mb-0">Durum</h5></div>
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Durum</h5>
+                    </div>
                     <div class="card-body">
                         <div class="form-check form-switch mb-3">
                             <input class="form-check-input" asp-for="isActive" />
-                            <label class="form-check-label" asp-for="isActive">@Html.DisplayNameFor(model => model.isActive)</label>
+                            <label class="form-check-label" asp-for="isActive">@Html.DisplayNameFor(model =>
+                                                                model.isActive)</label>
                         </div>
                         <div class="form-check form-switch">
                             <input class="form-check-input" asp-for="isHome" />
-                            <label class="form-check-label" asp-for="isHome">@Html.DisplayNameFor(model => model.isHome)</label>
+                            <label class="form-check-label" asp-for="isHome">@Html.DisplayNameFor(model =>
+                                                                model.isHome)</label>
                         </div>
                     </div>
                 </div>
@@ -134,6 +162,7 @@
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
     <script>
+        // Görsel Önizleme Fonksiyonun
         function previewImage(event) {
             const reader = new FileReader();
             reader.onload = function () {
@@ -142,6 +171,31 @@
                 output.style.display = 'block';
             };
             reader.readAsDataURL(event.target.files[0]);
+        }
+
+        // --- OTOMATİK SLUG OLUŞTURUCU ---
+        const nameInput = document.getElementById('ProductName');
+        const slugInput = document.getElementById('ProductSlug');
+
+        nameInput.addEventListener('input', function() {
+            // Eğer admin elle slug kısmına müdahale etmediyse otomatik doldur
+            let text = nameInput.value;
+            slugInput.value = generateSlug(text);
+        });
+
+        function generateSlug(text) {
+            const trMap = {
+                'ç': 'c', 'Ç': 'C', 'ğ': 'g', 'Ğ': 'G', 'ş': 's', 'Ş': 'S',
+                'ü': 'u', 'Ü': 'U', 'ı': 'i', 'İ': 'I', 'ö': 'o', 'Ö': 'O'
+            };
+            for (let key in trMap) {
+                text = text.replace(new RegExp(key, 'g'), trMap[key]);
+            }
+            return text.toLowerCase()
+                .replace(/[^-a-zA-Z0-9\s]+/g, '') // Özel karakterleri sil
+                .replace(/\s+/g, '-')             // Boşlukları - yap
+                .replace(/-+/g, '-')              // Çift tireleri tek tire yap
+                .trim();
         }
     </script>
 }

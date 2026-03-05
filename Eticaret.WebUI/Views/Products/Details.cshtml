@@ -2,9 +2,8 @@
 @model ProductDetailViewModel
 @{
     ViewData["Title"] = Model.Product.Name;
-    var favourites = Context.Session.GetJson<List<Product>>("GetFavourites");
+    var favourites = Context.Session.GetJson<List<Product>>("GetFavourites") ?? new List<Product>();
 }
-
 <style>
     /* --- TEMA ENTEGRASYONU --- */
     /* Bootstrap sınıflarını tema değişkenlerine bağlayalım */
@@ -117,7 +116,7 @@
             <ol class="breadcrumb bg-transparent p-0 m-0">
                 <li class="breadcrumb-item"><a href="/" class="text-decoration-none text-muted"><i
                             class="bi bi-house-door"></i> Ana Sayfa</a></li>
-                <li class="breadcrumb-item"><a href="/Products" class="text-decoration-none text-muted">Ürünler</a></li>
+                <li class="breadcrumb-item"><a href="/urunler" class="text-decoration-none text-muted">Ürünler</a></li>
                 <li class="breadcrumb-item active fw-bold text-dark" aria-current="page">@Model.Product.Name</li>
             </ol>
         </nav>
@@ -216,23 +215,23 @@
 
                     <form asp-action="Add" asp-controller="Favourites" method="post" class="m-0">
                         <input type="hidden" name="productId" value="@Model.Product.Id">
-                        @if(favourites.Any(x => x.Id == Model.Product.Id))
+                        @if (favourites.Any(x => x.Id == Model.Product.Id))
                         {
-                        <button
-                            class="btn btn-outline-danger shadow-sm rounded-circle d-flex align-items-center justify-content-center transition-all"
-                            type="submit" style="width: 54px; height: 54px;" data-bs-toggle="tooltip"
-                            data-bs-placement="top" title="Bu ürün zaten favorilerinizde!">
-                            <i class="bi bi-heart-fill fs-4"></i>
-                        </button>
+                            <button
+                                class="btn btn-outline-danger shadow-sm rounded-circle d-flex align-items-center justify-content-center transition-all"
+                                type="submit" style="width: 54px; height: 54px;" data-bs-toggle="tooltip"
+                                data-bs-placement="top" title="Bu ürün zaten favorilerinizde!">
+                                <i class="bi bi-heart-fill fs-4"></i>
+                            </button>
                         }
                         else
                         {
-                        <button
-                            class="btn btn-outline-danger shadow-sm rounded-circle d-flex align-items-center justify-content-center transition-all"
-                            type="submit" style="width: 54px; height: 54px;" data-bs-toggle="tooltip"
-                            data-bs-placement="top" title="Favorilere Ekle">
-                            <i class="bi bi-heart fs-4"></i>
-                        </button>
+                            <button
+                                class="btn btn-outline-danger shadow-sm rounded-circle d-flex align-items-center justify-content-center transition-all"
+                                type="submit" style="width: 54px; height: 54px;" data-bs-toggle="tooltip"
+                                data-bs-placement="top" title="Favorilere Ekle">
+                                <i class="bi bi-heart fs-4"></i>
+                            </button>
                         }
 
                     </form>

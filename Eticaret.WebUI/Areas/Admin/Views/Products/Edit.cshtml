@@ -11,9 +11,7 @@
     <input type="hidden" asp-for="CreateDate" />
 
     <div class="row g-4">
-        <!-- SOL KOLON: Ana İçerik -->
         <div class="col-lg-8">
-            <!-- Ürün Detayları -->
             <div class="card card-admin">
                 <div class="card-header">
                     <h5 class="card-title mb-0">Ürün Detayları</h5>
@@ -21,9 +19,23 @@
                 <div class="card-body">
                     <div class="mb-3">
                         <label asp-for="Name" class="form-label"></label>
-                        <input asp-for="Name" class="form-control form-control-lg" />
+                        <input asp-for="Name" id="ProductName" class="form-control form-control-lg" />
                         <span asp-validation-for="Name" class="text-danger small"></span>
                     </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Slug" class="form-label">Kalıcı Bağlantı (Slug)</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light text-muted small">/urun/</span>
+                            <input asp-for="Slug" id="ProductSlug" class="form-control" />
+                        </div>
+                        <div class="form-text small text-muted">
+                            <i class="bi bi-exclamation-triangle-fill text-warning me-1"></i> 
+                            DİKKAT: Slug değişirse eski linkler kırılabilir.
+                        </div>
+                        <span asp-validation-for="Slug" class="text-danger small"></span>
+                    </div>
+
                     <div class="mb-3">
                         <label asp-for="Description" class="form-label"></label>
                         <textarea asp-for="Description" class="form-control" rows="4"></textarea>
@@ -37,7 +49,6 @@
                 </div>
             </div>
 
-            <!-- Görsel Yükleme -->
             <div class="card card-admin mt-4">
                 <div class="card-header"><h5 class="card-title mb-0">Ürün Görseli</h5></div>
                 <div class="card-body">
@@ -58,7 +69,6 @@
                 </div>
             </div>
 
-            <!-- Fiyatlandırma ve Stok -->
             <div class="card card-admin mt-4">
                 <div class="card-header"><h5 class="card-title mb-0">Fiyat ve Stok</h5></div>
                 <div class="card-body">
@@ -80,7 +90,6 @@
                 </div>
             </div>
 
-            <!-- Organizasyon -->
             <div class="card card-admin mt-4">
                 <div class="card-header"><h5 class="card-title mb-0">Organizasyon</h5></div>
                 <div class="card-body">
@@ -102,10 +111,8 @@
             </div>
         </div>
 
-        <!-- SAĞ KOLON: Eylemler ve Durum -->
         <div class="col-lg-4">
             <div class="sticky-form-sidebar">
-                <!-- Eylemler -->
                 <div class="card card-admin">
                     <div class="card-header"><h5 class="card-title mb-0">Eylemler</h5></div>
                     <div class="card-body">
@@ -120,7 +127,6 @@
                     </div>
                 </div>
 
-                <!-- Durum -->
                 <div class="card card-admin mt-4">
                     <div class="card-header"><h5 class="card-title mb-0">Durum</h5></div>
                     <div class="card-body">
@@ -141,5 +147,36 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-    <script>function previewImage(e){const r=new FileReader;r.onload=function(){const o=document.getElementById("image-preview");o.src=r.result,o.style.display="inline-block"},r.readAsDataURL(e.target.files[0])}</script>
+    <script>
+     
+        function previewImage(e){
+            const r=new FileReader;
+            r.onload=function(){
+                const o=document.getElementById("image-preview");
+                o.src=r.result,o.style.display="inline-block"
+            },r.readAsDataURL(e.target.files[0])
+        }
+
+        const nameInput = document.getElementById('ProductName');
+        const slugInput = document.getElementById('ProductSlug');
+
+        nameInput.addEventListener('input', function() {
+
+        });
+
+        function generateSlug(text) {
+            const trMap = {
+                'ç': 'c', 'Ç': 'C', 'ğ': 'g', 'Ğ': 'G', 'ş': 's', 'Ş': 'S',
+                'ü': 'u', 'Ü': 'U', 'ı': 'i', 'İ': 'I', 'ö': 'o', 'Ö': 'O'
+            };
+            for (let key in trMap) {
+                text = text.replace(new RegExp(key, 'g'), trMap[key]);
+            }
+            return text.toLowerCase()
+                .replace(/[^-a-zA-Z0-9\s]+/g, '')
+                .replace(/\s+/g, '-')
+                .replace(/-+/g, '-')
+                .trim();
+        }
+    </script>
 }

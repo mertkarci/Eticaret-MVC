@@ -15,6 +15,14 @@
                     <dt class="col-sm-3 text-muted">Ürün Adı</dt>
                     <dd class="col-sm-9 fw-bold text-dark">@Model.Name</dd>
 
+                    <dt class="col-sm-3 text-muted">Kalıcı Bağlantı</dt>
+                    <dd class="col-sm-9">
+                        <code class="text-primary">/urun/@Model.Slug</code>
+                        <a href="/urun/@Model.Slug" target="_blank" class="ms-2 text-decoration-none small">
+                            <i class="bi bi-box-arrow-up-right"></i> Sitede Gör
+                        </a>
+                    </dd>
+
                     <dt class="col-sm-3 text-muted">Ürün Kodu</dt>
                     <dd class="col-sm-9">@Model.ProductCode</dd>
 
@@ -42,7 +50,6 @@
 
     <div class="col-lg-4">
         <div class="sticky-form-sidebar">
-            <!-- Görsel -->
             <div class="card card-admin mb-4">
                 <div class="card-header"><h5 class="card-title mb-0">Ürün Görseli</h5></div>
                 <div class="card-body text-center">
@@ -60,7 +67,6 @@
                 </div>
             </div>
 
-            <!-- Durum ve İşlemler -->
             <div class="card card-admin">
                 <div class="card-header"><h5 class="card-title mb-0">Durum</h5></div>
                 <div class="card-body">

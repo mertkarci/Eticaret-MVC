@@ -5,6 +5,7 @@ namespace Eticaret.Core.Entities;
 
 public class Product : IEntity
 {
+    
     public int Id {get; set;}
     public int ParentId {get; set;}
 
@@ -43,12 +44,13 @@ public class Product : IEntity
     [Display(Name ="Ürün Görseli")]
     public string? Image {get; set;}
     
-    // Eksik olan etiketleri ekledik
     [Display(Name ="Aktif mi?")]
     public bool isActive {get; set;}
     
     [Display(Name ="Anasayfada Göster")]
     public bool isHome {get; set;}
+    [Display(Name ="Ürün Sloganı (SEO için Önemli)")]
+    public string Slug {get;set;}
 
     [Display(Name ="Kayıt Tarihi"), ScaffoldColumn(false)]
     public DateTime CreateDate {get; set;} = DateTime.Now;

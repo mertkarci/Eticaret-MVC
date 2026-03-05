@@ -64,11 +64,23 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create( Product product, IFormFile? Image)
+        public async Task<IActionResult> Create(Product product, IFormFile? Image)
         {
             if (ModelState.IsValid)
             {
-                product.Image = await FileHelper.FileLoaderAsync(Image,"/img/products/");
+                product.Image = await FileHelper.FileLoaderAsync(Image, "/img/products/");
+
+                string baseSlug = UrlHelper.FriendlyUrl(product.Name);
+                string finalSlug = baseSlug;
+                int counter = 1;
+
+                while (await _context.Products.AnyAsync(p => p.Slug == finalSlug))
+                {
+                    finalSlug = $"{baseSlug}-{counter++}";
+                }
+
+                product.Slug = finalSlug;
+
                 _context.Add(product);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -112,13 +124,13 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
             {
                 try
                 {
-                    if(cbResmiSil)
+                    if (cbResmiSil)
                     {
                         product.Image = string.Empty;
                     }
-                    if(Image != null)
-                    { 
-                        product.Image = await FileHelper.FileLoaderAsync(Image,"/img/products/");
+                    if (Image != null)
+                    {
+                        product.Image = await FileHelper.FileLoaderAsync(Image, "/img/products/");
                     }
                     _context.Update(product);
                     await _context.SaveChangesAsync();
@@ -169,9 +181,9 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
             var product = await _context.Products.FindAsync(id);
             if (product != null)
             {
-                                if(!string.IsNullOrEmpty(product.Image))
+                if (!string.IsNullOrEmpty(product.Image))
                 {
-                    FileHelper.FileRemover(product.Image,"/wwwroot/img/products/");
+                    FileHelper.FileRemover(product.Image, "/wwwroot/img/products/");
                 }
                 _context.Products.Remove(product);
             }
@@ -185,4 +197,5 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
             return _context.Products.Any(e => e.Id == id);
         }
     }
+
 }

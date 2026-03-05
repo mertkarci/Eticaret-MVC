@@ -1,19 +1,15 @@
 @model Product
 @using Microsoft.AspNetCore.Http
 @using System.Text.Json
-@using Eticaret.WebUI.ExtensionMethods @* GetJson metodun buradaysa ekle *@
+@using Eticaret.WebUI.ExtensionMethods
 
 @{
-    // Session'dan "GetFavourites" anahtarlı listeyi oku
     var sessionData = Context.Session.GetString("GetFavourites");
     var isFavorite = false;
 
     if (!string.IsNullOrEmpty(sessionData))
     {
-        // Session'daki JSON'ı ürün listesine geri döndür
         var favoriteProducts = JsonSerializer.Deserialize<List<Product>>(sessionData);
-        
-        // Mevcut ürün ID'si listede var mı kontrol et
         if (favoriteProducts != null && favoriteProducts.Any(p => p.Id == Model.Id))
         {
             isFavorite = true;
@@ -24,8 +20,7 @@
 <div class="col mb-4">
     <div class="product-card-wrapper">
         <div class="card product-card">
-            
-            @* isFavorite durumuna göre class değişimi *@
+
             <div class="@(isFavorite ? "badge-discount-yes" : "badge-discount") position-absolute">
                 <form asp-action="Add" asp-controller="Favourites" method="post">
                     <input type="hidden" name="productId" value="@Model.Id">
@@ -35,13 +30,15 @@
                 </form>
             </div>
 
-            <a href="/Products/Details/@Model.Id" class="img-wrapper d-block">
+            @* Rota ismi (ProductDetail) ile yönlendirme *@
+            <a asp-route="ProductDetail" asp-route-slug="@Model.Slug" class="img-wrapper d-block">
                 <img class="img-fit" src="~/img/products/@Model.Image" alt="@Model.Name">
             </a>
 
             <div class="card-body-compact text-center">
                 <h6 class="mb-1">
-                    <a href="/Products/Details/@Model.Id" class="title-compact d-block" title="@Model.Name">
+                    @* Rota ismi (ProductDetail) ile yönlendirme *@
+                    <a asp-route="ProductDetail" asp-route-slug="@Model.Slug" class="title-compact d-block" title="@Model.Name">
                         @Model.Name
                     </a>
                 </h6>
@@ -51,7 +48,7 @@
                 </div>
             </div>
 
-            <form action="/Cart/Add" method="post">
+            <form asp-action="Add" asp-controller="Cart" method="post">
                 <input type="hidden" name="ProductId" value="@Model.Id">
                 <button class="btn btn-compact" type="submit" style="box-shadow: none">
                     <i class="bi bi-cart-plus me-1"></i> SEPETE EKLE

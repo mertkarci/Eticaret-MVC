@@ -11,5 +11,7 @@ internal class ProductConfigurations : IEntityTypeConfiguration<Product>
         builder.Property(x => x.Name).HasMaxLength(150);
         builder.Property(x => x.Image).HasMaxLength(100);
         builder.Property(x => x.ProductCode).HasMaxLength(50);
+        builder.Property(x => x.Slug).IsRequired().HasMaxLength(200); 
+        builder.HasIndex(x => x.Slug).IsUnique(); 
     }
 }
