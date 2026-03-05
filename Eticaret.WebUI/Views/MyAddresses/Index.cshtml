@@ -14,106 +14,124 @@
 
     @if (!Model.Any())
     {
-        <div class="d-flex flex-column justify-content-center align-items-center text-center py-5" style="min-height: 65vh;">
+        <div class="d-flex flex-column justify-content-center align-items-center text-center py-5"
+            style="min-height: 65vh;">
             <div class="mb-3">
-                <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center"
+                    style="width: 80px; height: 80px;">
                     <i class="bi bi-geo-alt text-muted fs-1"></i>
                 </div>
             </div>
             <h4 class="fw-bold text-dark">Henüz adres eklemediniz</h4>
             <p class="text-muted mb-4">Siparişlerinizi daha hızlı tamamlamak için adres ekleyin.</p>
-            <a asp-action="Create" class="btn btn-primary rounded-pill px-4">Adres Ekle</a>
+            <a asp-controller="MyAddresses" asp-action="Create" class="btn btn-primary rounded-pill px-4">
+                Adres Ekle
+            </a>
         </div>
     }
     else
     {
         <div class="letter-paper shadow-sm p-3 p-md-5" style="min-height: 65vh;">
-        <div class="row g-4">
-            @foreach (var item in Model)
-            {
-                <div class="col-md-6 col-lg-4">
-                    <div class="card h-100 border-0 shadow-sm address-card position-relative" onclick="location.href='@Url.Action("Edit", new { id = item.AddressGuid })'">
-                        <!-- Seçili/Aktif Göstergesi -->
-                        @if (item.IsActive)
-                        {
-                            <div class="position-absolute top-0 end-0 mt-3 me-3">
-                                <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-3">Aktif</span>
-                            </div>
-                        }
+            <div class="row g-4">
+                @foreach (var item in Model)
+                {
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card h-100 border-0 shadow-sm address-card position-relative"
+                            onclick="location.href='/adreslerim/duzenle/@item.Title'">
 
-                        <div class="card-body p-4 d-flex flex-column">
-                            <div class="d-flex align-items-center mb-4">
-                                <div class="icon-box bg-light text-primary rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 48px; height: 48px;">
-                                    <i class="bi bi-house-door-fill fs-5"></i>
+                            @if (item.IsActive)
+                            {
+                                <div class="position-absolute top-0 end-0 mt-3 me-3">
+                                    <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-3">Aktif</span>
                                 </div>
-                                <div>
-                                    <h6 class="fw-bold text-dark mb-0">@item.Title</h6>
-                                    <small class="text-muted">@item.City / @item.District</small>
-                                </div>
-                            </div>
+                            }
 
-                            <div class="mb-4 flex-grow-1">
-                                <p class="text-secondary small mb-0" style="line-height: 1.6;">
-                                    @item.OpenAddress
-                                </p>
-                            </div>
-
-                            <div class="d-flex align-items-center justify-content-between pt-3 border-top border-light">
-                                <div class="d-flex gap-2">
-                                    @if (item.IsDeliveryAddress)
-                                    {
-                                        <span class="badge bg-light text-secondary border fw-normal" data-bs-toggle="tooltip" title="Teslimat Adresi"><i class="bi bi-truck"></i></span>
-                                    }
-                                    @if (item.IsBillingAddress)
-                                    {
-                                        <span class="badge bg-light text-secondary border fw-normal" data-bs-toggle="tooltip" title="Fatura Adresi"><i class="bi bi-receipt"></i></span>
-                                    }
+                            <div class="card-body p-4 d-flex flex-column">
+                                <div class="d-flex align-items-center mb-4">
+                                    <div class="icon-box bg-light text-primary rounded-circle d-flex align-items-center justify-content-center me-3"
+                                        style="width: 48px; height: 48px;">
+                                        <i class="bi bi-house-door-fill fs-5"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="fw-bold text-dark mb-0">@item.Title</h6>
+                                        <small class="text-muted">@item.City / @item.District</small>
+                                    </div>
                                 </div>
-                                
-                                <a asp-action="Delete" asp-route-id="@item.AddressGuid" class="btn btn-sm btn-outline-danger rounded-pill px-3 py-0" onclick="event.stopPropagation()">
-                                    <i class="bi bi-trash me-1"></i> Sil
-                                </a>
+
+                                <div class="mb-4 flex-grow-1">
+                                    <p class="text-secondary small mb-0" style="line-height: 1.6;">
+                                        @item.OpenAddress
+                                    </p>
+                                </div>
+
+                                <div class="d-flex align-items-center justify-content-between pt-3 border-top border-light">
+                                    <div class="d-flex gap-2">
+                                        @if (item.IsDeliveryAddress)
+                                        {
+                                            <span class="badge bg-light text-secondary border fw-normal" data-bs-toggle="tooltip"
+                                                title="Teslimat Adresi"><i class="bi bi-truck"></i></span>
+                                        }
+                                        @if (item.IsBillingAddress)
+                                        {
+                                            <span class="badge bg-light text-secondary border fw-normal" data-bs-toggle="tooltip"
+                                                title="Fatura Adresi"><i class="bi bi-receipt"></i></span>
+                                        }
+                                    </div>
+                                    <a asp-action="Delete" asp-route-name="@item.Title"
+                                        class="btn btn-sm btn-outline-danger rounded-pill px-3 py-0"
+                                        onclick="event.stopPropagation()">
+                                        <i class="bi bi-trash me-1"></i> Sil
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </div>
+                }
+
+                <div class="col-md-6 col-lg-4">
+                    <a asp-action="Create"
+                        class="card h-100 border-2 border-dashed border-light bg-transparent text-decoration-none d-flex align-items-center justify-content-center p-4 address-add-card">
+                        <div class="text-center text-muted">
+                            <i class="bi bi-plus-circle fs-3 mb-2 d-block"></i>
+                            <span class="fw-medium">Yeni Adres Ekle</span>
+                        </div>
+                    </a>
                 </div>
-            }
-            
-            <!-- Yeni Ekle Kartı -->
-             <div class="col-md-6 col-lg-4">
-                <a asp-action="Create" class="card h-100 border-2 border-dashed border-light bg-transparent text-decoration-none d-flex align-items-center justify-content-center p-4 address-add-card">
-                    <div class="text-center text-muted">
-                        <i class="bi bi-plus-circle fs-3 mb-2 d-block"></i>
-                        <span class="fw-medium">Yeni Adres Ekle</span>
-                    </div>
-                </a>
             </div>
-        </div>
         </div>
     }
 </div>
 
 <style>
-
     .address-card {
         transition: transform 0.2s ease, box-shadow 0.2s ease;
         border-radius: 1rem;
         cursor: pointer;
     }
+
     .address-card:hover {
         transform: translateY(-3px);
-        box-shadow: 0 5px 15px rgba(0,0,0,0.08) !important;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
     }
+
     .address-add-card {
         border-radius: 1rem;
         transition: all 0.2s ease;
+        border-style: dashed !important;
     }
+
     .address-add-card:hover {
         border-color: var(--bs-primary) !important;
         color: var(--bs-primary) !important;
         background-color: rgba(var(--bs-primary-rgb), 0.03) !important;
     }
+
     .address-add-card:hover .text-muted {
         color: var(--bs-primary) !important;
+    }
+
+    /* Tooltip'lerin düzgün görünmesi için minik bir dokunuş */
+    .badge i {
+        font-size: 0.9rem;
     }
 </style>

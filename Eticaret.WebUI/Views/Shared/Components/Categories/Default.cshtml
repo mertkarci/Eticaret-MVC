@@ -1,27 +1,29 @@
 @model IEnumerable<Category>
 
 <div class="collapse navbar-collapse" id="navbarsExample04">
-    
+
     <ul class="navbar-nav mr-auto navbar-font">
-        
-        @foreach (var mainCategory in Model.Where(c =>  c.ParentId == 0))
+
+        @foreach (var mainCategory in Model.Where(c => c.ParentId == 0))
         {
             // Bu ana kategoriye ait alt kategorileri buluyoruz
             var subCategories = Model.Where(c => c.ParentId == mainCategory.Id).ToList();
 
-            if (subCategories.Any())
+            @if (subCategories.Any())
             {
-                // --- EĞER ALT KATEGORİSİ VARSA (Dropdown Yap) ---
                 <li class="nav-item dropdown navbar-font">
-                    <a class="nav-link dropdown-toggle navbar-font" href="/Categories/Index/@mainCategory.Id" id="dropdown-@mainCategory.Id" onclick="window.location.href=this.href"
-                       data-bs-toggle="dropdown" aria-expanded="false">
+                    <a class="nav-link dropdown-toggle navbar-font" href="/kategoriler/@mainCategory.Slug"
+                        id="dropdown-@mainCategory.Id" onclick="window.location.href=this.href" data-bs-toggle="dropdown"
+                        aria-expanded="false">
                         @mainCategory.Name
                     </a>
                     <ul class="dropdown-menu" aria-labelledby="dropdown-@mainCategory.Id">
                         @foreach (var sub in subCategories)
                         {
                             <li>
-                                <a class="dropdown-item" href="/Categories/Index/@sub.Id">@sub.Name</a>
+                                <a class="dropdown-item" href="/kategoriler/@mainCategory.Slug/@sub.Slug">
+                                    @sub.Name
+                                </a>
                             </li>
                         }
                     </ul>
@@ -29,12 +31,13 @@
             }
             else
             {
-                // --- ALT KATEGORİSİ YOKSA (Düz Link Yap) ---
-                <li class="nav-item">
-                    <a class="nav-link" href="/Categories/Index/@mainCategory.Id">@mainCategory.Name</a>
+                <li class="nav-item navbar-font">
+                    <a class="nav-link navbar-font" href="/kategoriler/@mainCategory.Slug">
+                        @mainCategory.Name
+                    </a>
                 </li>
             }
         }
     </ul>
-    
+
 </div>

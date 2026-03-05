@@ -66,12 +66,12 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
                 {
                     category.Image = await FileHelper.FileLoaderAsync(Image, "/img/categories/");
                 }
-                
+
                 _context.Add(category);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            
+
             // Model hatalıysa sayfa geri dönerken dropdown boşalmasın diye tekrar listeyi gönderiyoruz
             ViewBag.Categories = new SelectList(await _context.Categories.ToListAsync(), "Id", "Name", category.ParentId);
             return View(category);
@@ -185,5 +185,36 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
         {
             return _context.Categories.Any(e => e.Id == id);
         }
+        // [Route("Admin/Categories/GenerateCategorySlugs")]
+        // public async Task<IActionResult> GenerateCategorySlugs()
+        // {
+        //     // Veritabanındaki tüm kategorileri çekiyoruz
+        //     var categories = await _context.Categories.ToListAsync();
+        //     int updatedCount = 0;
+
+        //     foreach (var category in categories)
+        //     {
+        //         // İsimden SEO uyumlu link oluştur (Örn: "Ev Eşyası" -> "ev-esyasi")
+        //         string baseSlug = UrlHelper.FriendlyUrl(category.Name ?? "");
+        //         string finalSlug = baseSlug;
+        //         int counter = 1;
+
+        //         // Benzersizlik kontrolü: Eğer aynı slug varsa sonuna -1, -2 ekler
+        //         while (await _context.Categories.AnyAsync(c => c.Slug == finalSlug && c.Id != category.Id))
+        //         {
+        //             finalSlug = $"{baseSlug}-{counter++}";
+        //         }
+
+        //         category.Slug = finalSlug;
+        //         _context.Update(category);
+        //         updatedCount++;
+        //     }
+
+        //     await _context.SaveChangesAsync();
+
+        //     // İşlem bitince liste sayfasına mesajla dön
+        //     TempData["Message"] = $"{updatedCount} adet kategori başarıyla SEO uyumlu hale getirildi.";
+        //     return RedirectToAction(nameof(Index));
+        // }
     }
 }

@@ -19,6 +19,8 @@ public class Category : IEntity
 
     [Display(Name ="Görsel")]
     public string? Image {get; set;}
+    [Display(Name ="Slug")]
+    public string? Slug {get; set;}
     public bool isActive {get; set;}
     public bool isTopMenu {get; set;}
 

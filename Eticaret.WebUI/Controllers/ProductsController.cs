@@ -20,6 +20,7 @@ namespace Eticaret.WebUI.Controllers
             _categoryService = categoryService;
         }
 
+        [Route("urun")]
         public async Task<IActionResult> Index(string q = "")
         {
             // 1. ADIM: Servisten "Henüz Çalışmamış" sorguyu (IQueryable) alıyoruz.
@@ -91,8 +92,10 @@ namespace Eticaret.WebUI.Controllers
         [Route("/urun/{slug}", Name = "ProductDetail")]
         public async Task<IActionResult> Details(string slug)
         {
-            if (string.IsNullOrEmpty(slug)) return NotFound();
-
+            if (string.IsNullOrWhiteSpace(slug))
+            {
+                return RedirectToAction(nameof(Index)); 
+            }
             // 1. ADIM: Servis kontrolü
             var queryable = _service.GetQueryable();
             if (queryable == null)

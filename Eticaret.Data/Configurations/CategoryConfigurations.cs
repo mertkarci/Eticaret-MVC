@@ -1,6 +1,6 @@
 ﻿using Eticaret.Core;
 using Eticaret.Core.Entities;
-using Microsoft.EntityFrameworkCore; 
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 namespace Eticaret.Data.Configurations;
 
@@ -19,8 +19,12 @@ internal class CategoryConfigurations : IEntityTypeConfiguration<Category>
                 isActive = true,
                 ParentId = 0,
                 OrderNo = 1,
-                CreateDate = DateTime.Parse("2024-01-01")
+                CreateDate = DateTime.Parse("2024-01-01"),
+                Slug = "elektronik"
             }
         );
+
+        builder.Property(x => x.Slug).IsRequired().HasMaxLength(200);
+        builder.HasIndex(x => x.Slug).IsUnique();
     }
 }

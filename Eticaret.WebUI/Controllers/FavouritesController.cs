@@ -14,6 +14,7 @@ namespace Eticaret.WebUI.Controllers
             _service = service;
 
         }
+        [Route("favorilerim")]
         public ActionResult Index()
         {
             var favourites = GetFavourites();

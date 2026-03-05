@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Eticaret.WebUI.Controllers
 {
+    [Route("sepetim")]
     public class CartController : Controller
     {
         private readonly IService<Product> _serviceProduct;
@@ -26,10 +27,11 @@ namespace Eticaret.WebUI.Controllers
             _serviceProduct = serviceProduct;
             _serviceAppUser = serviceAppUser;
             _serviceAddress = serviceAddress;
-  
+
             _orderService = orderService;
-  
+
         }
+        [HttpGet("")]
         public IActionResult Index()
         {
             var cart = GetCart();
@@ -40,19 +42,29 @@ namespace Eticaret.WebUI.Controllers
             };
             return View(model);
         }
+        [HttpPost("ekle")] 
         public IActionResult Add(int ProductId, int quantity = 1)
         {
             var product = _serviceProduct.Find(ProductId);
             if (product != null)
-
             {
                 var cart = GetCart();
+
+   
                 cart.AddProduct(product, quantity);
+
                 HttpContext.Session.SetJson("Cart", cart);
-                return Redirect(Request.Headers["Referer"].ToString());
+
+            
+                var returnUrl = Request.Headers["Referer"].ToString();
+                if (!string.IsNullOrEmpty(returnUrl))
+                {
+                    return Redirect(returnUrl);
+                }
             }
             return RedirectToAction("Index");
         }
+        [HttpPost("guncelle")] 
         public IActionResult Update(int ProductId, int quantity = 1)
         {
             var product = _serviceProduct.Find(ProductId);
@@ -65,6 +77,7 @@ namespace Eticaret.WebUI.Controllers
             }
             return RedirectToAction("Index");
         }
+        [HttpPost("sil")] 
         public IActionResult Remove(int ProductId)
         {
             var product = _serviceProduct.Find(ProductId);
@@ -78,6 +91,7 @@ namespace Eticaret.WebUI.Controllers
             return RedirectToAction("Index");
         }
         [Authorize]
+        [HttpGet("ödeme")]
         public async Task<IActionResult> Checkout()
         {
             var cart = GetCart();
@@ -169,7 +183,7 @@ namespace Eticaret.WebUI.Controllers
             };
             return View(model);
         }
-
+        [HttpGet("basarili")]
         public IActionResult Thanks()
         {
             return View();

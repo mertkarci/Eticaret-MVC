@@ -22,6 +22,7 @@ public class AccountsController : Controller
     }
 
     [Authorize]
+    [Route("hesabim")]
     public async Task<IActionResult> Index()
     {
         // 1. Cookie'deki String Guid'i al

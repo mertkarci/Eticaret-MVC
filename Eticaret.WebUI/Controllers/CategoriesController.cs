@@ -16,21 +16,23 @@ namespace Eticaret.WebUI.Controllers
             _service = service;
             _brandService = brandService;
         }
-
-        public async Task<IActionResult> IndexAsync(int? id)
+        [Route("/kategoriler/{**slug}")]
+        [Route("/kategoriler/{mainSlug}/{slug}")]
+        public async Task<IActionResult> IndexAsync(string slug, string? mainSlug = null)
         {
-            if (id == null) return NotFound();
+            if (string.IsNullOrEmpty(slug)) return NotFound();
+            
 
-            // 1. Ana kategoriyi ve ürünlerini çek (Brand dahil)
+            // 1. Ana kategoriyi SLUG üzerinden bul ve ürünlerini çek
             var category = await _service.GetQueryable()
                 .Include(p => p.Products).ThenInclude(pr => pr.Brand)
-                .FirstOrDefaultAsync(m => m.Id == id);
+                .FirstOrDefaultAsync(m => m.Slug == slug); // Id yerine Slug ile arıyoruz
 
             if (category == null) return NotFound();
 
-            // 2. Alt kategorileri ve ürünlerini çek
+            // 2. Alt kategorileri çek (ParentId hala ana kategorinin Id'si olmalı)
             var subCategories = await _service.GetQueryable()
-                .Where(c => c.ParentId == id)
+                .Where(c => c.ParentId == category.Id)
                 .Include(c => c.Products).ThenInclude(pr => pr.Brand)
                 .ToListAsync();
 
@@ -41,21 +43,18 @@ namespace Eticaret.WebUI.Controllers
                 if (sub.Products != null) allProducts.AddRange(sub.Products);
             }
 
-            // IndexAsync içindeki ViewModel oluşturma kısmı
             var viewModel = new CategoryFilterViewModel
             {
                 CurrentCategory = category,
-                // Alt kategorileri sidebar'da göstermek için buraya aktarıyoruz
                 SubCategories = subCategories,
                 FilteredProducts = allProducts,
                 AvailableBrands = allProducts
                     .Where(p => p.Brand != null)
                     .Select(p => p.Brand)
-                    .DistinctBy(b => b.Id) // Daha temiz bir yöntem
+                    .DistinctBy(b => b.Id)
                     .ToList()
             };
 
-            // Sayfaya ViewModel'i gönderiyoruz (Category değil!)
             return View(viewModel);
         }
 

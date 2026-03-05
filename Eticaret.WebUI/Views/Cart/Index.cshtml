@@ -38,7 +38,8 @@
                                                 <tr class="border-bottom">
                                                     <td class="ps-3 py-3" style="width: 60px;">
                                                         <a href="/Products/Details/@item.Product.Id">
-                                                            <img src="~/img/products/@item.Product.Image" alt="@item.Product.Name"
+                                                            <img src="~/img/products/@item.Product.Image"
+                                                                alt="@item.Product.Name"
                                                                 class="rounded-3 shadow-sm object-fit-cover"
                                                                 style="width: 50px; height: 50px;" />
                                                         </a>
@@ -49,18 +50,27 @@
                                                             style="max-width: 140px; font-size: 0.9rem;">
                                                             @item.Product.Name
                                                         </a>
-                                                        <div class="text-primary fw-bold small">@item.Product.Price.ToString("c")</div>
+                                                        <div class="text-primary fw-bold small">
+                                                            @item.Product.Price.ToString("c")</div>
                                                     </td>
                                                     <td class="py-3 text-end pe-3">
                                                         <div class="d-flex align-items-center justify-content-end gap-2">
-                                                            <div class="qty-container" style="transform: scale(0.85); transform-origin: right center;">
-                                                                <a href="/Cart/Update?ProductId=@item.Product.Id&quantity=-1" class="qty-btn text-decoration-none d-flex align-items-center justify-content-center small">-</a>
-                                                                <span class="qty-input d-block py-1" style="width: 25px; font-size: 0.9rem;">@item.Quantity</span>
-                                                                <a href="/Cart/Update?ProductId=@item.Product.Id&quantity=1" class="qty-btn text-decoration-none d-flex align-items-center justify-content-center small">+</a>
+                                                            <div class="qty-container"
+                                                                style="transform: scale(0.85); transform-origin: right center;">
+                                                                <a href="/Cart/Update?ProductId=@item.Product.Id&quantity=-1"
+                                                                    class="qty-btn text-decoration-none d-flex align-items-center justify-content-center small">-</a>
+                                                                <span class="qty-input d-block py-1"
+                                                                    style="width: 25px; font-size: 0.9rem;">@item.Quantity</span>
+                                                                <a href="/Cart/Update?ProductId=@item.Product.Id&quantity=1"
+                                                                    class="qty-btn text-decoration-none d-flex align-items-center justify-content-center small">+</a>
                                                             </div>
-                                                            <form asp-controller="Cart" asp-action="Remove" method="post" class="m-0">
+                                                            <form asp-controller="Cart" asp-action="Remove" method="post"
+                                                                class="m-0">
                                                                 <input type="hidden" name="ProductId" value="@item.Product.Id">
-                                                                <button class="btn btn-sm btn-light text-danger rounded-circle p-0 d-flex align-items-center justify-content-center shadow-sm" style="width: 28px; height: 28px;" type="submit"><i class="bi bi-trash3"></i></button>
+                                                                <button
+                                                                    class="btn btn-sm btn-light text-danger rounded-circle p-0 d-flex align-items-center justify-content-center shadow-sm"
+                                                                    style="width: 28px; height: 28px;" type="submit"><i
+                                                                        class="bi bi-trash3"></i></button>
                                                             </form>
                                                         </div>
                                                     </td>
@@ -190,11 +200,12 @@
                                 <span class="fs-5 fw-bold text-dark px-2">Toplam</span>
                                 <span class="fs-5 fw-bolder text-primary">@finalTotal.ToString("c")</span>
                             </div>
-
-                            <a href="/Cart/Checkout"
+                            <a class="btn btn-primary btn-lg w-100 rounded-pill shadow-sm fw-bold mb-2 d-none d-lg-block" asp-controller="Cart"
+                                asp-action="Checkout" title="Sepetim">Sepetei Onayla</a>
+                            @* <a href="/Cart/Checkout"
                                 class="btn btn-primary btn-lg w-100 rounded-pill shadow-sm fw-bold mb-2 d-none d-lg-block">
                                 Sepeti Onayla <i class="bi bi-lock-fill ms-1"></i>
-                            </a>
+                            </a> *@
                             <div class="d-flex justify-content-center gap-3 mt-2 text-muted small">
                                 <span><i class="bi bi-shield-check"></i> 3D Secure Güvenli Ödeme</span>
                             </div>
@@ -238,8 +249,10 @@
                 <small class="text-muted d-block" style="font-size: 0.8rem;">Toplam Tutar</small>
                 <span class="fs-4 fw-bold text-primary">@finalTotal.ToString("c")</span>
             </div>
-            <a href="/Cart/Checkout" class="btn btn-primary rounded-pill px-4 py-2 fw-bold shadow-sm">
-                Sepeti Onayla <i class="bi bi-arrow-right ms-1"></i>
+            <a class="btn btn-primary rounded-pill px-4 py-2 fw-bold shadow-sm" asp-controller="Cart"
+                asp-action="Checkout" title="Sepetim">Sepetei Onayla</a>
+            @* <a href="/Cart/Checkout" class="btn btn-primary rounded-pill px-4 py-2 fw-bold shadow-sm">
+                Sepeti Onayla <i class="bi bi-arrow-right ms-1"></i> *@
             </a>
         </div>
     </div>

@@ -45,6 +45,7 @@ public class HomeController : Controller
         return View();
     }
     // GET: Sayfayı Gösterir
+    [Route("iletisim")]
     public IActionResult ContactUs()
     {
         return View();

@@ -10,10 +10,11 @@
                 <a asp-action="Index" class="list-group-item list-group-item-action active">
                     <i class="bi bi-person"></i> Üyelik Bilgileri
                 </a>
-                <a href="/MyAddresses" class="list-group-item list-group-item-action">
+                <a asp-controller="MyAddresses" asp-action="Index" class="list-group-item list-group-item-action">
                     <i class="bi bi-box-arrow-right"></i> Adreslerim
                 </a>
-                <a href="/Accounts/SignOut" class="list-group-item list-group-item-action text-danger d-none d-md-block">
+                <a href="/Accounts/SignOut"
+                    class="list-group-item list-group-item-action text-danger d-none d-md-block">
                     <i class="bi bi-box-arrow-right"></i> Çıkış Yap
                 </a>
             </div>

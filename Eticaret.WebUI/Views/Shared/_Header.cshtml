@@ -21,8 +21,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 
     <style>
-
-
         /* 1. Hover ve Taşma Düzeltmesi */
         .dropdown-menu-end {
             right: 0 !important;
@@ -138,18 +136,23 @@
                     data-bs-target="#mobileSearchBox">
                     <i class="bi bi-search mobile-icon-size"></i>
                 </button>
-                
+
                 <!-- 1200px Altı İçin (Tablet/Laptop) - Genişlik 200px -->
-                <form action="/Products" class="d-none d-lg-flex d-xl-none position-relative me-2" role="search" style="width:150px;">
-                    <input name="q" class="form-control rounded-pill ps-4 pe-5 bg-light border-0" type="search" placeholder="Ara...">
-                    <button type="submit" class="btn btn-link text-muted position-absolute end-0 top-50 translate-middle-y text-decoration-none">
+                <form action="/Products" class="d-none d-lg-flex d-xl-none position-relative me-2" role="search"
+                    style="width:150px;">
+                    <input name="q" class="form-control rounded-pill ps-4 pe-5 bg-light border-0" type="search"
+                        placeholder="Ara...">
+                    <button type="submit"
+                        class="btn btn-link text-muted position-absolute end-0 top-50 translate-middle-y text-decoration-none">
                         <i class="bi bi-search"></i>
                     </button>
                 </form>
 
                 <!-- 1200px ve Üzeri İçin (Geniş Ekran) - Genişlik 280px -->
-                <form action="/Products" class="d-none d-xl-flex position-relative me-2" role="search" style="width: 280px;">
-                    <input name="q" class="form-control rounded-pill ps-4 pe-5 bg-light border-0" type="search" placeholder="Sitede Ara...">
+                <form action="/urun" class="d-none d-xl-flex position-relative me-2" role="search"
+                    style="width: 280px;">
+                    <input name="q" class="form-control rounded-pill ps-4 pe-5 bg-light border-0" type="search"
+                        placeholder="Sitede Ara...">
                     <button type="submit"
                         class="btn btn-link text-muted position-absolute end-0 top-50 translate-middle-y text-decoration-none">
                         <i class="bi bi-search"></i>
@@ -233,9 +236,11 @@
                             </div>
 
                             <li class="p-3 border-top bg-white" style="border-radius: 0 0 12px 12px;">
-                                <a href="/Cart/Index"
-                                    class="btn btn-primary w-100 rounded-pill fw-bold py-2 shadow-sm">Sepete Git <i
-                                        class="bi bi-arrow-right-short fs-5 align-middle"></i></a>
+                                <a class="btn btn-primary w-100 rounded-pill fw-bold py-2 shadow-sm"
+                                    asp-controller="Cart" asp-action="Index" title="Sepetim">Sepete Git</a>
+                                    @* <a href="/Cart/Index"
+                                        class="btn btn-primary w-100 rounded-pill fw-bold py-2 shadow-sm">Sepete Git <i
+                                            class="bi bi-arrow-right-short fs-5 align-middle"></i></a> *@
                             </li>
                         }
                         else
@@ -311,7 +316,7 @@
     <div class="collapse bg-white p-3 border-bottom shadow-sm w-100 position-absolute" id="mobileSearchBox"
         style="z-index: 1050; top: 100%; left: 0;">
         <div class="container">
-            <form action="/Products" class="d-flex position-relative" role="search">
+            <form action="/urun" class="d-flex position-relative" method="get" role="search">
                 <input name="q" class="form-control rounded-pill ps-4 pe-5 bg-light border-0 py-2" type="search"
                     placeholder="Ne aramıştınız?">
                 <button class="btn btn-primary rounded-pill position-absolute end-0 top-0 bottom-0 px-4"
