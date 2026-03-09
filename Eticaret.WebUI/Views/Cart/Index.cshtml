@@ -1,259 +1,288 @@
 @model CartViewModel
 @{
-    ViewData["Title"] = "Sepetim";
+ViewData["Title"] = "Sepetim";
 
-    decimal freeShippingThreshold = 1000m; // Ücretsiz kargo barajı
-    decimal shippingCost = Model.TotalPrice >= freeShippingThreshold ? 0 : 99m;
-    decimal finalTotal = Model.TotalPrice + shippingCost;
+decimal freeShippingThreshold = 1000m; // Ücretsiz kargo barajı
+decimal shippingCost = Model.TotalPrice >= freeShippingThreshold ? 0 : 99m;
+decimal finalTotal = Model.TotalPrice + shippingCost;
 
-    decimal progress = Model.TotalPrice >= freeShippingThreshold ? 100 : (Model.TotalPrice / freeShippingThreshold) * 100;
-    decimal remainingForFreeShipping = freeShippingThreshold - Model.TotalPrice;
+decimal progress = Model.TotalPrice >= freeShippingThreshold ? 100 : (Model.TotalPrice / freeShippingThreshold) * 100;
+decimal remainingForFreeShipping = freeShippingThreshold - Model.TotalPrice;
 }
 
 <section class="py-4 py-md-5 mb-5 mb-lg-0">
-    <div class="container">
+<div class="container">
 
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1 class="display-6 fw-bold m-0">Sepetim</h1>
-            <a href="/Products" class="text-decoration-none text-primary fw-bold">
-                <i class="bi bi-arrow-left me-1"></i> Alışverişe Devam Et
-            </a>
-        </div>
+<div class="d-flex justify-content-between align-items-center mb-4">
+<h1 class="display-6 fw-bold m-0">Sepetim</h1>
+<a class="d-flex justify-content-between align-items-center mb-4" asp-controller="Products"
+asp-action="Index" title="Alisverise Devam Et"><i class="bi bi-arrow-left me-1"></i> Alışverişe Devam
+Et</a>
+</div>
 
-        @if (Model.CartLines.Any())
-        {
-            <div class="row g-4">
+@if (Model.CartLines.Any())
+{
+<div class="row g-4">
 
-                <div class="col-lg-9">
-                    <!-- MOBİL & TABLET GÖRÜNÜMÜ (Kaydırmalı Tablo) -->
-                    <div class="d-lg-none">
-                        <div class="card shadow-sm border-0 mb-3">
-                            <div class="card-body p-0">
-                                <!-- max-height: Yaklaşık 3 ürünün görüneceği yükseklik (örn: 280px) -->
-                                <div style="max-height: 280px; overflow-y: auto;">
-                                    <table class="table align-middle mb-0">
-                                        <tbody>
-                                            @foreach (var item in Model.CartLines)
-                                            {
-                                                <tr class="border-bottom">
-                                                    <td class="ps-3 py-3" style="width: 60px;">
-                                                        <a href="/Products/Details/@item.Product.Id">
-                                                            <img src="~/img/products/@item.Product.Image"
-                                                                alt="@item.Product.Name"
-                                                                class="rounded-3 shadow-sm object-fit-cover"
-                                                                style="width: 50px; height: 50px;" />
-                                                        </a>
-                                                    </td>
-                                                    <td class="py-3">
-                                                        <a href="/Products/Details/@item.Product.Id"
-                                                            class="text-decoration-none fw-bold text-dark d-block text-truncate mb-1"
-                                                            style="max-width: 140px; font-size: 0.9rem;">
-                                                            @item.Product.Name
-                                                        </a>
-                                                        <div class="text-primary fw-bold small">
-                                                            @item.Product.Price.ToString("c")</div>
-                                                    </td>
-                                                    <td class="py-3 text-end pe-3">
-                                                        <div class="d-flex align-items-center justify-content-end gap-2">
-                                                            <div class="qty-container"
-                                                                style="transform: scale(0.85); transform-origin: right center;">
-                                                                <a href="/Cart/Update?ProductId=@item.Product.Id&quantity=-1"
-                                                                    class="qty-btn text-decoration-none d-flex align-items-center justify-content-center small">-</a>
-                                                                <span class="qty-input d-block py-1"
-                                                                    style="width: 25px; font-size: 0.9rem;">@item.Quantity</span>
-                                                                <a href="/Cart/Update?ProductId=@item.Product.Id&quantity=1"
-                                                                    class="qty-btn text-decoration-none d-flex align-items-center justify-content-center small">+</a>
-                                                            </div>
-                                                            <form asp-controller="Cart" asp-action="Remove" method="post"
-                                                                class="m-0">
-                                                                <input type="hidden" name="ProductId" value="@item.Product.Id">
-                                                                <button
-                                                                    class="btn btn-sm btn-light text-danger rounded-circle p-0 d-flex align-items-center justify-content-center shadow-sm"
-                                                                    style="width: 28px; height: 28px;" type="submit"><i
-                                                                        class="bi bi-trash3"></i></button>
-                                                            </form>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                            }
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+<div class="col-lg-9">
+<!-- MOBİL & TABLET GÖRÜNÜMÜ (Kaydırmalı Tablo) -->
+<div class="d-lg-none">
+<div class="card shadow-sm border-0 mb-3">
+<div class="card-body p-0">
+<!-- max-height: Yaklaşık 3 ürünün görüneceği yükseklik (örn: 280px) -->
+<div style="max-height: 280px; overflow-y: auto;">
+<table class="table align-middle mb-0">
+<tbody>
+@foreach (var item in Model.CartLines)
+{
+<tr class="border-bottom">
+<td class="ps-3 py-3" style="width: 60px;">
+<a asp-route="ProductDetail" asp-route-slug="@item.Product.Slug"
+title="@item.Product.Name">
+<img src="~/img/products/@item.Product.Image"
+alt="@item.Product.Name"
+class="rounded-3 shadow-sm object-fit-cover"
+style="width: 50px; height: 50px;" />
+</a>
+</td>
+<td class="py-3">
+<a asp-route="ProductDetail" asp-route-slug="@item.Product.Slug"
+class="text-decoration-none fw-bold text-dark d-block text-truncate mb-1"
+style="max-width: 140px; font-size: 0.9rem;"
+title="@item.Product.Name">
+@item.Product.Name
+</a>
+<div class="text-primary fw-bold small">
+@item.Product.Price.ToString("c")</div>
+</td>
+<td class="py-3 text-end pe-3">
+<div class="d-flex align-items-center justify-content-end gap-2">
+<div class="qty-container"
+style="transform: scale(0.85); transform-origin: right center;">
+<form asp-action="Update" asp-controller="Cart" method="post"
+class="d-inline">
+<input type="hidden" name="ProductId"
+value="@item.Product.Id" />
+<input type="hidden" name="quantity" value="-1" />
+<button type="submit"
+class="qty-btn border-0 bg-transparent">-</button>
+</form>
 
-                    <!-- MASAÜSTÜ GÖRÜNÜMÜ (Tablo Yapısı) -->
-                    <div class="card shadow-sm d-none d-lg-block">
-                        <!-- table-responsive eklendi: İçerik sığmazsa yatay kaydırma çubuğu çıkar, bozulmayı önler. -->
-                        <div class="card-body p-4 table-responsive">
-                            <table class="table table-modern align-middle mb-0">
-                                <thead>
-                                    <tr>
-                                        <!-- width: 45% kaldırıldı, tablo daha esnek olacak -->
-                                        <th class="ps-4 py-3" style="width: 15%;">Ürün</th>
-                                        <th class="py-3">Birim Fiyat</th>
-                                        <th class="text-center py-3">Adet</th>
-                                        <th class="py-3 text-end">Toplam</th>
-                                        <th class="pe-4 py-3 text-end" style="width: 50px;"></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach (var item in Model.CartLines)
-                                    {
-                                        <tr>
-                                            <td class="ps-4 py-3">
-                                                <div class="d-flex align-items-center">
-                                                    <a href="/Products/Details/@item.Product.Id" class="flex-shrink-0">
-                                                        <img src="~/img/products/@item.Product.Image" alt="@item.Product.Name"
-                                                            class="rounded-3 shadow-sm me-3"
-                                                            style="width:60px; height: 60px; object-fit: cover;" />
-                                                    </a>
-                                                    <div>
-                                                        <a href="/Products/Details/@item.Product.Id"
-                                                            class="text-decoration-none fw-bold text-dark d-block mb-1 cart-product-name">
-                                                            @item.Product.Name
-                                                        </a>
-                                                        <small class="text-muted">Kod: @item.Product.Id</small>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td class="py-3 fw-medium text-muted">@item.Product.Price.ToString("c")</td>
-                                            <td class="text-center py-3">
-                                                <div class="qty-container mx-auto">
-                                                    <a href="/Cart/Update?ProductId=@item.Product.Id&quantity=-1"
-                                                        class="qty-btn text-decoration-none d-flex align-items-center justify-content-center small">-</a>
-                                                    <span class="qty-input d-block py-2">@item.Quantity</span>
-                                                    <a href="/Cart/Update?ProductId=@item.Product.Id&quantity=1"
-                                                        class="qty-btn text-decoration-none d-flex align-items-center justify-content-center small">+</a>
-                                                </div>
-                                            </td>
-                                            <td class="py-3 text-end fw-bold text-dark">
-                                                @((item.Product.Price * item.Quantity).ToString("c"))
-                                            </td>
-                                            <td class="pe-4 py-3 text-end">
-                                                <form asp-controller="Cart" asp-action="Remove" method="post">
-                                                    <input type="hidden" name="ProductId" value="@item.Product.Id">
-                                                    <button
-                                                        class="btn btn-sm btn-light text-danger rounded-circle p-0 d-flex align-items-center justify-content-center shadow-sm"
-                                                        style="width: 32px; height: 32px; transition: all 0.2s;" type="submit"
-                                                        title="Sepetten Çıkar">
-                                                        <i class="bi bi-trash3"></i>
-                                                    </button>
-                                                </form>
-                                            </td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
+<span class="qty-input d-block py-2">@item.Quantity</span>
 
-                <div class="col-lg-3">
-                    <div class="sticky-summary">
-                        <div class="card p-4">
-                            <h5 class="fw-bold mb-4">Sipariş Özeti</h5>
+<form asp-action="Update" asp-controller="Cart" method="post"
+class="d-inline">
+<input type="hidden" name="ProductId"
+value="@item.Product.Id" />
+<input type="hidden" name="quantity" value="1" />
+<button type="submit"
+class="qty-btn border-0 bg-transparent">+</button>
+</form>
+</div>
+<form asp-controller="Cart" asp-action="Remove" method="post"
+class="m-0">
+<input type="hidden" name="ProductId" value="@item.Product.Id">
+<button
+class="btn btn-sm btn-light text-danger rounded-circle p-0 d-flex align-items-center justify-content-center shadow-sm"
+style="width: 28px; height: 28px;" type="submit"><i
+class="bi bi-trash3"></i></button>
+</form>
+</div>
+</td>
+</tr>
+}
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
 
-                            <div class="mb-4 bg-light p-2 rounded-3 border">
-                                @if (Model.TotalPrice >= freeShippingThreshold)
-                                {
-                                    <div class="text-primary fw-bold text-center small mb-0">
-                                        <i class="bi bi-check-circle-fill me-1"></i> Tebrikler, kargonuz bedava!
-                                    </div>
-                                }
-                                else
-                                {
-                                    <div class="d-flex justify-content-between small text-muted mb-2">
-                                        <span>Ücretsiz Kargo</span>
-                                        <span class="fw-bold text-dark">@remainingForFreeShipping.ToString("c") kaldı</span>
-                                    </div>
-                                    <div class="progress" style="height: 8px;">
-                                        <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary"
-                                            role="progressbar" style="width: @progress.ToString().Replace(",", ".")%"></div>
-                                    </div>
-                                }
-                            </div>
+<!-- MASAÜSTÜ GÖRÜNÜMÜ (Tablo Yapısı) -->
+<div class="card shadow-sm d-none d-lg-block">
+<!-- table-responsive eklendi: İçerik sığmazsa yatay kaydırma çubuğu çıkar, bozulmayı önler. -->
+<div class="card-body p-4 table-responsive">
+<table class="table table-modern align-middle mb-0">
+<thead>
+<tr>
+<!-- width: 45% kaldırıldı, tablo daha esnek olacak -->
+<th class="ps-4 py-3" style="width: 15%;">Ürün</th>
+<th class="py-3">Birim Fiyat</th>
+<th class="text-center py-3">Adet</th>
+<th class="py-3 text-end">Toplam</th>
+<th class="pe-4 py-3 text-end" style="width: 50px;"></th>
+</tr>
+</thead>
+<tbody>
+@foreach (var item in Model.CartLines)
+{
+<tr>
+<td class="ps-4 py-3">
+<div class="d-flex align-items-center">
+<a asp-route="ProductDetail" asp-route-slug="@item.Product.Slug"
+class="flex-shrink-0" title="@item.Product.Name">
+<img src="~/img/products/@item.Product.Image" alt="@item.Product.Name"
+class="rounded-3 shadow-sm me-3"
+style="width:60px; height: 60px; object-fit: cover;" />
+</a>
+<div>
+<a asp-route="ProductDetail" asp-route-slug="@item.Product.Slug"
+class="text-decoration-none fw-bold text-dark d-block mb-1 cart-product-name"
+title="@item.Product.Name">
+@item.Product.Name
+</a>
+<small class="text-muted">Kod: @item.Product.Id</small>
+</div>
+</div>
+</td>
+<td class="py-3 fw-medium text-muted">@item.Product.Price.ToString("c")</td>
+<td class="text-center py-3">
+<div
+class="qty-container mx-auto d-flex align-items-center justify-content-center">
+<form asp-action="Update" asp-controller="Cart" method="post"
+class="d-inline">
+<input type="hidden" name="ProductId" value="@item.Product.Id" />
+<input type="hidden" name="quantity" value="-1" />
+<button type="submit" class="qty-btn border-0 bg-transparent">-</button>
+</form>
 
-                            <div class="d-flex justify-content-between align-items-center mb-2 text-secondary">
-                                <span class="text-nowrap">Ara Toplam</span>
-                                <span class="fw-medium text-dark px-1 text-center">
-                                    @Model.TotalPrice.ToString("c")
-                                </span>
-                            </div>
+<span class="qty-input d-block py-2">@item.Quantity</span>
 
-                            <div class="d-flex justify-content-between text-secondary">
-                                <span>Kargo Ücreti</span>
-                                @if (shippingCost == 0)
-                                {
-                                    <span class="text-primary fw-bold">Ücretsiz</span>
-                                }
-                                else
-                                {
-                                    <span class="fw-medium text-dark">@shippingCost.ToString("c")</span>
-                                }
-                            </div>
+<form asp-action="Update" asp-controller="Cart" method="post"
+class="d-inline">
+<input type="hidden" name="ProductId" value="@item.Product.Id" />
+<input type="hidden" name="quantity" value="1" />
+<button type="submit" class="qty-btn border-0 bg-transparent">+</button>
+</form>
+</div>
+</td>
+<td class="py-3 text-end fw-bold text-dark">
+@((item.Product.Price * item.Quantity).ToString("c"))
+</td>
+<td class="pe-4 py-3 text-end">
+<form asp-controller="Cart" asp-action="Remove" method="post">
+<input type="hidden" name="ProductId" value="@item.Product.Id">
+<button
+class="btn btn-sm btn-light text-danger rounded-circle p-0 d-flex align-items-center justify-content-center shadow-sm"
+style="width: 32px; height: 32px; transition: all 0.2s;" type="submit"
+title="Sepetten Çıkar">
+<i class="bi bi-trash3"></i>
+</button>
+</form>
+</td>
+</tr>
+}
+</tbody>
+</table>
+</div>
+</div>
+</div>
 
-                            <hr class="text-muted my-4">
+<div class="col-lg-3">
+<div class="sticky-summary">
+<div class="card p-4">
+<h5 class="fw-bold mb-4">Sipariş Özeti</h5>
 
-                            <div class="d-flex justify-content-between align-items-center mb-4">
-                                <span class="fs-5 fw-bold text-dark px-2">Toplam</span>
-                                <span class="fs-5 fw-bolder text-primary">@finalTotal.ToString("c")</span>
-                            </div>
-                            <a class="btn btn-primary btn-lg w-100 rounded-pill shadow-sm fw-bold mb-2 d-none d-lg-block" asp-controller="Cart"
-                                asp-action="Checkout" title="Sepetim">Sepetei Onayla</a>
-                            @* <a href="/Cart/Checkout"
-                                class="btn btn-primary btn-lg w-100 rounded-pill shadow-sm fw-bold mb-2 d-none d-lg-block">
-                                Sepeti Onayla <i class="bi bi-lock-fill ms-1"></i>
-                            </a> *@
-                            <div class="d-flex justify-content-center gap-3 mt-2 text-muted small">
-                                <span><i class="bi bi-shield-check"></i> 3D Secure Güvenli Ödeme</span>
-                            </div>
-                        </div>
+<div class="mb-4 bg-light p-2 rounded-3 border">
+@if (Model.TotalPrice >= freeShippingThreshold)
+{
+<div class="text-primary fw-bold text-center small mb-0">
+<i class="bi bi-check-circle-fill me-1"></i> Tebrikler, kargonuz bedava!
+</div>
+}
+else
+{
+<div class="d-flex justify-content-between small text-muted mb-2">
+<span>Ücretsiz Kargo</span>
+<span class="fw-bold text-dark">@remainingForFreeShipping.ToString("c") kaldı</span>
+</div>
+<div class="progress" style="height: 8px;">
+<div class="progress-bar progress-bar-striped progress-bar-animated bg-primary"
+role="progressbar" style="width: @progress.ToString().Replace(",", ".")%"></div>
+</div>
+}
+</div>
 
-                        <div class="d-flex justify-content-center gap-3 mt-4 text-muted small">
-                            <span><i class="bi bi-shield-check"></i> 256-bit SSL</span>
-                            <span><i class="bi bi-arrow-return-left"></i> Kolay İade</span>
-                        </div>
-                    </div>
-                </div>
+<div class="d-flex justify-content-between align-items-center mb-2 text-secondary">
+<span class="text-nowrap">Ara Toplam</span>
+<span class="fw-medium text-dark px-1 text-center">
+@Model.TotalPrice.ToString("c")
+</span>
+</div>
 
-            </div>
-        }
-        else
-        {
-            <div class="row justify-content-center">
-                <div class="col-md-6 text-center py-5">
-                    <div class="card p-5">
-                        <div class="mb-4">
-                            <i class="bi bi-cart-x text-muted opacity-50" style="font-size: 6rem;"></i>
-                        </div>
-                        <h2 class="fw-bold text-dark mb-3">Sepetiniz Bomboş</h2>
-                        <p class="text-muted mb-4 fs-5">Alışverişe başlamak için harika ürünlerimizi inceleyebilirsiniz.</p>
-                        <a href="/Products" class="btn btn-primary btn-lg px-5 rounded-pill shadow-sm">
-                            Ürünleri Keşfet
-                        </a>
-                    </div>
-                </div>
-            </div>
-        }
+<div class="d-flex justify-content-between text-secondary">
+<span>Kargo Ücreti</span>
+@if (shippingCost == 0)
+{
+<span class="text-primary fw-bold">Ücretsiz</span>
+}
+else
+{
+<span class="fw-medium text-dark">@shippingCost.ToString("c")</span>
+}
+</div>
 
-    </div>
+<hr class="text-muted my-4">
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+<span class="fs-5 fw-bold text-dark px-2">Toplam</span>
+<span class="fs-5 fw-bolder text-primary">@finalTotal.ToString("c")</span>
+</div>
+<a class="btn btn-primary btn-lg w-100 rounded-pill shadow-sm fw-bold mb-2 d-none d-lg-block"
+asp-controller="Cart" asp-action="Checkout" title="Sepetim">Sepeti Onayla</a>
+@* <a href="/Cart/Checkout"
+class="btn btn-primary btn-lg w-100 rounded-pill shadow-sm fw-bold mb-2 d-none d-lg-block">
+Sepeti Onayla <i class="bi bi-lock-fill ms-1"></i>
+</a> *@
+<div class="d-flex justify-content-center gap-3 mt-2 text-muted small">
+<span><i class="bi bi-shield-check"></i> 3D Secure Güvenli Ödeme</span>
+</div>
+</div>
+
+<div class="d-flex justify-content-center gap-3 mt-4 text-muted small">
+<span><i class="bi bi-shield-check"></i> 256-bit SSL</span>
+<span><i class="bi bi-arrow-return-left"></i> Kolay İade</span>
+</div>
+</div>
+</div>
+
+</div>
+}
+else
+{
+<div class="row justify-content-center">
+<div class="col-md-6 text-center py-5">
+<div class="card p-5">
+<div class="mb-4">
+<i class="bi bi-cart-x text-muted opacity-50" style="font-size: 6rem;"></i>
+</div>
+<h2 class="fw-bold text-dark mb-3">Sepetiniz Bomboş</h2>
+<p class="text-muted mb-4 fs-5">Alışverişe başlamak için harika ürünlerimizi inceleyebilirsiniz.</p>
+<a class="btn btn-primary btn-lg px-5 rounded-pill shadow-sm" asp-controller="Products"
+asp-action="Index" title="Alisverise Devam Et"> Alışverişe
+Devam Et</a>
+</div>
+</div>
+</div>
+}
+
+</div>
 </section>
 
 <!-- MOBİL SABİT ALT BAR -->
 <div class="fixed-bottom bg-white border-top shadow-lg p-3 d-lg-none" style="z-index: 1040;">
-    <div class="container">
-        <div class="d-flex justify-content-between align-items-center">
-            <div>
-                <small class="text-muted d-block" style="font-size: 0.8rem;">Toplam Tutar</small>
-                <span class="fs-4 fw-bold text-primary">@finalTotal.ToString("c")</span>
-            </div>
-            <a class="btn btn-primary rounded-pill px-4 py-2 fw-bold shadow-sm" asp-controller="Cart"
-                asp-action="Checkout" title="Sepetim">Sepetei Onayla</a>
-            @* <a href="/Cart/Checkout" class="btn btn-primary rounded-pill px-4 py-2 fw-bold shadow-sm">
-                Sepeti Onayla <i class="bi bi-arrow-right ms-1"></i> *@
-            </a>
-        </div>
-    </div>
+<div class="container">
+<div class="d-flex justify-content-between align-items-center">
+<div>
+<small class="text-muted d-block" style="font-size: 0.8rem;">Toplam Tutar</small>
+<span class="fs-4 fw-bold text-primary">@finalTotal.ToString("c")</span>
 </div>
+<a class="btn btn-primary rounded-pill px-4 py-2 fw-bold shadow-sm" asp-controller="Cart"
+asp-action="Checkout" title="Sepetim">Sepeti Onayla</a>
+@* <a href="/Cart/Checkout" class="btn btn-primary rounded-pill px-4 py-2 fw-bold shadow-sm">
+Sepeti Onayla <i class="bi bi-arrow-right ms-1"></i> *@
+</a>
+</div>
+</div>
+</div>
+<script>

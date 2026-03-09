@@ -1,4 +1,5 @@
 @model IEnumerable<Eticaret.Core.Entities.Order>
+@using Eticaret.WebUI.Extensions
 
 @{
     ViewData["Title"] = "Siparişlerim";
@@ -15,7 +16,8 @@
         <div class="text-center py-5 bg-light rounded-4 border border-dashed">
             <i class="bi bi-bag-x display-1 text-muted opacity-50"></i>
             <h4 class="mt-3 text-muted">Henüz hiç siparişiniz bulunmuyor.</h4>
-            <a href="/Products" class="btn btn-primary mt-3 rounded-pill px-4">Alışverişe Başla</a>
+            <a class="btn btn-primary btn-lg px-5 rounded-pill shadow-sm" asp-controller="Products" asp-action="Index"
+                title="Ürünleri İncele"> Keşfet</a>
         </div>
     }
     else
@@ -23,37 +25,8 @@
         <div class="row g-4">
             @foreach (var item in Model.OrderByDescending(x => x.OrderDate))
             {
-                // Sipariş durumuna göre renk belirleme
-                string badgeClass = "bg-secondary bg-opacity-10 text-secondary border-secondary";
-                string statusIcon = "circle";
-
-                var statusStr = item.OrderState.ToString();
-
-                if (statusStr == "Waiting")
-                {
-                    badgeClass = "bg-warning bg-opacity-90 mytext border-warning";
-                    statusIcon = "hourglass-split";
-                }
-                else if (statusStr == "Shipped")
-                {
-                    badgeClass = "bg-info bg-opacity-90 mytext border-info";
-                    statusIcon = "truck";
-                }
-                else if (statusStr == "Approved")
-                {
-                    badgeClass = "bg-myapproved mytext border-info";
-                    statusIcon = "box2-fill";
-                }
-                else if (statusStr == "Completed")
-                {
-                    badgeClass = "bg-success bg-opacity-20 mytext border-success";
-                    statusIcon = "check-circle-fill";
-                }
-                else if (statusStr == "Rejected")
-                {
-                    badgeClass = "bg-danger bg-opacity-20 mytext mytext border-danger";
-                    statusIcon = "x-circle-fill";
-                }
+                // Extension metodumuzla sadece tek satırda renk ve ikonu çekiyoruz!
+                var ui = item.OrderState.GetStatusUI();
 
                 <div class="col-12">
                     <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
@@ -72,27 +45,25 @@
                                     <span class="fw-bold mytext fs-5">@item.TotalPrice.ToString("c")</span>
                                 </div>
                                 <div class="col-6 col-md-3 text-md-end">
-                                    <span class="badge @badgeClass border px-3 py-2 rounded-pill">
-                                        <i class="bi  bi-@statusIcon me-1"></i> @Html.DisplayFor(modelItem => item.OrderState)
+                                    <span class="badge @ui.BadgeClass border px-3 py-2 rounded-pill">
+                                        <i class="bi bi-@ui.Icon me-1"></i> @Html.DisplayFor(modelItem => item.OrderState)
                                     </span>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Kart İçeriği: Ürünler -->
                         <div class="card-body p-3">
                             @foreach (var line in item.OrderLines.Take(2))
                             {
-                                <div
-                                    class="d-flex align-items-center @(item.OrderLines.Take(2).Last() != line ? "mb-3 pb-3 border-bottom" : "")">
+                                <div class="d-flex align-items-center @(item.OrderLines.Take(2).Last() != line ? "mb-3 pb-3 border-bottom" : "")">
                                     <div class="flex-shrink-0 border rounded-3 p-1 bg-white" style="width: 50px; height: 50px;">
                                         <img src="~/img/products/@line.Product.Image" class="w-100 h-100 object-fit-cover rounded-2"
                                             alt="@line.Product.Name">
                                     </div>
                                     <div class="ms-3 flex-grow-1">
                                         <h6 class="mb-0 fw-semibold text-dark small text-truncate" style="max-width: 250px;">
-                                            <a href="/Products/Details/@line.Product.Id" class="text-decoration-none text-dark">
-                                                @line.Product.Name
+                                            <a asp-route="ProductDetail" asp-route-slug="@line.Product.Slug"
+                                                class="text-decoration-none text-dark" title="@line.Product.Name">@line.Product.Name
                                             </a>
                                         </h6>
                                         <small class="text-muted">@line.Quantity adet x @line.UnitPrice.ToString("c")</small>
@@ -109,13 +80,13 @@
                             }
                         </div>
 
-                        <!-- Kart Altı: Detay Butonu ve Sipariş No -->
                         <div class="card-footer mycard p-3">
                             <div class="d-flex justify-content-between align-items-center">
                                 <small class="mytext mycardfont-monospace">Sipariş No: #@item.OrderNumber</small>
-                                <a href="/Accounts/MyOrderDetails/@item.Id"
-                                    class="btn btn-sm btn-primary btn-primary-order  rounded-pill px-3">
-                                    Detayları Görüntüle <i class="bi bi-arrow-right ms-1"></i>
+                                
+                                <a asp-action="MyOrderDetails" asp-controller="Accounts"
+                                    asp-route-orderNumber="@item.OrderNumber" class="btn btn-sm btn-primary">
+                                    Detayları Gör
                                 </a>
                             </div>
                         </div>

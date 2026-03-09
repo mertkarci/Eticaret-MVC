@@ -219,9 +219,11 @@
                                         </div>
 
                                         <div class="flex-grow-1 overflow-hidden">
-                                            <a href="/Products/Details/@item.Product.Id"
+                                            <a asp-route="ProductDetail" asp-route-slug="@item.Product.Slug"
                                                 class="text-decoration-none text-dark fw-bold d-block text-truncate"
-                                                style="font-size: 0.85rem;">@item.Product.Name</a>
+                                                style="font-size: 0.85rem;" title="@item.Product.Name">
+                                                @item.Product.Name
+                                            </a>
                                             <small class="text-muted fw-medium">@((item.Product.Price *
                                                                                         item.Quantity).ToString("c"))</small>
                                         </div>
@@ -236,9 +238,9 @@
                             </div>
 
                             <li class="p-3 border-top bg-white" style="border-radius: 0 0 12px 12px;">
-                                <a class="btn btn-primary w-100 rounded-pill fw-bold py-2 shadow-sm"
-                                    asp-controller="Cart" asp-action="Index" title="Sepetim">Sepete Git</a>
-                                    @* <a href="/Cart/Index"
+                                <a class="btn btn-primary w-100 rounded-pill fw-bold py-2 shadow-sm" asp-controller="Cart"
+                                    asp-action="Index" title="Sepetim">Sepete Git</a>
+                                @* <a href="/Cart/Index"
                                         class="btn btn-primary w-100 rounded-pill fw-bold py-2 shadow-sm">Sepete Git <i
                                             class="bi bi-arrow-right-short fs-5 align-middle"></i></a> *@
                             </li>

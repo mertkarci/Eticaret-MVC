@@ -24,13 +24,17 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var item in Model) {
+                @foreach (var item in Model)
+                {
                     <tr>
                         <td class="ps-4 py-3 fw-bold text-dark">
                             #@Html.DisplayFor(modelItem => item.OrderNumber)
                         </td>
                         <td class="py-3">
-                            <span class="fw-medium">@(item.AppUser?.Name ?? "Bilinmeyen Müşteri")</span>
+                            <a asp-controller="AppUsers" asp-action="Details" asp-route-id="@item.AppUser.Id"
+                                class="btn btn-sm btn-warning"> <span class="fw-medium">@(item.AppUser?.Name ??
+                                                                    "Bilinmeyen Müşteri")</span></a>
+
                         </td>
                         <td class="py-3 text-muted">
                             @item.OrderDate.ToString("dd MMM yyyy HH:mm")
@@ -63,10 +67,12 @@
                         </td>
                         <td class="pe-4 py-3 text-end">
                             <div class="action-buttons">
-                                <a asp-action="Edit" class="btn btn-outline-primary" asp-route-id="@item.Id" title="Düzenle">
+                                <a asp-action="Edit" class="btn btn-outline-primary" asp-route-id="@item.Id"
+                                    title="Düzenle">
                                     <i class="bi bi-pencil-square"></i>
                                 </a>
-                                <a asp-action="Details" class="btn btn-outline-info" asp-route-id="@item.Id" title="Detaylar">
+                                <a asp-action="Details" class="btn btn-outline-info" asp-route-id="@item.Id"
+                                    title="Detaylar">
                                     <i class="bi bi-eye"></i>
                                 </a>
                                 <a asp-action="Delete" class="btn btn-outline-danger" asp-route-id="@item.Id" title="Sil">

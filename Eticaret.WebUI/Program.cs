@@ -38,14 +38,14 @@ builder.Services.AddSession(options =>
 
 
 
-builder.Services.AddScoped(typeof(IService<>),typeof(Service<>));
+builder.Services.AddScoped(typeof(IService<>), typeof(Service<>));
 builder.Services.AddScoped<IOrderService, OrderService>();
 // Authentication (Giriş) Ayarları
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie
 (p =>
 {
-    p.LoginPath = "/Accounts/SignIn";
-    p.AccessDeniedPath = "/AccessDenied";
+    p.LoginPath = "/hesabim/giris-yap";
+    p.AccessDeniedPath = "/404";
     p.Cookie.Name = "Account";
     p.Cookie.MaxAge = TimeSpan.FromDays(1);
     p.Cookie.IsEssential = true;
@@ -55,7 +55,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 builder.Services.AddAuthorization(p =>
 {
     p.AddPolicy("AdminPolicy", policy => policy.RequireClaim(ClaimTypes.Role, "Admin"));
-    p.AddPolicy("UserPolicy", policy => policy.RequireClaim(ClaimTypes.Role, "Admin", "User", "Customer"));
+    p.AddPolicy("UserPolicy", policy => policy.RequireClaim(ClaimTypes.Role, "Admin", "User"));
 });
 
 var app = builder.Build();

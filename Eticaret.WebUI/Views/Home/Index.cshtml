@@ -16,14 +16,13 @@
 <!-- Popüler Ürünler -->
 <section class="py-5">
     <div class="container">
-        
+
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h2 class="fw-bold m-0">Öne Çıkan Ürünler</h2>
-            <a href="/Products" class="btn btn-outline-primary rounded-pill px-4">
-                Tümünü Gör <i class="bi bi-arrow-right ms-1"></i>
-            </a>
+            <a class="btn btn-outline-primary rounded-pill px-4" asp-controller="Products" asp-action="Index"
+                title="Tümünü Gör"> Tümünü Gör <i class="bi bi-arrow-right ms-1"></i></a>
         </div>
-        
+
         <div class="row gx-4 gx-lg-5 row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
             @if (Model.Products != null && Model.Products.Any())
             {
@@ -60,6 +59,5 @@
     </div>
 </section>
 <style>
-    .custom-section-bg {
-   
-    }</style>
+    .custom-section-bg {}
+</style>

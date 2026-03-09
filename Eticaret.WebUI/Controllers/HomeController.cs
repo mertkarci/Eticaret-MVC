@@ -52,7 +52,7 @@ public class HomeController : Controller
     }
 
     // POST: Formu Karşılar
-    [HttpPost]
+    [HttpPost, Route("iletisim")]
     [ValidateAntiForgeryToken] // Güvenlik önlemi (CSRF saldırılarına karşı)
     public async Task<IActionResult> ContactUs(ContactViewModel model)
     {

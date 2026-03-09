@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Eticaret.WebUI;
 
+[Route("hesabim")]
 public class AccountsController : Controller
 {
     private readonly IService<AppUser> _service;
@@ -22,7 +23,7 @@ public class AccountsController : Controller
     }
 
     [Authorize]
-    [Route("hesabim")]
+    [HttpGet("")]
     public async Task<IActionResult> Index()
     {
         // 1. Cookie'deki String Guid'i al
@@ -60,7 +61,7 @@ public class AccountsController : Controller
         return View(model);
     }
 
-    [HttpPost]
+    [HttpPost("")]
     [Authorize]
     public async Task<IActionResult> Index(UserEditViewModel model)
     {
@@ -127,7 +128,7 @@ public class AccountsController : Controller
         return View(model);
     }
 
-    [HttpGet]
+    [HttpGet("giris-yap")]
     public IActionResult SignIn(string returnUrl = null)
     {
         // Yönlendirme Kontrolü ve ViewBag Doldurma İşlemi
@@ -161,7 +162,7 @@ public class AccountsController : Controller
         return View(model);
     }
 
-    [HttpPost]
+    [HttpPost("giris-yap")]
     public async Task<IActionResult> SignInAsync(LoginViewModel loginViewModel)
     {
         if (ModelState.IsValid)
@@ -200,13 +201,13 @@ public class AccountsController : Controller
         }
         return View();
     }
-
+    [HttpGet("kayit-ol")]
     public IActionResult SignUp()
     {
         return View();
     }
 
-    [HttpPost]
+    [HttpPost("kayit-ol")]
     public async Task<IActionResult> SignUpAsync(AppUser appUser)
     {
         appUser.isAdmin = false; // başlangıçta nolursa olsun admin olmasın
@@ -219,7 +220,7 @@ public class AccountsController : Controller
         }
         return View(appUser);
     }
-
+    [HttpGet("cikis-yap")]
     public async Task<IActionResult> SignOutAsync()
     {
         await HttpContext.SignOutAsync();
@@ -227,6 +228,7 @@ public class AccountsController : Controller
     }
 
     [Authorize]
+    [HttpGet("siparislerim")]
     public async Task<IActionResult> MyOrders()
     {
         var userGuidClaim = HttpContext.User.FindFirst("UserGuid");
@@ -257,13 +259,13 @@ public class AccountsController : Controller
         return View(model);
     }
 
-    [HttpGet]
+    [HttpGet("sifremi-unuttum")]
     public IActionResult PasswordRenew()
     {
         return View();
     }
 
-    [HttpPost]
+    [HttpPost("sifremi-unuttum")]
     public async Task<IActionResult> PasswordRenew(string Email)
     {
         if (string.IsNullOrWhiteSpace(Email))
@@ -294,7 +296,7 @@ public class AccountsController : Controller
         return View();
     }
 
-    [HttpGet]
+    [HttpGet("sifremi-yenile")]
     public async Task<IActionResult> PasswordChange(string user)
     {
         if (string.IsNullOrEmpty(user))
@@ -318,7 +320,7 @@ public class AccountsController : Controller
         return View();
     }
 
-    [HttpPost]
+    [HttpPost("sifremi-yenile")]
     public async Task<IActionResult> PasswordChange(string user, string password)
     {
         if (string.IsNullOrEmpty(user) || string.IsNullOrEmpty(password))
@@ -361,36 +363,32 @@ public class AccountsController : Controller
 
         return View();
     }
-    public async Task<IActionResult> MyOrderDetails(int? id)
+    [HttpGet("siparislerim/{orderNumber}")]
+    public async Task<IActionResult> MyOrderDetails(string orderNumber)
     {
-        // 1. Cookie'deki String Guid'i al
+        if (string.IsNullOrEmpty(orderNumber)) return NotFound();
+
         var userGuidClaim = HttpContext.User.FindFirst("UserGuid");
-
-        if (userGuidClaim == null) return RedirectToAction("SignIn");
-
-        // 2. String'i C# GUID nesnesine çevir (Güvenlik ve Performans için)
-        if (!Guid.TryParse(userGuidClaim.Value, out Guid guidFromCookie))
+        if (userGuidClaim == null || !Guid.TryParse(userGuidClaim.Value, out Guid guidFromCookie))
         {
-            await HttpContext.SignOutAsync();
             return RedirectToAction("SignIn");
         }
 
         AppUser user = await _service.GetAsync(p => p.UserGuid == guidFromCookie);
+        if (user is null) return RedirectToAction("SignIn");
 
-        if (user is null)
-        {
-            await HttpContext.SignOutAsync();
-            return RedirectToAction("SignIn");
-        }
+        // SORGULAMA: Id yerine OrderNumber ile arıyoruz
+        var order = await _serviceOrder.GetQueryable()
+            .Include(x => x.OrderLines)
+            .ThenInclude(x => x.Product)
+            .FirstOrDefaultAsync(x => x.OrderNumber == orderNumber && x.AppUserId == user.Id);
 
-        var order = await _serviceOrder.GetQueryable().Include(x => x.OrderLines).ThenInclude(x => x.Product)
-        .FirstOrDefaultAsync(x => x.Id == id && x.AppUserId == user.Id);
         if (order == null)
         {
             return NotFound("Sipariş bulunamadı!");
         }
-        return View(order);
 
+        return View(order);
     }
 
 

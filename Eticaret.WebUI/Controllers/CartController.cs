@@ -135,7 +135,7 @@ namespace Eticaret.WebUI.Controllers
 
 
         }
-        [Authorize, HttpPost]
+        [Authorize, HttpPost("ödeme")]
         public async Task<IActionResult> Checkout(string CardNumber, string CardNameSurname, string CardMonth, string CardYear, string CVV, string DeliveryAddress, string BillingAddress)
         {
             var cart = GetCart();

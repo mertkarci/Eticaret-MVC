@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Eticaret.Core.Entities;
 using Eticaret.Data;
 using Microsoft.AspNetCore.Authorization;
+using Eticaret.WebUI.Areas.Admin.Models;
 
 namespace Eticaret.WebUI.Areas.Admin.Controllers
 {
@@ -36,14 +37,37 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
                 return NotFound();
             }
 
+            // 1. Kullanıcıyı bul
             var appUser = await _context.AppUsers
                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (appUser == null)
             {
                 return NotFound();
             }
 
-            return View(appUser);
+            // 2. Kullanıcının Siparişlerini bul
+            // Sipariş nesnesinin içindeki AppUserId'nin, bizim aradığımız id'ye eşit olanlarını listele
+            var orders = await _context.Orders
+                .Where(o => o.AppUserId == id)
+                .ToListAsync();
+
+            // 3. Kullanıcının Adreslerini bul
+            // Adres nesnesinin içindeki AppUserId'nin, bizim aradığımız id'ye eşit olanlarını listele
+            var addresses = await _context.Addresses
+                .Where(a => a.AppUserId == id)
+                .ToListAsync();
+
+            // 4. Hepsini ViewModel kutusuna doldur ve View'a gönder
+            // (Bunu yapmazsak View'da sekmelere verileri dağıtamayız)
+            var model = new UserDetailsViewModel
+            {
+                User = appUser,
+                Orders = orders,
+                Addresses = addresses
+            };
+
+            return View(model);
         }
 
         // GET: Admin/AppUsers/Create
