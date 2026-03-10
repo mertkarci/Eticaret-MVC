@@ -97,9 +97,9 @@
                                                         onclick="selectAddress(this)">
                                                         <div class="d-flex align-items-start">
                                                             <div class="form-check mt-1">
-                                                                <input class="form-check-input" type="radio"
-                                                                    name="DeliveryAddress" value="@item.AddressGuid"
-                                                                    @(item.IsDeliveryAddress ? "checked" : "") required>
+                                                                <input class="form-check-input" type="radio" name="DeliveryAddress"
+                                                                    value="@item.AddressGuid" @(item.IsDeliveryAddress ? "checked" : "")
+                                                                    required>
                                                             </div>
                                                             <div class="ms-2">
                                                                 <span class="fw-bold d-block text-dark">@item.Title</span>
@@ -119,8 +119,7 @@
                                             <div class="form-check">
                                                 <input class="form-check-input" type="checkbox" id="sameAddress" checked
                                                     onchange="toggleBillingSection()">
-                                                <label class="form-check-label fw-medium user-select-none"
-                                                    for="sameAddress">
+                                                <label class="form-check-label fw-medium user-select-none" for="sameAddress">
                                                     Fatura adresim teslimat adresimle aynı olsun.
                                                 </label>
                                             </div>
@@ -133,17 +132,15 @@
                                                 @foreach (var item in Model.Addresses)
                                                 {
                                                     <div class="col-md-6">
-                                                        <label
-                                                            class="card h-100 address-card rounded-3 position-relative p-3"
+                                                        <label class="card h-100 address-card rounded-3 position-relative p-3"
                                                             onclick="selectBillingAddress(this)">
                                                             <div class="d-flex align-items-start">
                                                                 <div class="form-check mt-1">
-                                                                    <input class="form-check-input" type="radio"
-                                                                        name="BillingAddress" value="@item.AddressGuid">
+                                                                    <input class="form-check-input" type="radio" name="BillingAddress"
+                                                                        value="@item.AddressGuid">
                                                                 </div>
                                                                 <div class="ms-2">
-                                                                    <span
-                                                                        class="fw-bold d-block text-dark">@item.Title</span>
+                                                                    <span class="fw-bold d-block text-dark">@item.Title</span>
                                                                     <small class="text-muted d-block">@item.City /
                                                                         @item.District</small>
                                                                 </div>
@@ -162,40 +159,68 @@
                                 else
                                 {
                                     <!-- GUEST CHECKOUT FORM -->
-                                    <h6 class="fw-bold mb-3 text-secondary">İletişim Bilgileri</h6>
+                                    <h6 class="fw-bold mb-3 text-secondary border-bottom pb-2"><i
+                                            class="bi bi-person-lines-fill me-2"></i>İletişim Bilgileri</h6>
                                     <div class="row g-3 mb-4">
                                         <div class="col-md-6">
-                                            <label class="form-label small">Ad</label>
-                                            <input type="text" name="GuestName" class="form-control" required>
+                                            <label class="form-label small fw-medium">Ad <span
+                                                    class="text-danger">*</span></label>
+                                            <input type="text" name="GuestName" class="form-control"
+                                                placeholder="Adınızı girin.." required>
                                         </div>
                                         <div class="col-md-6">
-                                            <label class="form-label small">Soyad</label>
-                                            <input type="text" name="GuestSurname" class="form-control" required>
+                                            <label class="form-label small fw-medium">Soyad <span
+                                                    class="text-danger">*</span></label>
+                                            <input type="text" name="GuestSurname" class="form-control"
+                                                placeholder="Soyadınızı girin.." required>
                                         </div>
                                         <div class="col-md-6">
-                                            <label class="form-label small">E-posta</label>
-                                            <input type="email" name="GuestEmail" class="form-control" required>
+                                            <label class="form-label small fw-medium">E-posta <span
+                                                    class="text-danger">*</span></label>
+                                            <input type="email" name="GuestEmail" class="form-control"
+                                                placeholder="ornek@mail.com" required>
                                         </div>
                                         <div class="col-md-6">
-                                            <label class="form-label small">Telefon</label>
-                                            <input type="tel" name="GuestPhone" class="form-control">
+                                            <label class="form-label small fw-medium">Telefon <span
+                                                    class="text-danger">*</span></label>
+                                            <input type="tel" name="GuestPhone" class="form-control"
+                                                placeholder="05XX XXX XX XX" pattern="05[0-9]{9}" maxlength="11" minlength="11"
+                                                title="Lütfen telefon numaranızı 05 ile başlayarak 11 haneli olacak şekilde giriniz (Örn: 05523233344)"
+                                                oninput="this.value = this.value.replace(/[^0-9]/g, '')" required>
                                         </div>
                                     </div>
 
-                                    <h6 class="fw-bold mb-3 text-secondary">Teslimat Adresi</h6>
+                                    <h6 class="fw-bold mb-3 text-secondary border-bottom pb-2 mt-2"><i
+                                            class="bi bi-truck me-2"></i>Teslimat Adresi</h6>
                                     <div class="row g-3">
                                         <div class="col-12">
-                                            <label class="form-label small">Açık Adres</label>
-                                            <textarea name="GuestOpenAddress" class="form-control" rows="3"
-                                                required></textarea>
+                                            <label class="form-label small fw-medium">Açık Adres <span
+                                                    class="text-danger">*</span></label>
+                                            <textarea name="GuestOpenAddress" class="form-control" rows="3" maxlength="250"
+                                        placeholder="Mahalle, sokak, bina ve daire numaranızı detaylıca giriniz (Maksimum 250 karakter).."
+                                        required></textarea>
+                                            <div class="form-text text-end" style="font-size: 0.75rem;">Maks: 250 karakter</div>
                                         </div>
                                         <div class="col-md-6">
-                                            <label class="form-label small">Şehir</label>
-                                            <input type="text" name="GuestCity" class="form-control" required>
+                                            <label class="form-label small fw-medium">Şehir <span
+                                                    class="text-danger">*</span></label>
+                                            <select id="GuestCity" name="GuestCity" class="form-select" required>
+                                                <option value="">İl Seçiniz</option>
+                                                <option value="İstanbul" selected>İstanbul</option>
+                                                <option value="Ankara">Ankara</option>
+                                                <option value="İzmir">İzmir</option>
+                                                <option value="Denizli">Denizli</option>
+                                            </select>
                                         </div>
                                         <div class="col-md-6">
-                                            <label class="form-label small">İlçe</label>
-                                            <input type="text" name="GuestDistrict" class="form-control" required>
+                                            <label class="form-label small fw-medium">İlçe <span
+                                                    class="text-danger">*</span></label>
+                                            <select id="GuestDistrict" name="GuestDistrict" class="form-select" required>
+                                                <option value="">İlçe Seçiniz</option>
+                                                <option value="Kadıköy" selected>Kadıköy</option>
+                                                <option value="Beşiktaş">Beşiktaş</option>
+                                                <option value="Üsküdar">Üsküdar</option>
+                                            </select>
                                         </div>
                                     </div>
                                 }
@@ -240,9 +265,9 @@
                                         <select class="form-select py-2" name="CardMonth" required>
                                             <option value="" selected disabled>Seçiniz</option>
                                             @for (int i = 1; i <= 12; i++)
-                                        {
+                                            {
                                                 <option value="@i">@i.ToString("00")</option>
-                                        }
+                                            }
                                         </select>
                                     </div>
                                     <div class="col-md-4">
@@ -453,7 +478,7 @@
             <button type="submit" form="checkoutForm" class="btn btn-primary rounded-pill px-4 py-2 fw-bold shadow-sm">
                 Ödemeyi Tamamla <i class="bi bi-chevron-right ms-1"></i>
             </button>
-            
+
         </div>
     </div>
 </div>

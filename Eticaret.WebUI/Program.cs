@@ -7,7 +7,6 @@ using Microsoft.EntityFrameworkCore; // UseSqlite için gerekli
 
 var builder = WebApplication.CreateBuilder(args);
 
-
 var webUiPath = builder.Environment.ContentRootPath;
 
 // Bir üst klasöre çıkıp (..) "Eticaret.Data" klasörünü hedefliyoruz.
@@ -24,31 +23,39 @@ builder.Services.AddDbContext<DatabaseContext>(options =>
     options.UseSqlite($"Data Source={dbPath}"));
 // --------------------------------------------------
 
-
 // Servisleri ekliyoruz
 builder.Services.AddControllersWithViews();
+
+// --- 1. GÜVENLİK GÜNCELLEMESİ: SESSION (OTURUM) AYARLARI ---
 builder.Services.AddSession(options =>
 {
     options.Cookie.Name = ".Eticaret.Session";
-    options.Cookie.HttpOnly = true;
+    options.Cookie.HttpOnly = true; // JS ile okunmasını engeller (XSS koruması)
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // Sadece HTTPS üzerinden iletilir
+    options.Cookie.SameSite = SameSiteMode.Strict; // CSRF koruması
     options.Cookie.IsEssential = true;
     options.IdleTimeout = TimeSpan.FromDays(1);
     options.IOTimeout = TimeSpan.FromMinutes(10);
 });
 
-
-
 builder.Services.AddScoped(typeof(IService<>), typeof(Service<>));
 builder.Services.AddScoped<IOrderService, OrderService>();
-// Authentication (Giriş) Ayarları
-builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie
-(p =>
+
+// --- 2. GÜVENLİK GÜNCELLEMESİ: AUTHENTICATION (GİRİŞ) AYARLARI ---
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(p =>
 {
     p.LoginPath = "/hesabim/giris-yap";
     p.AccessDeniedPath = "/404";
+
     p.Cookie.Name = "Account";
-    p.Cookie.MaxAge = TimeSpan.FromDays(1);
+    p.Cookie.HttpOnly = true; // KESİNLİKLE OLMALI: JS ile çerez hırsızlığını engeller
+    p.Cookie.SecurePolicy = CookieSecurePolicy.Always; // Sadece HTTPS
+    p.Cookie.SameSite = SameSiteMode.Strict; // Dış sitelerden gelen sahte POST isteklerini reddeder
     p.Cookie.IsEssential = true;
+
+    // Güvenli oturum süresi yönetimi (MaxAge yerine)
+    p.ExpireTimeSpan = TimeSpan.FromDays(1);
+    p.SlidingExpiration = true; // Kullanıcı aktifse süreyi otomatik uzatır
 });
 
 // Authorization (Yetki) Ayarları
@@ -85,8 +92,9 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
-app.UseSession();
 
+// MİMARİ SIRA ÇOK ÖNEMLİDİR (Dokunmadık, mükemmel ayarlamışsın)
+app.UseSession();
 app.UseAuthentication(); // Önce kimlik doğrulama
 app.UseAuthorization();  // Sonra yetkilendirme
 
