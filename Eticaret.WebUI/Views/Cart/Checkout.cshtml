@@ -54,7 +54,7 @@
 
         @if (Model.CartProducts != null && Model.CartProducts.Any())
         {
-            <form asp-action="Checkout" method="post" id="checkoutForm">
+            <form asp-controller="Cart" asp-action="Checkout" method="post" id="checkoutForm">
                 <div class="row g-4 g-lg-5">
 
                     <!-- SOL KOLON: Adres ve Ödeme -->
@@ -71,85 +71,133 @@
                                 </h5>
                             </div>
                             <div class="card-body p-4">
-                                @if (Model.Addresses == null || !Model.Addresses.Any())
+                                @if (User.Identity.IsAuthenticated)
                                 {
-                                    <div class="text-center py-4">
-                                        <i class="bi bi-geo-alt-fill text-warning display-4 mb-3"></i>
-                                        <h5 class="fw-bold">Kayıtlı Adresiniz Yok</h5>
-                                        <p class="text-muted mb-4">Sipariş verebilmek için lütfen bir teslimat adresi ekleyin.
-                                        </p>
-                                        <a href="/MyAddresses/Create" class="btn btn-primary rounded-pill px-4">
-                                            <i class="bi bi-plus-lg me-1"></i> Yeni Adres Ekle
-                                        </a>
-                                    </div>
-                                }
-                                else
-                                {
-                                    <div class="row g-3">
-                                        @foreach (var item in Model.Addresses)
-                                        {
-                                            <div class="col-md-6">
-                                                <label
-                                                    class="card h-100 address-card rounded-3 position-relative p-3 @(item.IsDeliveryAddress ? "selected" : "")"
-                                                    onclick="selectAddress(this)">
-                                                    <div class="d-flex align-items-start">
-                                                        <div class="form-check mt-1">
-                                                            <input class="form-check-input" type="radio" name="DeliveryAddress"
-                                                                value="@item.AddressGuid" @(item.IsDeliveryAddress ? "checked" : "")
-                                                                required>
-                                                        </div>
-                                                        <div class="ms-2">
-                                                            <span class="fw-bold d-block text-dark">@item.Title</span>
-                                                            <small class="text-muted d-block text-truncate"
-                                                                style="max-width: 200px;">@item.City / @item.District</small>
-                                                            <small class="text-muted d-block text-truncate"
-                                                                style="max-width: 200px;">@item.OpenAddress</small>
-                                                        </div>
-                                                    </div>
-                                                </label>
-                                            </div>
-                                        }
-                                    </div>
-
-                                    <div class="mt-4 pt-3 border-top">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" id="sameAddress" checked
-                                                onchange="toggleBillingSection()">
-                                            <label class="form-check-label fw-medium user-select-none" for="sameAddress">
-                                                Fatura adresim teslimat adresimle aynı olsun.
-                                            </label>
+                                    @if (Model.Addresses == null || !Model.Addresses.Any())
+                                    {
+                                        <div class="text-center py-4">
+                                            <i class="bi bi-geo-alt-fill text-warning display-4 mb-3"></i>
+                                            <h5 class="fw-bold">Kayıtlı Adresiniz Yok</h5>
+                                            <p class="text-muted mb-4">Sipariş verebilmek için lütfen bir teslimat adresi
+                                                ekleyin.
+                                            </p>
+                                            <a href="/adreslerim/ekle" class="btn btn-primary rounded-pill px-4">
+                                                <i class="bi bi-plus-lg me-1"></i> Yeni Adres Ekle
+                                            </a>
                                         </div>
-                                    </div>
-
-                                    <!-- Gizli Fatura Adresi Seçimi -->
-                                    <div id="billingSection" class="mt-4" style="display: none;">
-                                        <h6 class="fw-bold mb-3 text-secondary">Fatura Adresi Seçin</h6>
+                                    }
+                                    else
+                                    {
                                         <div class="row g-3">
                                             @foreach (var item in Model.Addresses)
                                             {
                                                 <div class="col-md-6">
-                                                    <label class="card h-100 address-card rounded-3 position-relative p-3"
-                                                        onclick="selectBillingAddress(this)">
+                                                    <label
+                                                        class="card h-100 address-card rounded-3 position-relative p-3 @(item.IsDeliveryAddress ? "selected" : "")"
+                                                        onclick="selectAddress(this)">
                                                         <div class="d-flex align-items-start">
                                                             <div class="form-check mt-1">
-                                                                <input class="form-check-input" type="radio" name="BillingAddress"
-                                                                    value="@item.AddressGuid">
+                                                                <input class="form-check-input" type="radio"
+                                                                    name="DeliveryAddress" value="@item.AddressGuid"
+                                                                    @(item.IsDeliveryAddress ? "checked" : "") required>
                                                             </div>
                                                             <div class="ms-2">
                                                                 <span class="fw-bold d-block text-dark">@item.Title</span>
-                                                                <small class="text-muted d-block">@item.City /
+                                                                <small class="text-muted d-block text-truncate"
+                                                                    style="max-width: 200px;">@item.City /
                                                                     @item.District</small>
+                                                                <small class="text-muted d-block text-truncate"
+                                                                    style="max-width: 200px;">@item.OpenAddress</small>
                                                             </div>
                                                         </div>
                                                     </label>
                                                 </div>
                                             }
                                         </div>
+
+                                        <div class="mt-4 pt-3 border-top">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="sameAddress" checked
+                                                    onchange="toggleBillingSection()">
+                                                <label class="form-check-label fw-medium user-select-none"
+                                                    for="sameAddress">
+                                                    Fatura adresim teslimat adresimle aynı olsun.
+                                                </label>
+                                            </div>
+                                        </div>
+
+                                        <!-- Gizli Fatura Adresi Seçimi -->
+                                        <div id="billingSection" class="mt-4" style="display: none;">
+                                            <h6 class="fw-bold mb-3 text-secondary">Fatura Adresi Seçin</h6>
+                                            <div class="row g-3">
+                                                @foreach (var item in Model.Addresses)
+                                                {
+                                                    <div class="col-md-6">
+                                                        <label
+                                                            class="card h-100 address-card rounded-3 position-relative p-3"
+                                                            onclick="selectBillingAddress(this)">
+                                                            <div class="d-flex align-items-start">
+                                                                <div class="form-check mt-1">
+                                                                    <input class="form-check-input" type="radio"
+                                                                        name="BillingAddress" value="@item.AddressGuid">
+                                                                </div>
+                                                                <div class="ms-2">
+                                                                    <span
+                                                                        class="fw-bold d-block text-dark">@item.Title</span>
+                                                                    <small class="text-muted d-block">@item.City /
+                                                                        @item.District</small>
+                                                                </div>
+                                                            </div>
+                                                        </label>
+                                                    </div>
+                                                }
+                                            </div>
+                                        </div>
+
+                                        <!-- Default Billing Value (Hidden) -->
+                                        <input type="hidden" name="BillingAddress" id="billingAddressDefault"
+                                            value="@Model.Addresses.FirstOrDefault(x => x.IsDeliveryAddress)?.AddressGuid">
+                                    }
+                                }
+                                else
+                                {
+                                    <!-- GUEST CHECKOUT FORM -->
+                                    <h6 class="fw-bold mb-3 text-secondary">İletişim Bilgileri</h6>
+                                    <div class="row g-3 mb-4">
+                                        <div class="col-md-6">
+                                            <label class="form-label small">Ad</label>
+                                            <input type="text" name="GuestName" class="form-control" required>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label small">Soyad</label>
+                                            <input type="text" name="GuestSurname" class="form-control" required>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label small">E-posta</label>
+                                            <input type="email" name="GuestEmail" class="form-control" required>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label small">Telefon</label>
+                                            <input type="tel" name="GuestPhone" class="form-control">
+                                        </div>
                                     </div>
 
-                                    <!-- Default Billing Value (Hidden) -->
-                                    <input type="hidden" name="BillingAddressDefault" id="billingAddressDefault"
-                                        value="@Model.Addresses.FirstOrDefault(x => x.IsDeliveryAddress)?.AddressGuid">
+                                    <h6 class="fw-bold mb-3 text-secondary">Teslimat Adresi</h6>
+                                    <div class="row g-3">
+                                        <div class="col-12">
+                                            <label class="form-label small">Açık Adres</label>
+                                            <textarea name="GuestOpenAddress" class="form-control" rows="3"
+                                                required></textarea>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label small">Şehir</label>
+                                            <input type="text" name="GuestCity" class="form-control" required>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label small">İlçe</label>
+                                            <input type="text" name="GuestDistrict" class="form-control" required>
+                                        </div>
+                                    </div>
                                 }
                             </div>
                         </div>
@@ -192,9 +240,9 @@
                                         <select class="form-select py-2" name="CardMonth" required>
                                             <option value="" selected disabled>Seçiniz</option>
                                             @for (int i = 1; i <= 12; i++)
-                                            {
+                                        {
                                                 <option value="@i">@i.ToString("00")</option>
-                                            }
+                                        }
                                         </select>
                                     </div>
                                     <div class="col-md-4">
@@ -329,67 +377,70 @@
     </div>
 </section>
 
-<script>
-    // Adres Kartı Seçim Efekti
-    function selectAddress(element) {
-        // Tüm kartlardan selected sınıfını kaldır
-        document.querySelectorAll('input[name="DeliveryAddress"]').forEach(input => {
-            input.closest('.address-card').classList.remove('selected');
-        });
-        // Seçilene ekle
-        element.classList.add('selected');
+@if (User.Identity.IsAuthenticated)
+{
+    <script>
+        // Adres Kartı Seçim Efekti
+        function selectAddress(element) {
+            // Tüm kartlardan selected sınıfını kaldır
+            document.querySelectorAll('input[name="DeliveryAddress"]').forEach(input => {
+                input.closest('.address-card').classList.remove('selected');
+            });
+            // Seçilene ekle
+            element.classList.add('selected');
 
-        // Radyo butonunu işaretle (Label'a tıklandığında otomatik olur ama garanti olsun)
-        const radio = element.querySelector('input[type="radio"]');
-        radio.checked = true;
+            // Radyo butonunu işaretle (Label'a tıklandığında otomatik olur ama garanti olsun)
+            const radio = element.querySelector('input[type="radio"]');
+            radio.checked = true;
 
-        // Eğer fatura adresi aynı ise hidden inputu güncelle
-        updateBillingInput();
-    }
-
-    function selectBillingAddress(element) {
-        document.querySelectorAll('input[name="BillingAddress"]').forEach(input => {
-            input.closest('.address-card').classList.remove('selected');
-        });
-        element.classList.add('selected');
-        element.querySelector('input[type="radio"]').checked = true;
-    }
-
-    function toggleBillingSection() {
-        const checkbox = document.getElementById('sameAddress');
-        const section = document.getElementById('billingSection');
-
-        if (checkbox.checked) {
-            section.style.display = 'none';
-            // Fatura adresi seçimlerini temizle
-            document.querySelectorAll('input[name="BillingAddress"]').forEach(r => r.checked = false);
+            // Eğer fatura adresi aynı ise hidden inputu güncelle
             updateBillingInput();
-        } else {
-            section.style.display = 'block';
-            // Hidden inputu devre dışı bırak, artık radyo butonları geçerli
-            document.getElementById('billingAddressDefault').name = "";
         }
-    }
 
-    function updateBillingInput() {
-        const checkbox = document.getElementById('sameAddress');
-        if (checkbox.checked) {
-            const selectedDelivery = document.querySelector('input[name="DeliveryAddress"]:checked');
-            const hiddenInput = document.getElementById('billingAddressDefault');
+        function selectBillingAddress(element) {
+            document.querySelectorAll('input[name="BillingAddress"]').forEach(input => {
+                input.closest('.address-card').classList.remove('selected');
+            });
+            element.classList.add('selected');
+            element.querySelector('input[type="radio"]').checked = true;
+        }
 
-            // Hidden inputu aktif et ve değerini güncelle
-            hiddenInput.name = "BillingAddress";
-            if (selectedDelivery) {
-                hiddenInput.value = selectedDelivery.value;
+        function toggleBillingSection() {
+            const checkbox = document.getElementById('sameAddress');
+            const section = document.getElementById('billingSection');
+
+            if (checkbox.checked) {
+                section.style.display = 'none';
+                // Fatura adresi seçimlerini temizle
+                document.querySelectorAll('input[name="BillingAddress"]').forEach(r => r.checked = false);
+                updateBillingInput();
+            } else {
+                section.style.display = 'block';
+                // Hidden inputu devre dışı bırak, artık radyo butonları geçerli
+                document.getElementById('billingAddressDefault').name = "";
             }
         }
-    }
 
-    // Sayfa yüklendiğinde çalıştır
-    document.addEventListener('DOMContentLoaded', function () {
-        updateBillingInput();
-    });
-</script>
+        function updateBillingInput() {
+            const checkbox = document.getElementById('sameAddress');
+            if (checkbox.checked) {
+                const selectedDelivery = document.querySelector('input[name="DeliveryAddress"]:checked');
+                const hiddenInput = document.getElementById('billingAddressDefault');
+
+                // Hidden inputu aktif et ve değerini güncelle
+                hiddenInput.name = "BillingAddress";
+                if (selectedDelivery) {
+                    hiddenInput.value = selectedDelivery.value;
+                }
+            }
+        }
+
+        // Sayfa yüklendiğinde çalıştır
+        document.addEventListener('DOMContentLoaded', function () {
+            updateBillingInput();
+        });
+    </script>
+}
 
 <!-- MOBİL SABİT ALT BAR -->
 <div class="fixed-bottom bg-white border-top shadow-lg p-3 d-lg-none" style="z-index: 1040;">

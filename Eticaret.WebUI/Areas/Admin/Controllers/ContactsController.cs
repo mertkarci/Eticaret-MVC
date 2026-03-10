@@ -16,12 +16,12 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
     [Authorize(Policy = "AdminPolicy")]
     public class ContactsController : Controller
     {
-            private readonly DatabaseContext _context;
+        private readonly DatabaseContext _context;
         public ContactsController(DatabaseContext context)
         {
             _context = context;
         }
-       public IActionResult Index()
+        public IActionResult Index()
         {
             return View(_context.Contacts);
         }
@@ -55,6 +55,22 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
+        }
+        public async Task<IActionResult> Details(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var contacts = await _context.Contacts
+                .FirstOrDefaultAsync(m => m.Id == id);
+            if (contacts == null)
+            {
+                return NotFound();
+            }
+
+            return View(contacts);
         }
     }
 }

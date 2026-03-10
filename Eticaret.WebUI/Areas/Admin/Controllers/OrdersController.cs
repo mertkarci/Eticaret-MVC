@@ -85,15 +85,22 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,OrderNumber,TotalPrice,OrderDate,AppUserId,CustomerId,BillingAddress,DeliveryAddress,OrderState")] Order order)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,OrderNumber,TotalPrice,OrderDate,AppUserId,CustomerId,BillingAddress,DeliveryAddress,OrderState,CustomerName,CustomerEmail,CustomerPhone")] Order order)
         {
             if (id != order.Id) return NotFound();
 
             if (ModelState.IsValid)
             {
-                _context.Update(order);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                try
+                {
+                    _context.Update(order);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
+                }
+                catch (Exception)
+                {
+                    ModelState.AddModelError("", "Kayıt sırasında bir veritabanı hatası oluştu.");
+                }
             }
 
             // Hata varsa listeleri tekrar doldur

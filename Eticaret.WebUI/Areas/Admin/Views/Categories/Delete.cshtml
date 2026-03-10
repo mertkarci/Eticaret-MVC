@@ -24,7 +24,7 @@
                 <form asp-action="Delete">
                     <input type="hidden" asp-for="Id" />
                     <div class="d-flex justify-content-end gap-2">
-                        <a asp-action="Index" class="btn btn-secondary"><i class="bi bi-x-lg me-2"></i> İptal</a>
+                        <a asp-action="Index"asp-area="Admin" class="btn btn-secondary"><i class="bi bi-x-lg me-2"></i> İptal</a>
                         <button type="submit" class="btn btn-danger"><i class="bi bi-trash-fill me-2"></i> Evet, Sil</button>
                     </div>
                 </form>

@@ -1,59 +1,89 @@
-@model IEnumerable<Contact>
+@model IEnumerable<Eticaret.Core.Entities.Contact>
 
 @{
-    ViewData["Title"] = "İletişim Formları";
+    ViewData["Title"] = "Gelen Mesajlar";
 }
 
-<table class="table table-hover table-striped">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Name)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Surname)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Email)
-            </th>
-                <td>
-                    @Html.DisplayNameFor(model => model.Message)
-                </td>
-            <th>
-                @Html.DisplayNameFor(model => model.Phone)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CreateDate)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Name)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Surname)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Email)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Message)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Phone)
-                </td>
-                <td>
-                    @item.CreateDate.ToShortDateString()
-                </td>
-                <td>
-                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h4 class="fw-bold mb-0 text-dark">İletişim Formu Mesajları</h4>
+        <p class="text-muted small mb-0">Müşterilerden gelen iletişim taleplerini buradan yönetebilirsiniz.</p>
+    </div>
+</div>
+
+<div class="card card-admin border-0 shadow-sm">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0 align-middle">
+                <thead class="bg-light">
+                    <tr>
+                        <th class="ps-4 py-3 text-muted">Gönderen</th>
+                        <th class="py-3 text-muted">İletişim Bilgileri</th>
+                        <th class="py-3 text-muted">Mesaj Özeti</th>
+                        <th class="py-3 text-muted">Tarih</th>
+                        <th class="pe-4 py-3 text-end text-muted">İşlemler</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (!Model.Any())
+                    {
+                        <tr>
+                            <td colspan="5" class="text-center py-5 text-muted">
+                                <i class="bi bi-inbox fs-1 d-block mb-2 text-secondary"></i>
+                                Henüz hiç mesaj bulunmuyor.
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td class="ps-4 py-3">
+                                    <div class="fw-bold text-dark">@item.Name @item.Surname</div>
+                                </td>
+                                
+                                <td class="py-3">
+                                    <div class="small text-dark">
+                                        <i class="bi bi-envelope text-muted me-1"></i> 
+                                        <a href="mailto:@item.Email" class="text-decoration-none text-dark">@item.Email</a>
+                                    </div>
+                                    @if (!string.IsNullOrEmpty(item.Phone))
+                                    {
+                                        <div class="small text-muted mt-1">
+                                            <i class="bi bi-telephone text-muted me-1"></i> 
+                                            <a href="tel:@item.Phone" class="text-decoration-none text-muted">@item.Phone</a>
+                                        </div>
+                                    }
+                                </td>
+                                
+                                <td class="py-3">
+                                    <span class="d-inline-block text-truncate text-secondary" style="max-width: 200px;" title="@item.Message">
+                                        @item.Message
+                                    </span>
+                                </td>
+                                
+                                <td class="py-3">
+                                    <span class="badge bg-light text-secondary border rounded-pill px-3 py-2 shadow-sm">
+                                        @item.CreateDate.ToString("dd.MM.yyyy HH:mm")
+                                    </span>
+                                </td>
+                                
+                                <td class="pe-4 py-3 text-end">
+                                    <div class="btn-group shadow-sm rounded-pill">
+                                        <a asp-action="Details" class="btn btn-sm btn-outline-info px-3" asp-route-id="@item.Id" title="Mesajı Oku">
+                                            <i class="bi bi-envelope-open me-1"></i> Oku
+                                        </a>
+                                        <a asp-action="Delete" class="btn btn-sm btn-outline-danger px-3" asp-route-id="@item.Id" title="Sil">
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

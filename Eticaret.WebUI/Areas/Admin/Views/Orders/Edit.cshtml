@@ -6,10 +6,15 @@
 
 <form asp-action="Edit">
     <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+    
     <input type="hidden" asp-for="Id" />
     <input type="hidden" asp-for="BillingAddress" />
     <input type="hidden" asp-for="DeliveryAddress" />
     <input type="hidden" asp-for="CustomerId" />
+
+    <input type="hidden" asp-for="CustomerName" />
+    <input type="hidden" asp-for="CustomerEmail" />
+    <input type="hidden" asp-for="CustomerPhone" />
 
     <div class="row g-4">
         <div class="col-lg-8">
@@ -21,15 +26,27 @@
                     <div class="row g-3">
                         <div class="col-md-6">
                             <label asp-for="OrderNumber" class="form-label"></label>
-                            <input asp-for="OrderNumber" class="form-control" />
-                            <span asp-validation-for="OrderNumber" class="text-danger small"></span>
+                            <input asp-for="OrderNumber" class="form-control" readonly /> <span asp-validation-for="OrderNumber" class="text-danger small"></span>
                         </div>
+                        
                         <div class="col-md-6">
-                            <label asp-for="AppUserId" class="form-label">Müşteri</label>
-                            <select asp-for="AppUserId" class="form-select" asp-items="ViewBag.AppUserId">
-                                <option value="">Müşteri Seçiniz</option>
-                            </select>
+                            <label class="form-label">Müşteri</label>
+                            @if (Model.AppUserId != null)
+                            {
+                                <select asp-for="AppUserId" class="form-select" asp-items="ViewBag.AppUserId">
+                                    <option value="">Müşteri Seçiniz</option>
+                                </select>
+                            }
+                            else
+                            {
+                                <input type="hidden" asp-for="AppUserId" />
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light"><i class="bi bi-person-badge"></i></span>
+                                    <input type="text" class="form-control bg-light text-muted" value="Misafir: @Model.CustomerName" readonly />
+                                </div>
+                            }
                         </div>
+
                         <div class="col-md-6">
                             <label asp-for="OrderDate" class="form-label"></label>
                             <input asp-for="OrderDate" class="form-control" asp-format="{0:yyyy-MM-ddTHH:mm}" type="datetime-local" />
@@ -57,13 +74,13 @@
                     <div class="card-body">
                         <div class="mb-3">
                             <label asp-for="OrderState" class="form-label">Sipariş Durumu</label>
-                            <select asp-for="OrderState" class="form-select"
+                            <select asp-for="OrderState" class="form-select border-primary shadow-sm"
                                 asp-items="Html.GetEnumSelectList<Eticaret.Core.Entities.EnumOrderState>()"></select>
                             <span asp-validation-for="OrderState" class="text-danger small"></span>
                         </div>
                         <hr />
                         <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-submit shadow-sm">
+                            <button type="submit" class="btn btn-submit shadow-sm btn-primary">
                                 <i class="bi bi-check-lg me-2"></i> Güncelle
                             </button>
                             <a asp-action="Index" class="btn btn-outline-secondary">
@@ -81,5 +98,4 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-
 }

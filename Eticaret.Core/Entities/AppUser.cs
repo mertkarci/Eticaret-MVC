@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿﻿using System.ComponentModel.DataAnnotations;
 
 namespace Eticaret.Core.Entities;
 
@@ -23,7 +23,9 @@ public class AppUser : IEntity
 
     [Display(Name ="Kullanıcı Adı")]
     public string? Username {get; set;}
+        [Display(Name ="Aktif mi?")]
     public bool isActive {get; set;}
+        [Display(Name ="Yetkili Rol mü?")]
     public bool isAdmin{get; set;}
 
     [Display(Name ="Kayıt Tarihi"), ScaffoldColumn(false)]

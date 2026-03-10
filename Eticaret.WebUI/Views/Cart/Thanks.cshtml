@@ -1,68 +1,34 @@
 @{
-ViewData["Title"] = "Sipariş Başarılı";
+    ViewData["Title"] = "Siparişiniz Alındı";
 }
 
-<div class="container py-5 my-5">
-<div class="row justify-content-center">
-<div class="col-md-8 col-lg-6 text-center">
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center">
+                <div class="mb-4">
+                    <i class="bi bi-bag-check-fill text-success" style="font-size: 5rem;"></i>
+                </div>
+                <h1 class="display-5 fw-bold">Teşekkürler!</h1>
+                <p class="lead text-muted">Siparişiniz başarıyla alınmıştır.</p>
 
-<div class="mb-4">
-<i class="bi bi-check-circle-fill text-success" style="font-size: 5rem;"></i>
-</div>
+                @if (TempData["OrderNumber"] != null)
+                {
+                    <p class="fs-5 mt-4">Sipariş Numaranız: <strong class="text-primary">@TempData["OrderNumber"]</strong></p>
+                }
+                else if (ViewBag.OrderNumber != null)
+                {
+                    <p class="fs-5 mt-4">Sipariş Numaranız: <strong class="text-primary">@ViewBag.OrderNumber</strong></p>
+                }
 
-<h1 class="display-4 fw-bold text-dark mb-3">Siparişiniz Alındı!</h1>
-
-<p class="lead text-muted mb-4">
-Bizi tercih ettiğiniz için teşekkür ederiz. Siparişiniz başarıyla sisteme kaydedildi ve hazırlık
-sürecine başlandı.
-</p>
-
-<div class="card border-0 shadow-sm bg-light rounded-4 p-4 mb-4">
-<div class="d-flex justify-content-between align-items-center mb-2">
-<span class="text-muted small fw-bold text-uppercase">Sipariş Numarası</span>
-<span class="badge bg-primary rounded-pill px-3">#@TempData["OrderNumber"]</span>
-</div>
-<hr class="my-2 opacity-25">
-<div class="text-start mt-3">
-<p class="small text-muted mb-1"><i class="bi bi-envelope-me-fill me-2"></i> Detaylar kayıtlı
-e-posta adresinize gönderildi.</p>
-<p class="small text-muted mb-0"><i class="bi bi-truck me-2"></i> Kargo takip numaranız SMS ile
-iletilecektir.</p>
-</div>
-</div>
-
-<div class="d-grid gap-2 d-sm-flex justify-content-sm-center mt-2">
-<a asp-action="Index" asp-controller="Home" class="btn btn-outline-secondary btn-lg px-4 rounded-pill">
-<i class="bi bi-house-door me-2"></i>Ana Sayfa
-</a>
-<a asp-action="MyOrders" asp-controller="Accounts"
-class="btn btn-success btn-lg px-4 rounded-pill fw-bold shadow">
-<i class="bi bi-bag-check me-2"></i>Siparişlerime Git
-</a>
-</div>
-
-<p class="mt-5 text-muted small">
-Bir sorunuz mu var? <a asp-action="ContactUs" asp-controller="Home"
-class="text-decoration-none fw-bold">
-<i class="bi bi-bag-check me-2"></i>Destek ekibimizle iletişime geçin.
-</a>
-</p>
-
-</div>
-</div>
-</div>
-
-@section Scripts {
-<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
-<script>
-// Sayfa yüklendiğinde konfeti patlasın
-window.onload = function () {
-confetti({
-particleCount: 150,
-spread: 70,
-origin: { y: 0.6 },
-colors: ['#28a745', '#007bff', '#ffc107']
-});
-};
-</script>
-}
+                <div class="d-flex gap-2 justify-content-center mt-4">
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <a asp-action="MyOrders" asp-controller="Accounts" class="btn btn-primary rounded-pill px-4">Siparişlerim</a>
+                    }
+                    <a asp-action="Index" asp-controller="Home" class="btn btn-outline-secondary rounded-pill px-4">Alışverişe Devam Et</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

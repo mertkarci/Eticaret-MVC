@@ -50,7 +50,6 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
         // GET: Admin/Categories/Create
         public async Task<IActionResult> CreateAsync()
         {
-            // ViewBag.Kategoriler yerine ViewBag.Categories yaptık ki View ile tam eşleşsin.
             ViewBag.Categories = new SelectList(await _context.Categories.ToListAsync(), "Id", "Name");
             return View();
         }
@@ -58,7 +57,7 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
         // POST: Admin/Categories/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Category category, IFormFile Image)
+        public async Task<IActionResult> Create(Category category, IFormFile? Image)
         {
             if (ModelState.IsValid)
             {
@@ -67,12 +66,24 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
                     category.Image = await FileHelper.FileLoaderAsync(Image, "/img/categories/");
                 }
 
+                // EKSİK OLAN SLUG ÜRETME MANTIĞI EKLENDİ
+                string baseSlug = UrlHelper.FriendlyUrl(category.Name ?? "");
+                string finalSlug = baseSlug;
+                int counter = 1;
+
+                while (await _context.Categories.AnyAsync(c => c.Slug == finalSlug))
+                {
+                    finalSlug = $"{baseSlug}-{counter++}";
+                }
+                category.Slug = finalSlug;
+
                 _context.Add(category);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+
+                // AREA YÖNLENDİRMESİ DÜZELTİLDİ
+                return RedirectToAction(nameof(Index), new { area = "Admin" });
             }
 
-            // Model hatalıysa sayfa geri dönerken dropdown boşalmasın diye tekrar listeyi gönderiyoruz
             ViewBag.Categories = new SelectList(await _context.Categories.ToListAsync(), "Id", "Name", category.ParentId);
             return View(category);
         }
@@ -91,7 +102,6 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
                 return NotFound();
             }
 
-            // Kategori kendi kendisinin üst kategorisi olamaz (c.Id != id)
             var categoryList = await _context.Categories.Where(c => c.Id != id).ToListAsync();
             ViewBag.Categories = new SelectList(categoryList, "Id", "Name", category.ParentId);
 
@@ -112,6 +122,19 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
             {
                 try
                 {
+                    // FORM'DAN SLUG BOŞ GELİRSE DÜŞECEĞİ GÜVENLİK AĞI
+                    if (string.IsNullOrWhiteSpace(category.Slug))
+                    {
+                        string baseSlug = UrlHelper.FriendlyUrl(category.Name ?? "");
+                        string finalSlug = baseSlug;
+                        int counter = 1;
+                        while (await _context.Categories.AnyAsync(c => c.Slug == finalSlug && c.Id != category.Id))
+                        {
+                            finalSlug = $"{baseSlug}-{counter++}";
+                        }
+                        category.Slug = finalSlug;
+                    }
+
                     if (cbResmiSil)
                     {
                         category.Image = string.Empty;
@@ -120,6 +143,7 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
                     {
                         category.Image = await FileHelper.FileLoaderAsync(Image, "/img/categories/");
                     }
+
                     _context.Update(category);
                     await _context.SaveChangesAsync();
                 }
@@ -134,10 +158,11 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+
+                // GÜNCELLEDİKTEN SONRA AYNI SAYFADA KALMASI VE AREA İÇİNDE TUTULMASI SAĞLANDI
+                return RedirectToAction(nameof(Edit), new { id = category.Id, area = "Admin" });
             }
 
-            // İşlem başarısız olursa ve sayfa geri yüklenecekse, dropdown'ı tekrar doldur (Kendisi hariç)
             var categoryList = await _context.Categories.Where(c => c.Id != id).ToListAsync();
             ViewBag.Categories = new SelectList(categoryList, "Id", "Name", category.ParentId);
 
@@ -178,43 +203,47 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
             }
 
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+
+            // AREA YÖNLENDİRMESİ DÜZELTİLDİ
+            return RedirectToAction(nameof(Index), new { area = "Admin" });
         }
 
         private bool CategoryExists(int id)
         {
             return _context.Categories.Any(e => e.Id == id);
         }
-        // [Route("Admin/Categories/GenerateCategorySlugs")]
-        // public async Task<IActionResult> GenerateCategorySlugs()
-        // {
-        //     // Veritabanındaki tüm kategorileri çekiyoruz
-        //     var categories = await _context.Categories.ToListAsync();
-        //     int updatedCount = 0;
 
-        //     foreach (var category in categories)
-        //     {
-        //         // İsimden SEO uyumlu link oluştur (Örn: "Ev Eşyası" -> "ev-esyasi")
-        //         string baseSlug = UrlHelper.FriendlyUrl(category.Name ?? "");
-        //         string finalSlug = baseSlug;
-        //         int counter = 1;
 
-        //         // Benzersizlik kontrolü: Eğer aynı slug varsa sonuna -1, -2 ekler
-        //         while (await _context.Categories.AnyAsync(c => c.Slug == finalSlug && c.Id != category.Id))
-        //         {
-        //             finalSlug = $"{baseSlug}-{counter++}";
-        //         }
-
-        //         category.Slug = finalSlug;
-        //         _context.Update(category);
-        //         updatedCount++;
-        //     }
-
-        //     await _context.SaveChangesAsync();
-
-        //     // İşlem bitince liste sayfasına mesajla dön
-        //     TempData["Message"] = $"{updatedCount} adet kategori başarıyla SEO uyumlu hale getirildi.";
-        //     return RedirectToAction(nameof(Index));
-        // }
     }
 }
+// [Route("Admin/Categories/GenerateCategorySlugs")]
+// public async Task<IActionResult> GenerateCategorySlugs()
+// {
+//     // Veritabanındaki tüm kategorileri çekiyoruz
+//     var categories = await _context.Categories.ToListAsync();
+//     int updatedCount = 0;
+
+//     foreach (var category in categories)
+//     {
+//         // İsimden SEO uyumlu link oluştur (Örn: "Ev Eşyası" -> "ev-esyasi")
+//         string baseSlug = UrlHelper.FriendlyUrl(category.Name ?? "");
+//         string finalSlug = baseSlug;
+//         int counter = 1;
+
+//         // Benzersizlik kontrolü: Eğer aynı slug varsa sonuna -1, -2 ekler
+//         while (await _context.Categories.AnyAsync(c => c.Slug == finalSlug && c.Id != category.Id))
+//         {
+//             finalSlug = $"{baseSlug}-{counter++}";
+//         }
+
+//         category.Slug = finalSlug;
+//         _context.Update(category);
+//         updatedCount++;
+//     }
+
+//     await _context.SaveChangesAsync();
+
+//     // İşlem bitince liste sayfasına mesajla dön
+//     TempData["Message"] = $"{updatedCount} adet kategori başarıyla SEO uyumlu hale getirildi.";
+//     return RedirectToAction(nameof(Index));
+// }

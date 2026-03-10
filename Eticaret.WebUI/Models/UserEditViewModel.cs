@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿﻿using System.ComponentModel.DataAnnotations;
 
 namespace Eticaret.WebUI;
 
@@ -19,5 +19,5 @@ public class UserEditViewModel
     public string Phone { get; set; }
 
     [Display(Name = "Şifre")]
-    public string Password { get; set; }
+    public string? Password { get; set; }
 }

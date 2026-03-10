@@ -212,11 +212,21 @@ public class AccountsController : Controller
     {
         appUser.isAdmin = false; // başlangıçta nolursa olsun admin olmasın
         appUser.isActive = true;
+        if (string.IsNullOrWhiteSpace(appUser.Password))
+        {
+            ModelState.AddModelError("Password", "Şifre alanı boş geçilemez.");
+        }
         if (ModelState.IsValid)
         {
+            if (await _service.GetAsync(u => u.Email == appUser.Email) != null)
+            {
+                ModelState.AddModelError("Email", "Bu e-posta adresi zaten kullanılıyor.");
+                return View(appUser);
+            }
             await _service.AddAsync(appUser);
             await _service.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            TempData["Message"] = "Kaydınız başarıyla oluşturuldu. Lütfen giriş yapınız.";
+            return RedirectToAction(nameof(SignIn));
         }
         return View(appUser);
     }
