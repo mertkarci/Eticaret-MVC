@@ -119,7 +119,6 @@ namespace Eticaret.WebUI.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(string name, [FromForm] string id, Address address)
         {
-            // KİLİT 2: Gizli input'tan id gelmemişse işlemi durdur
             if (string.IsNullOrEmpty(id)) return BadRequest("Geçersiz işlem: ID bulunamadı.");
             var userGuidStr = HttpContext.User.FindFirst("UserGuid")?.Value;
 
@@ -128,25 +127,19 @@ namespace Eticaret.WebUI.Controllers
                 return NotFound("Oturumda UserGuid bulunamadı. Lütfen tekrar giriş yapın.");
             }
 
-            // 2. DÜZELTME: Karşılaştırmayı her iki tarafı da Normalize (küçülterek) ederek yapıyoruz
-            // Ayrıca ToString().ToLower() yaparak veritabanı farklarını ortadan kaldırıyoruz.
             var appUser = await _serviceAppUser.GetAsync(p =>
                 p.UserGuid.ToString().ToLower() == userGuidStr.ToLower());
 
             if (appUser == null)
             {
-                // Eğer buraya düşüyorsa veritabanında bu Guid'e sahip bir AppUser gerçekten yoktur.
-                // Veritabanını açıp AppUser tablosundaki UserGuid sütununu kontrol etmelisin.
                 return NotFound($"Kullanıcı bulunamadı! Aranan Guid: {userGuidStr}");
             }
 
-            // PROFESYONEL DOKUNUŞ: String olarak gelen id'yi gerçek bir Guid nesnesine çeviriyoruz
             if (!Guid.TryParse(id, out Guid parsedGuid))
             {
                 return BadRequest("Bozuk veya geçersiz bir ID gönderildi.");
             }
 
-            // ARTIK HATA VEREMEZ: Çünkü ToLower() veya ToString() yok, iki temiz Guid'i karşılaştırıyoruz
             var model = await _serviceAddress.GetAsync(p => p.AddressGuid == parsedGuid && p.AppUserId == appUser.Id);
 
             if (model != null)

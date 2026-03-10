@@ -38,10 +38,9 @@ public class AccountsController : Controller
             return RedirectToAction("SignIn");
         }
 
-        // 3. SERVICE İLE ÇAĞIRMA (Async)
+
         AppUser user = await _service.GetAsync(p => p.UserGuid == guidFromCookie);
 
-        // 4. Kullanıcı kontrolü
         if (user is null)
         {
             await HttpContext.SignOutAsync();
@@ -63,58 +62,63 @@ public class AccountsController : Controller
 
     [HttpPost("")]
     [Authorize]
+    [ValidateAntiForgeryToken] // CSRF Kalkanı
     public async Task<IActionResult> Index(UserEditViewModel model)
     {
+        // E-posta ve Şifre ön yüzden gelse bile C# tarafında bunları yok sayıyoruz (Overposting koruması)
+        // Sadece Name, Surname ve Phone güncellenecek.
+
+        // TELEFON FORMAT KONTROLÜ (Backend Güvenliği - Frontend bypass edilse bile buradan geçemez)
+        if (!string.IsNullOrWhiteSpace(model.Phone))
+        {
+            // Sadece rakamlardan oluşmalı, 11 hane olmalı ve 05 ile başlamalı
+            if (!System.Text.RegularExpressions.Regex.IsMatch(model.Phone, @"^05[0-9]{9}$"))
+            {
+                ModelState.AddModelError("Phone", "Telefon numarası 05 ile başlamalı ve 11 haneli olmalıdır.");
+            }
+        }
+
         if (ModelState.IsValid)
         {
             try
             {
-                // GUID ALMA VE GÜVENLİK
                 var userGuidClaim = HttpContext.User.FindFirst("UserGuid");
-                if (userGuidClaim == null) return RedirectToAction("SignIn");
-
-                if (!Guid.TryParse(userGuidClaim.Value, out Guid guidFromCookie))
+                if (userGuidClaim == null || !Guid.TryParse(userGuidClaim.Value, out Guid guidFromCookie))
                 {
                     await HttpContext.SignOutAsync();
                     return RedirectToAction("SignIn");
                 }
 
-                // VERİYİ SERVİSTEN ÇEKME
                 AppUser user = await _service.GetAsync(p => p.UserGuid == guidFromCookie);
 
                 if (user is not null)
                 {
-                    // Verileri Güncelle
+                    // SADECE İZİN VERDİĞİMİZ ALANLARI GÜNCELLİYORUZ
                     user.Name = model.Name;
                     user.Surname = model.Surname;
-                    user.Email = model.Email;
+
+
+                    // if(model.Phone != user.Phone) { SendSmsAndRedirectToVerification(...) }
                     user.Phone = model.Phone;
 
-                    // Şifre boş gelirse eski şifreyi koru
-                    if (!string.IsNullOrEmpty(model.Password))
-                    {
-                        user.Password = model.Password;
-                    }
 
-                    // GÜNCELLEME VE KAYDETME
                     _service.Update(user);
                     var result = await _service.SaveChangesAsync();
 
                     if (result > 0)
                     {
                         TempData["Message"] = @"<div class='alert alert-success alert-dismissible fade show rounded-0' role='alert'>
-                            <strong> Tebrikler! </strong> Bilgileriniz başarıyla güncellendi.
-                            <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
-                        </div>";
-
+                        <strong> Tebrikler! </strong> Bilgileriniz başarıyla güncellendi.
+                        <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
+                    </div>";
                         return RedirectToAction("Index");
                     }
                     else
                     {
                         TempData["Message"] = @"<div class='alert alert-info alert-dismissible fade show rounded-0' role='alert'>
-                            Değişiklik yapılmadı.
-                            <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
-                        </div>";
+                        Değişiklik yapılmadı.
+                        <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
+                    </div>";
                         return RedirectToAction("Index");
                     }
                 }
@@ -125,6 +129,11 @@ public class AccountsController : Controller
                 Debug.WriteLine(ex);
             }
         }
+
+        // Model validasyondan geçemezse (Örn: Telefon yanlışsa), sayfa yenilendiğinde Email boş kalmasın diye tekrar dolduruyoruz.
+        var currentUser = await _service.GetAsync(p => p.UserGuid.ToString() == HttpContext.User.FindFirst("UserGuid").Value);
+        if (currentUser != null) model.Email = currentUser.Email;
+
         return View(model);
     }
 
@@ -208,26 +217,41 @@ public class AccountsController : Controller
     }
 
     [HttpPost("kayit-ol")]
+    [ValidateAntiForgeryToken] // CSRF Kalkanı
     public async Task<IActionResult> SignUpAsync(AppUser appUser)
     {
-        appUser.isAdmin = false; // başlangıçta nolursa olsun admin olmasın
+        appUser.isAdmin = false;
         appUser.isActive = true;
+
+        // TELEFON FORMAT KONTROLÜ
+        if (!string.IsNullOrWhiteSpace(appUser.Phone))
+        {
+            if (!System.Text.RegularExpressions.Regex.IsMatch(appUser.Phone, @"^05[0-9]{9}$"))
+            {
+                ModelState.AddModelError("Phone", "Telefon numarası 05 ile başlamalı ve 11 haneli olmalıdır.");
+            }
+        }
+
         if (string.IsNullOrWhiteSpace(appUser.Password))
         {
             ModelState.AddModelError("Password", "Şifre alanı boş geçilemez.");
         }
+
         if (ModelState.IsValid)
         {
+            // E-posta benzersizliği (Unique) kontrolü
             if (await _service.GetAsync(u => u.Email == appUser.Email) != null)
             {
                 ModelState.AddModelError("Email", "Bu e-posta adresi zaten kullanılıyor.");
                 return View(appUser);
             }
+
             await _service.AddAsync(appUser);
             await _service.SaveChangesAsync();
             TempData["Message"] = "Kaydınız başarıyla oluşturuldu. Lütfen giriş yapınız.";
             return RedirectToAction(nameof(SignIn));
         }
+
         return View(appUser);
     }
     [HttpGet("cikis-yap")]

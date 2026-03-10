@@ -24,7 +24,10 @@ builder.Services.AddDbContext<DatabaseContext>(options =>
 // --------------------------------------------------
 
 // Servisleri ekliyoruz
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews(options =>
+{
+    options.Filters.Add(new Microsoft.AspNetCore.Mvc.AutoValidateAntiforgeryTokenAttribute());
+});
 
 // --- 1. GÜVENLİK GÜNCELLEMESİ: SESSION (OTURUM) AYARLARI ---
 builder.Services.AddSession(options =>
