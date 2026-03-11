@@ -65,10 +65,7 @@ public class AccountsController : Controller
     [ValidateAntiForgeryToken] // CSRF Kalkanı
     public async Task<IActionResult> Index(UserEditViewModel model)
     {
-        // E-posta ve Şifre ön yüzden gelse bile C# tarafında bunları yok sayıyoruz (Overposting koruması)
-        // Sadece Name, Surname ve Phone güncellenecek.
 
-        // TELEFON FORMAT KONTROLÜ (Backend Güvenliği - Frontend bypass edilse bile buradan geçemez)
         if (!string.IsNullOrWhiteSpace(model.Phone))
         {
             // Sadece rakamlardan oluşmalı, 11 hane olmalı ve 05 ile başlamalı
@@ -99,8 +96,16 @@ public class AccountsController : Controller
 
 
                     // if(model.Phone != user.Phone) { SendSmsAndRedirectToVerification(...) }
-                    user.Phone = model.Phone;
+                    if (await _service.GetAsync(u => u.Phone == model.Phone) != null)
+                    {
+                        ModelState.AddModelError("Phone", "Bu telefon numarası zaten kullanılıyor.");
+                        return View(model);
+                    }
+                    else
+                    {
+                        user.Phone = model.Phone;
 
+                    }
 
                     _service.Update(user);
                     var result = await _service.SaveChangesAsync();
@@ -239,13 +244,17 @@ public class AccountsController : Controller
 
         if (ModelState.IsValid)
         {
-            // E-posta benzersizliği (Unique) kontrolü
+            // E-posta benzersizliği kontrolü
             if (await _service.GetAsync(u => u.Email == appUser.Email) != null)
             {
                 ModelState.AddModelError("Email", "Bu e-posta adresi zaten kullanılıyor.");
                 return View(appUser);
             }
-
+            if (await _service.GetAsync(u => u.Phone == appUser.Phone) != null)
+            {
+                ModelState.AddModelError("Phone", "Bu telefon numarası zaten kullanılıyor.");
+                return View(appUser);
+            }
             await _service.AddAsync(appUser);
             await _service.SaveChangesAsync();
             TempData["Message"] = "Kaydınız başarıyla oluşturuldu. Lütfen giriş yapınız.";
@@ -298,8 +307,8 @@ public class AccountsController : Controller
     {
         return View();
     }
-
     [HttpPost("sifremi-unuttum")]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> PasswordRenew(string Email)
     {
         if (string.IsNullOrWhiteSpace(Email))
@@ -315,78 +324,112 @@ public class AccountsController : Controller
             return View();
         }
 
-        string message = $"Şifrenizi bağlantıyı kullanarak sıfırlayınız: <a href='http://localhost:5292/Accounts/PasswordChange?user={user.UserGuid.ToString()}'>Buraya tıklayınız</a>";
-        var result = await MailHelper.SendmMailAsync(Email, "Şifreyi Yenile", message);
+        string resetToken = Guid.NewGuid().ToString();
+
+        user.PasswordResetToken = resetToken;
+        user.ResetTokenExpires = DateTime.Now.AddHours(2);
+        _service.Update(user);
+        await _service.SaveChangesAsync();
+
+        string resetLink = Url.Action("PasswordChange", "Accounts", new { token = resetToken }, Request.Scheme);
+
+        string message = $@"
+        <div style='font-family: Arial, sans-serif; padding: 20px;'>
+            <h3>Şifre Sıfırlama Talebi</h3>
+            <p>Merhaba {user.Name},</p>
+            <p>Şifrenizi yenilemek için aşağıdaki bağlantıya tıklayabilirsiniz. Bu bağlantı sadece size özeldir.</p>
+            <p><a href='{resetLink}' style='display: inline-block; padding: 10px 20px; background-color: #0d6efd; color: white; text-decoration: none; border-radius: 5px;'>Şifremi Yenile</a></p>
+            <p style='font-size: 12px; color: #6c757d; margin-top: 20px;'>Eğer bu talebi siz yapmadıysanız, bu e-postayı görmezden gelebilirsiniz.</p>
+        </div>";
+
+        var result = await MailHelper.SendmMailAsync(Email, message, "Şifremi Yenile");
 
         if (result)
         {
-            TempData["Message"] = "Şifre sıfırlama bağlantınız mail adresinize başarıyla gönderilmiştir.";
+            TempData["Message"] = @"<div class='alert alert-success'>Şifre sıfırlama bağlantınız mail adresinize başarıyla gönderilmiştir. Lütfen gelen kutunuzu (ve Spam klasörünü) kontrol edin.</div>";
         }
         else
         {
-            TempData["Message"] = "Mail gönderilirken bir hata oluştu!";
+            TempData["Message"] = @"<div class='alert alert-danger'>Mail gönderilirken sistemsel bir hata oluştu! Lütfen daha sonra tekrar deneyin.</div>";
+
         }
 
         return View();
     }
 
     [HttpGet("sifremi-yenile")]
-    public async Task<IActionResult> PasswordChange(string user)
+    public async Task<IActionResult> PasswordChange(string token) // Artık 'user' değil 'token' bekliyoruz
     {
-        if (string.IsNullOrEmpty(user))
+        if (string.IsNullOrEmpty(token))
         {
             return BadRequest("Geçersiz istek!");
         }
 
-        // Güvenlik ve Dönüşüm: String to Guid
-        if (!Guid.TryParse(user, out Guid parsedGuid))
+        // Veritabanında bu token'a sahip ve süresi dolmamış kullanıcıyı arıyoruz
+        AppUser appUser = await _service.GetAsync(p => p.PasswordResetToken == token);
+
+        if (appUser is null || appUser.ResetTokenExpires < DateTime.Now)
         {
-            return BadRequest("Geçersiz link formatı!");
+            return NotFound("Geçersiz veya süresi dolmuş bir şifre sıfırlama bağlantısı kullandınız.");
         }
 
-        AppUser appUser = await _service.GetAsync(p => p.UserGuid == parsedGuid);
-
-        if (appUser is null)
-        {
-            return NotFound("Geçersiz veya süresi dolmuş değer.");
-        }
+        // Token geçerliyse, formun içine koymak için ViewBag ile sayfaya yolluyoruz
+        ViewBag.Token = token;
 
         return View();
     }
 
     [HttpPost("sifremi-yenile")]
-    public async Task<IActionResult> PasswordChange(string user, string password)
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> PasswordChange(string token, string password) // Parametre 'token' oldu
     {
-        if (string.IsNullOrEmpty(user) || string.IsNullOrEmpty(password))
-        {
-            return BadRequest("Lütfen tüm alanları doldurun!");
-        }
+        // Hata durumunda sayfa yenilendiğinde gizli input boş kalmasın diye tekrar dolduruyoruz
+        ViewBag.Token = token;
 
-        if (!Guid.TryParse(user, out Guid parsedGuid))
+        // 1. BOŞLUK KONTROLÜ
+        if (string.IsNullOrEmpty(token) || string.IsNullOrEmpty(password))
         {
-            return BadRequest("Geçersiz link formatı!");
-        }
-
-        AppUser appUser = await _service.GetAsync(p => p.UserGuid == parsedGuid);
-
-        if (appUser is null)
-        {
-            ModelState.AddModelError("", "Kullanıcı bulunamadı.");
+            ModelState.AddModelError("", "Lütfen tüm alanları doldurun!");
             return View();
         }
 
-        appUser.Password = password;
+        // 2. BACKEND UZUNLUK VE GÜVENLİK KONTROLÜ
+        if (password.Length < 6)
+        {
+            ModelState.AddModelError("", "Şifreniz güvenlik gereği en az 6 karakter uzunluğunda olmalıdır.");
+            return View();
+        }
 
-        // Servis Update
+        if (password.Contains(" "))
+        {
+            ModelState.AddModelError("", "Şifreniz boşluk karakteri içeremez.");
+            return View();
+        }
+
+        // 3. TOKEN VE SÜRE KONTROLÜ (Gerçek Güvenlik Duvarı)
+        AppUser appUser = await _service.GetAsync(p => p.PasswordResetToken == token);
+
+        // Eğer token yoksa, kullanılmışsa veya 2 saatlik süresi dolmuşsa işlemi iptal et
+        if (appUser is null || appUser.ResetTokenExpires < DateTime.Now)
+        {
+            ModelState.AddModelError("", "Geçersiz veya süresi dolmuş bir şifre sıfırlama bağlantısı kullandınız.");
+            return View();
+        }
+
+        // 4. ŞİFREYİ GÜNCELLEME VE TOKEN İPTALİ (Tek kullanımlık yapma)
+        appUser.Password = password;
+        appUser.PasswordResetToken = null; // Token'ı imha ediyoruz
+        appUser.ResetTokenExpires = null;  // Süreyi sıfırlıyoruz
+
         _service.Update(appUser);
         var result = await _service.SaveChangesAsync();
 
         if (result > 0)
         {
             TempData["Message"] = @"<div class='alert alert-success alert-dismissible fade show rounded-0' role='alert'>
-                            Şifreniz başarıyla güncellenmiştir! Lütfen yeni şifrenizle giriş yapın.
-                            <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
-                        </div>";
+                Şifreniz başarıyla güncellenmiştir! Lütfen yeni şifrenizle giriş yapın.
+                <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
+            </div>";
 
             return RedirectToAction("SignIn");
         }

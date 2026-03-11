@@ -1,9 +1,7 @@
-using System.Threading.Tasks;
 using Eticaret.Core.Entities;
 using Eticaret.Service.Abstract;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Eticaret.WebUI.Controllers
 {
@@ -30,7 +28,6 @@ namespace Eticaret.WebUI.Controllers
                 return NotFound("Oturumda UserGuid bulunamadı.");
             }
 
-            // Karşılaştırmayı daha güvenli hale getirelim (büyük/küçük harf duyarlılığını ortadan kaldırarak)
             var appUser = await _serviceAppUser.GetAsync(p => p.UserGuid.ToString().ToLower() == userGuidStr.ToLower());
 
             if (appUser == null)
@@ -38,7 +35,6 @@ namespace Eticaret.WebUI.Controllers
                 return NotFound("Kullanıcı bulunamadı! Veritabanında bu Guid'e sahip bir kayıt olmayabilir.");
             }
 
-            // MUTLAKA await ekle, yoksa model View'a gitmeden Task olarak kalır
             var model = await _serviceAddress.GetAllAsync(p => p.AppUserId == appUser.Id);
 
             return View(model);
@@ -85,7 +81,6 @@ namespace Eticaret.WebUI.Controllers
         [HttpGet("duzenle/{**name}")]
         public async Task<IActionResult> Edit(string name)
         {
-            // KİLİT 1: Eğer URL'de isim yoksa direkt listeye geri yolla (Hata vermesini engeller)
             if (string.IsNullOrEmpty(name)) return RedirectToAction(nameof(Index));
 
             var userGuidStr = HttpContext.User.FindFirst("UserGuid")?.Value;
@@ -95,19 +90,15 @@ namespace Eticaret.WebUI.Controllers
                 return NotFound("Oturumda UserGuid bulunamadı. Lütfen tekrar giriş yapın.");
             }
 
-            // 2. DÜZELTME: Karşılaştırmayı her iki tarafı da Normalize (küçülterek) ederek yapıyoruz
-            // Ayrıca ToString().ToLower() yaparak veritabanı farklarını ortadan kaldırıyoruz.
             var appUser = await _serviceAppUser.GetAsync(p =>
                 p.UserGuid.ToString().ToLower() == userGuidStr.ToLower());
 
             if (appUser == null)
             {
-                // Eğer buraya düşüyorsa veritabanında bu Guid'e sahip bir AppUser gerçekten yoktur.
-                // Veritabanını açıp AppUser tablosundaki UserGuid sütununu kontrol etmelisin.
+
                 return NotFound($"Kullanıcı bulunamadı! Aranan Guid: {userGuidStr}");
             }
 
-            // DÜZELTME: ToLower() kullanmak yerine direkt eşitliyoruz. SQL bunu sorunsuz anlar.
             var model = await _serviceAddress.GetAsync(p => p.Title == name && p.AppUserId == appUser.Id);
 
             if (model != null) return View(model);
@@ -195,7 +186,7 @@ namespace Eticaret.WebUI.Controllers
                 return NotFound("Kullanıcı bulunamadı! Veritabanında bu Guid'e sahip bir kayıt olmayabilir.");
             }
 
-            // DÜZELTİLEN KISIM BURASI: id (Guid) yerine name (Title) üzerinden arıyoruz
+
             var model = await _serviceAddress.GetAsync(p => p.Title.ToLower() == name.ToLower() && p.AppUserId == appUser.Id);
 
             if (model != null)
@@ -232,13 +223,13 @@ namespace Eticaret.WebUI.Controllers
                 {
                     _serviceAddress.Delete(model);
                     await _serviceAddress.SaveChangesAsync();
-                    return RedirectToAction(nameof(Index)); // Silince listeye dön
+                    return RedirectToAction(nameof(Index)); 
                 }
                 catch (Exception)
                 {
                     ModelState.AddModelError("", "Silme işlemi sırasında bir hata oluştu.");
                 }
-                return View(model); // Hata varsa aynı sayfada kal
+                return View(model); 
             }
             else
             {

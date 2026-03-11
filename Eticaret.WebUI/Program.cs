@@ -3,33 +3,30 @@ using Eticaret.Data;
 using Eticaret.Service.Abstract;
 using Eticaret.Service.Concrete;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.EntityFrameworkCore; // UseSqlite için gerekli
+using Microsoft.EntityFrameworkCore; 
 
 var builder = WebApplication.CreateBuilder(args);
 
 var webUiPath = builder.Environment.ContentRootPath;
 
-// Bir üst klasöre çıkıp (..) "Eticaret.Data" klasörünü hedefliyoruz.
-// DİKKAT: Klasör adın "Eticaret.Data" değilse burayı kendi klasör adınla değiştir.
+
 var dbPath = Path.GetFullPath(Path.Combine(webUiPath, "..", "Eticaret.Data", "Eticaret.db"));
 
-// Konsola yazdıralım ki doğru yeri bulduğundan emin ol
+
 Console.WriteLine($"--------------------------------------------------");
 Console.WriteLine($"KULLANILAN DB YOLU: {dbPath}");
 Console.WriteLine($"--------------------------------------------------");
 
-// DbContext'e bu özel yolu veriyoruz.
+
 builder.Services.AddDbContext<DatabaseContext>(options =>
     options.UseSqlite($"Data Source={dbPath}"));
-// --------------------------------------------------
 
-// Servisleri ekliyoruz
 builder.Services.AddControllersWithViews(options =>
 {
     options.Filters.Add(new Microsoft.AspNetCore.Mvc.AutoValidateAntiforgeryTokenAttribute());
 });
 
-// --- 1. GÜVENLİK GÜNCELLEMESİ: SESSION (OTURUM) AYARLARI ---
+
 builder.Services.AddSession(options =>
 {
     options.Cookie.Name = ".Eticaret.Session";
@@ -44,19 +41,18 @@ builder.Services.AddSession(options =>
 builder.Services.AddScoped(typeof(IService<>), typeof(Service<>));
 builder.Services.AddScoped<IOrderService, OrderService>();
 
-// --- 2. GÜVENLİK GÜNCELLEMESİ: AUTHENTICATION (GİRİŞ) AYARLARI ---
+
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(p =>
 {
     p.LoginPath = "/hesabim/giris-yap";
     p.AccessDeniedPath = "/404";
 
     p.Cookie.Name = "Account";
-    p.Cookie.HttpOnly = true; // KESİNLİKLE OLMALI: JS ile çerez hırsızlığını engeller
+    p.Cookie.HttpOnly = true; // JS ile çerez hırsızlığını engeller
     p.Cookie.SecurePolicy = CookieSecurePolicy.Always; // Sadece HTTPS
     p.Cookie.SameSite = SameSiteMode.Strict; // Dış sitelerden gelen sahte POST isteklerini reddeder
     p.Cookie.IsEssential = true;
 
-    // Güvenli oturum süresi yönetimi (MaxAge yerine)
     p.ExpireTimeSpan = TimeSpan.FromDays(1);
     p.SlidingExpiration = true; // Kullanıcı aktifse süreyi otomatik uzatır
 });
@@ -96,7 +92,7 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-// MİMARİ SIRA ÇOK ÖNEMLİDİR (Dokunmadık, mükemmel ayarlamışsın)
+
 app.UseSession();
 app.UseAuthentication(); // Önce kimlik doğrulama
 app.UseAuthorization();  // Sonra yetkilendirme

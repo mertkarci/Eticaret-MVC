@@ -30,7 +30,7 @@ public class MailHelper
 
 
     }
-    public static async Task<bool> SendmMailAsync(string email,string mailBody,string subject)
+    public static async Task<bool> SendmMailAsync(string email, string mailBody, string subject)
     {
         SmtpClient smtpClient = new SmtpClient("mail.siteadi.com", 587);
         smtpClient.Credentials = new NetworkCredential("info@siteadi.com", "password");
@@ -47,9 +47,11 @@ public class MailHelper
             smtpClient.Dispose();
             return true;
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            Console.WriteLine("MAIL HATASI DETAYI: " + ex.ToString()); // Bu satırı ekle
             return false;
+
         }
 
 

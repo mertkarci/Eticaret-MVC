@@ -51,19 +51,17 @@ public class HomeController : Controller
         return View();
     }
 
-    // POST: Formu Karşılar
+
     [HttpPost, Route("iletisim")]
-    [ValidateAntiForgeryToken] // Güvenlik önlemi (CSRF saldırılarına karşı)
+    [ValidateAntiForgeryToken] 
     public async Task<IActionResult> ContactUs(ContactViewModel model)
     {
-        // 1. Model geçerli mi? (Boş alan var mı?)
+ 
         if (ModelState.IsValid)
         {
             try
             {
-                // 2. ViewModel'i -> Gerçek Entity'e Dönüştürme (Mapping)
-                // Kullanıcı sadece ad, mail, konu ve mesaj gönderdi.
-                // Tarih gibi sistem verilerini biz burada atıyoruz.
+
                 var contact = new Contact()
                 {
                     Name = model.Name,
@@ -71,7 +69,7 @@ public class HomeController : Controller
                     Surname = model.Surname,
                     Phone = model.Phone,
                     Message = model.Message,
-                    CreateDate = DateTime.Now // Veritabanında tarih alanı varsa
+                    CreateDate = DateTime.Now 
                 };
 
                 // 3. Veritabanına Ekleme
@@ -87,12 +85,10 @@ public class HomeController : Controller
             }
             catch (Exception)
             {
-                // Hata olursa kullanıcıya genel bir hata mesajı
                 ModelState.AddModelError("", "Bir hata oluştu, lütfen tekrar deneyin.");
             }
         }
 
-        // Hata varsa veya model geçersizse formu (yazılanlarla birlikte) geri gönder
         return View(model);
     }
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

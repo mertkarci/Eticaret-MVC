@@ -1,6 +1,6 @@
 using Eticaret.Core.Entities;
 using Eticaret.Service.Abstract;
-using Eticaret.WebUI.Models; // ViewModel klasörünü eklediğinden emin ol
+using Eticaret.WebUI.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,12 +9,12 @@ namespace Eticaret.WebUI.Controllers
     public class CategoriesController : Controller
     {
         private readonly IService<Category> _service;
-        private readonly IService<Brand> _brandService; // Markaları çekmek için gerekebilir
+  
 
         public CategoriesController(IService<Category> service, IService<Brand> brandService)
         {
             _service = service;
-            _brandService = brandService;
+
         }
         [Route("/kategoriler/{**slug}")]
         [Route("/kategoriler/{mainSlug}/{slug}")]

@@ -7,7 +7,6 @@ using Eticaret.WebUI.ExtensionMethods;
 using Eticaret.WebUI.Models;
 
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 
