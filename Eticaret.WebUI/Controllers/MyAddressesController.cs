@@ -44,7 +44,6 @@ namespace Eticaret.WebUI.Controllers
         {
             return View();
         }
-        [ValidateAntiForgeryToken]
         [HttpPost("ekle")]
         public async Task<IActionResult> Create(Address address)
         {
@@ -107,7 +106,6 @@ namespace Eticaret.WebUI.Controllers
         }
 
         [HttpPost("duzenle/{**name}")]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(string name, [FromForm] string id, Address address)
         {
             if (string.IsNullOrEmpty(id)) return BadRequest("Geçersiz işlem: ID bulunamadı.");
@@ -200,7 +198,6 @@ namespace Eticaret.WebUI.Controllers
         }
 
         [HttpPost("sil/{name}")]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(string name, [FromForm] string id)
         {
             var userGuidStr = HttpContext.User.FindFirst("UserGuid")?.Value;

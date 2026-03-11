@@ -265,3 +265,186 @@ main > section:nth-of-type(even) {
     border-color: rgb(26, 50, 237) !important;
     border-width: 0.2rem !important;
 }
+
+/* --- HEADER & NAVIGATION --- */
+/* Hover ve Taşma Düzeltmesi */
+.dropdown-menu-end {
+    right: 0 !important;
+    left: auto !important;
+}
+
+/* Sepet Dropdown Özelleştirmeleri */
+.cart-dropdown-menu {
+    width: 340px;
+    padding: 0;
+    border: none;
+    border-radius: 12px;
+    max-width: 95vw;
+}
+
+.cart-scroll-area {
+    max-height: 320px;
+    overflow-y: auto;
+}
+
+.cart-scroll-area::-webkit-scrollbar {
+    width: 6px;
+}
+
+.cart-scroll-area::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.cart-scroll-area::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 10px;
+}
+
+.cart-scroll-area::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+.nav-badge {
+    font-size: 0.55rem;
+    padding: 0.25em 0.45em;
+    transform: translate(-50%, -10%) !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.fav-icon:hover i {
+    color: #ff6b6b;
+    transition: color 0.2s ease-in-out;
+}
+
+/* --- CHECKOUT (Ödeme Sayfası) --- */
+.address-card {
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 2px solid transparent;
+    box-shadow: 0 0 0 1px #dee2e6;
+}
+
+.address-card:hover {
+    box-shadow: 0 0 0 1px var(--secondary-color);
+}
+
+.address-card.selected {
+    border-color: var(--main-color);
+    background-color: #f8faff;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+.form-check-input:checked {
+    background-color: var(--main-color);
+    border-color: var(--main-color);
+}
+
+/* --- MOBİL HEADER LOGO ORTALAMA --- */
+@media (max-width: 991.98px) {
+    .logo-mobile-centered {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        margin: 0 !important; /* mx-auto ve site.css'deki diğer marginleri sıfırla */
+    }
+}
+
+/* --- OFFCANVAS MOBİL MENÜ --- */
+.offcanvas .navbar-nav .nav-link {
+    font-size: 1.1rem !important; /* Daha büyük, dokunması kolay font */
+    padding-top: 0.75rem !important;
+    padding-bottom: 0.75rem !important;
+    transition: background-color 0.2s ease-in-out;
+}
+
+/* Sadece Mouse olan cihazlarda hover efekti çalışsın (Mobilde takılmayı önler) */
+@media (hover: hover) {
+    .offcanvas .navbar-nav .nav-link:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+        color: #fff !important;
+    }
+    .offcanvas .dropdown-item:hover {
+        background-color: transparent !important;
+        color: #fff !important;
+    }
+}
+
+/* --- KATEGORİ MENÜSÜ GÖRSEL İYİLEŞTİRMELERİ --- */
+
+/* MASAÜSTÜ (LG ve Üzeri) */
+@media (min-width: 992px) {
+    /* Hover ile açılma efekti */
+    .navbar-nav .dropdown:hover .dropdown-menu {
+        display: block;
+        animation: dropdownSlideIn 0.2s ease forwards;
+        margin-top: 0; /* Boşluk oluşmasını engeller */
+    }
+
+    /* Dropdown Tasarımı */
+    .dropdown-menu {
+        border-radius: 1rem !important; /* Daha yuvarlak köşeler */
+        padding: 0.2rem !important;
+        min-width: 140px; /* Biraz daha geniş */
+        background-color: #ffffff;
+        border: 1px solid rgba(0,0,0,0.04) !important;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.12) !important; /* Modern gölge */
+    }
+
+    /* Link Tasarımı */
+    .dropdown-item {
+        border-radius: 8px;
+        color: #444;
+        transition: all 0.2s ease;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        position: relative;
+    }
+
+    .dropdown-item:hover {
+        background-color: #f8f9fa; 
+        color: var(--main-color) !important;
+        padding-left: 1.25rem !important; /* Hafif sağa kayma */
+    }
+    
+    /* Hover olunca sol tarafa minik bir çizgi efekti (isteğe bağlı şıklık) */
+    .dropdown-item:hover::before {
+        content: '';
+        display: inline-block;
+        width: 4px;
+        height: 4px;
+        background-color: var(--main-color);
+        border-radius: 50%;
+        margin-right: 8px;
+    }
+
+    /* Animasyon */
+    @keyframes dropdownSlideIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+}
+
+/* MOBİL (OFFCANVAS İÇİ) - AKORDİYON YAPISI */
+.offcanvas .dropdown-menu {
+    position: static !important;      /* Mutlak pozisyonu iptal et, akışa gir */
+    background-color: rgba(255, 255, 255, 0.05) !important; /* Hafif transparan zemin */
+    border: none !important;
+    box-shadow: none !important;
+    margin-left: 1rem;                /* İçeri girinti */
+    padding: 0;
+    transform: none !important;       /* Varsa transformu iptal et */
+}
+
+.offcanvas .dropdown-item {
+    color: rgba(255, 255, 255, 0.7) !important;
+    padding: 10px 15px;
+}
+
+/* Mobilde ok işaretini kaldır (daha temiz görünüm için) */
+.offcanvas .dropdown-toggle::after {
+    display: inline-block;
+    margin-left: auto; /* Oku en sağa it */
+    float: right;
+    margin-top: 8px;
+}

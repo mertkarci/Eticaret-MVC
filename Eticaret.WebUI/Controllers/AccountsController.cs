@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+﻿﻿using System.Diagnostics;
 using System.Security.Claims;
 using Eticaret.Core.Entities;
 using Eticaret.Service.Abstract;
@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using BCrypt;
+using BCrypt.Net;
 
 namespace Eticaret.WebUI;
 
@@ -62,13 +64,11 @@ public class AccountsController : Controller
 
     [HttpPost("")]
     [Authorize]
-    [ValidateAntiForgeryToken] // CSRF Kalkanı
     public async Task<IActionResult> Index(UserEditViewModel model)
     {
 
         if (!string.IsNullOrWhiteSpace(model.Phone))
         {
-            // Sadece rakamlardan oluşmalı, 11 hane olmalı ve 05 ile başlamalı
             if (!System.Text.RegularExpressions.Regex.IsMatch(model.Phone, @"^05[0-9]{9}$"))
             {
                 ModelState.AddModelError("Phone", "Telefon numarası 05 ile başlamalı ve 11 haneli olmalıdır.");
@@ -90,21 +90,23 @@ public class AccountsController : Controller
 
                 if (user is not null)
                 {
-                    // SADECE İZİN VERDİĞİMİZ ALANLARI GÜNCELLİYORUZ
+
                     user.Name = model.Name;
                     user.Surname = model.Surname;
 
-
                     // if(model.Phone != user.Phone) { SendSmsAndRedirectToVerification(...) }
-                    if (await _service.GetAsync(u => u.Phone == model.Phone) != null)
+
+                    if (user.Phone != model.Phone && await _service.GetAsync(u => u.Phone == model.Phone) != null)
                     {
                         ModelState.AddModelError("Phone", "Bu telefon numarası zaten kullanılıyor.");
                         return View(model);
                     }
-                    else
-                    {
-                        user.Phone = model.Phone;
+                    
+                    user.Phone = model.Phone;
 
+                    if (!string.IsNullOrEmpty(model.Password))
+                    {
+                        user.Password = BCrypt.Net.BCrypt.HashPassword(model.Password);
                     }
 
                     _service.Update(user);
@@ -135,7 +137,6 @@ public class AccountsController : Controller
             }
         }
 
-        // Model validasyondan geçemezse (Örn: Telefon yanlışsa), sayfa yenilendiğinde Email boş kalmasın diye tekrar dolduruyoruz.
         var currentUser = await _service.GetAsync(p => p.UserGuid.ToString() == HttpContext.User.FindFirst("UserGuid").Value);
         if (currentUser != null) model.Email = currentUser.Email;
 
@@ -145,7 +146,6 @@ public class AccountsController : Controller
     [HttpGet("giris-yap")]
     public IActionResult SignIn(string returnUrl = null)
     {
-        // Yönlendirme Kontrolü ve ViewBag Doldurma İşlemi
         if (!string.IsNullOrEmpty(returnUrl))
         {
             if (returnUrl.Contains("/Checkout", StringComparison.OrdinalIgnoreCase))
@@ -183,10 +183,15 @@ public class AccountsController : Controller
         {
             try
             {
-                var account = await _service.GetAsync(p => p.Email == loginViewModel.Email && p.Password == loginViewModel.Password && p.isActive);
+                var account = await _service.GetAsync(p => p.Email == loginViewModel.Email && p.isActive);
                 if (account == null)
                 {
                     ModelState.AddModelError("", "Giriş Başarısız!");
+                }
+                else if (!BCrypt.Net.BCrypt.Verify(loginViewModel.Password, account.Password))
+                {
+                    ModelState.AddModelError("", "Giriş Başarısız!");
+
                 }
                 else
                 {
@@ -222,13 +227,11 @@ public class AccountsController : Controller
     }
 
     [HttpPost("kayit-ol")]
-    [ValidateAntiForgeryToken] // CSRF Kalkanı
     public async Task<IActionResult> SignUpAsync(AppUser appUser)
     {
         appUser.isAdmin = false;
         appUser.isActive = true;
 
-        // TELEFON FORMAT KONTROLÜ
         if (!string.IsNullOrWhiteSpace(appUser.Phone))
         {
             if (!System.Text.RegularExpressions.Regex.IsMatch(appUser.Phone, @"^05[0-9]{9}$"))
@@ -241,10 +244,9 @@ public class AccountsController : Controller
         {
             ModelState.AddModelError("Password", "Şifre alanı boş geçilemez.");
         }
-
+        appUser.Password = BCrypt.Net.BCrypt.HashPassword(appUser.Password);
         if (ModelState.IsValid)
         {
-            // E-posta benzersizliği kontrolü
             if (await _service.GetAsync(u => u.Email == appUser.Email) != null)
             {
                 ModelState.AddModelError("Email", "Bu e-posta adresi zaten kullanılıyor.");
@@ -308,7 +310,6 @@ public class AccountsController : Controller
         return View();
     }
     [HttpPost("sifremi-unuttum")]
-    [ValidateAntiForgeryToken]
     public async Task<IActionResult> PasswordRenew(string Email)
     {
         if (string.IsNullOrWhiteSpace(Email))
@@ -358,14 +359,14 @@ public class AccountsController : Controller
     }
 
     [HttpGet("sifremi-yenile")]
-    public async Task<IActionResult> PasswordChange(string token) // Artık 'user' değil 'token' bekliyoruz
+    public async Task<IActionResult> PasswordChange(string token) 
     {
         if (string.IsNullOrEmpty(token))
         {
             return BadRequest("Geçersiz istek!");
         }
 
-        // Veritabanında bu token'a sahip ve süresi dolmamış kullanıcıyı arıyoruz
+
         AppUser appUser = await _service.GetAsync(p => p.PasswordResetToken == token);
 
         if (appUser is null || appUser.ResetTokenExpires < DateTime.Now)
@@ -373,27 +374,22 @@ public class AccountsController : Controller
             return NotFound("Geçersiz veya süresi dolmuş bir şifre sıfırlama bağlantısı kullandınız.");
         }
 
-        // Token geçerliyse, formun içine koymak için ViewBag ile sayfaya yolluyoruz
         ViewBag.Token = token;
 
         return View();
     }
 
     [HttpPost("sifremi-yenile")]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> PasswordChange(string token, string password) // Parametre 'token' oldu
+    public async Task<IActionResult> PasswordChange(string token, string password) 
     {
-        // Hata durumunda sayfa yenilendiğinde gizli input boş kalmasın diye tekrar dolduruyoruz
         ViewBag.Token = token;
 
-        // 1. BOŞLUK KONTROLÜ
         if (string.IsNullOrEmpty(token) || string.IsNullOrEmpty(password))
         {
             ModelState.AddModelError("", "Lütfen tüm alanları doldurun!");
             return View();
         }
 
-        // 2. BACKEND UZUNLUK VE GÜVENLİK KONTROLÜ
         if (password.Length < 6)
         {
             ModelState.AddModelError("", "Şifreniz güvenlik gereği en az 6 karakter uzunluğunda olmalıdır.");
@@ -406,20 +402,17 @@ public class AccountsController : Controller
             return View();
         }
 
-        // 3. TOKEN VE SÜRE KONTROLÜ (Gerçek Güvenlik Duvarı)
         AppUser appUser = await _service.GetAsync(p => p.PasswordResetToken == token);
 
-        // Eğer token yoksa, kullanılmışsa veya 2 saatlik süresi dolmuşsa işlemi iptal et
         if (appUser is null || appUser.ResetTokenExpires < DateTime.Now)
         {
             ModelState.AddModelError("", "Geçersiz veya süresi dolmuş bir şifre sıfırlama bağlantısı kullandınız.");
             return View();
         }
 
-        // 4. ŞİFREYİ GÜNCELLEME VE TOKEN İPTALİ (Tek kullanımlık yapma)
-        appUser.Password = password;
-        appUser.PasswordResetToken = null; // Token'ı imha ediyoruz
-        appUser.ResetTokenExpires = null;  // Süreyi sıfırlıyoruz
+        appUser.Password = BCrypt.Net.BCrypt.HashPassword(password);
+        appUser.PasswordResetToken = null; 
+        appUser.ResetTokenExpires = null;  
 
         _service.Update(appUser);
         var result = await _service.SaveChangesAsync();
@@ -454,7 +447,6 @@ public class AccountsController : Controller
         AppUser user = await _service.GetAsync(p => p.UserGuid == guidFromCookie);
         if (user is null) return RedirectToAction("SignIn");
 
-        // SORGULAMA: Id yerine OrderNumber ile arıyoruz
         var order = await _serviceOrder.GetQueryable()
             .Include(x => x.OrderLines)
             .ThenInclude(x => x.Product)

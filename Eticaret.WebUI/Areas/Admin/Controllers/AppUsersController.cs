@@ -80,7 +80,6 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(AppUser appUser)
         {
             if (ModelState.IsValid)
@@ -112,7 +111,6 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, AppUser appUser)
         {
             if (id != appUser.Id)
@@ -165,7 +163,6 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
 
         // POST: Admin/AppUsers/Delete/5
         [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id, bool isHardDelete = false)
         {
             var appUser = await _context.AppUsers.FindAsync(id);

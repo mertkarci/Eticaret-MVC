@@ -8,30 +8,6 @@
     decimal finalTotal = Model.TotalPrice + shippingCost;
 }
 
-<style>
-    .address-card {
-        cursor: pointer;
-        transition: all 0.2s ease;
-        border: 2px solid transparent;
-        box-shadow: 0 0 0 1px #dee2e6;
-    }
-
-    .address-card:hover {
-        box-shadow: 0 0 0 1px var(--secondary-color);
-    }
-
-    .address-card.selected {
-        border-color: var(--main-color);
-        background-color: #f8faff;
-        /* Hafif mavi ton */
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-    }
-
-    .form-check-input:checked {
-        background-color: var(--main-color);
-        border-color: var(--main-color);
-    }
-</style>
 @if (TempData["Message"] != null)
 {
     <div class="alert alert-danger">
@@ -43,9 +19,9 @@
 
         <!-- Başlık ve Geri Dön -->
         <div class="d-flex align-items-center mb-4 mb-lg-5">
-            <a href="/Cart" class="btn btn-light rounded-circle shadow-sm me-3" title="Sepete Dön">
-                <i class="bi bi-arrow-left"></i>
-            </a>
+
+            <a class="btn btn-light rounded-circle shadow-sm me-3" title="Sepete Dön asp-controller=" Products"
+                asp-action="Index"> <i class="bi bi-arrow-left"></i></a>
             <div>
                 <h1 class="display-6 fw-bold m-0">Ödeme</h1>
                 <p class="text-muted m-0 small">Siparişinizi güvenle tamamlayın.</p>
@@ -404,67 +380,8 @@
 
 @if (User.Identity.IsAuthenticated)
 {
-    <script>
-        // Adres Kartı Seçim Efekti
-        function selectAddress(element) {
-            // Tüm kartlardan selected sınıfını kaldır
-            document.querySelectorAll('input[name="DeliveryAddress"]').forEach(input => {
-                input.closest('.address-card').classList.remove('selected');
-            });
-            // Seçilene ekle
-            element.classList.add('selected');
-
-            // Radyo butonunu işaretle (Label'a tıklandığında otomatik olur ama garanti olsun)
-            const radio = element.querySelector('input[type="radio"]');
-            radio.checked = true;
-
-            // Eğer fatura adresi aynı ise hidden inputu güncelle
-            updateBillingInput();
-        }
-
-        function selectBillingAddress(element) {
-            document.querySelectorAll('input[name="BillingAddress"]').forEach(input => {
-                input.closest('.address-card').classList.remove('selected');
-            });
-            element.classList.add('selected');
-            element.querySelector('input[type="radio"]').checked = true;
-        }
-
-        function toggleBillingSection() {
-            const checkbox = document.getElementById('sameAddress');
-            const section = document.getElementById('billingSection');
-
-            if (checkbox.checked) {
-                section.style.display = 'none';
-                // Fatura adresi seçimlerini temizle
-                document.querySelectorAll('input[name="BillingAddress"]').forEach(r => r.checked = false);
-                updateBillingInput();
-            } else {
-                section.style.display = 'block';
-                // Hidden inputu devre dışı bırak, artık radyo butonları geçerli
-                document.getElementById('billingAddressDefault').name = "";
-            }
-        }
-
-        function updateBillingInput() {
-            const checkbox = document.getElementById('sameAddress');
-            if (checkbox.checked) {
-                const selectedDelivery = document.querySelector('input[name="DeliveryAddress"]:checked');
-                const hiddenInput = document.getElementById('billingAddressDefault');
-
-                // Hidden inputu aktif et ve değerini güncelle
-                hiddenInput.name = "BillingAddress";
-                if (selectedDelivery) {
-                    hiddenInput.value = selectedDelivery.value;
-                }
-            }
-        }
-
-        // Sayfa yüklendiğinde çalıştır
-        document.addEventListener('DOMContentLoaded', function () {
-            updateBillingInput();
-        });
-    </script>
+    @* Özel JS dosyasını çağırıyoruz *@
+    <script src="~/js/checkout.js"></script>
 }
 
 <!-- MOBİL SABİT ALT BAR -->

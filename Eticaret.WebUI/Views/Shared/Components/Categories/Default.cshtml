@@ -1,43 +1,46 @@
 @model IEnumerable<Category>
 
-<div class="collapse navbar-collapse" id="navbarsExample04">
+@foreach (var mainCategory in Model.Where(c => c.ParentId == 0))
+{
+    // Bu ana kategoriye ait alt kategorileri buluyoruz
+    var subCategories = Model.Where(c => c.ParentId == mainCategory.Id).ToList();
 
-    <ul class="navbar-nav mr-auto navbar-font">
+    @if (subCategories.Any())
+    {
+        <li class="nav-item dropdown navbar-font">
+            <a class="nav-link dropdown-toggle navbar-font" href="/kategoriler/@mainCategory.Slug"
+                id="dropdown-@mainCategory.Id" onclick="handleCategoryClick(event, this)" data-bs-toggle="dropdown"
+                aria-expanded="false">
+                @mainCategory.Name
+            </a>
+            <ul class="dropdown-menu border-0 shadow-lg rounded-4 mt-2" aria-labelledby="dropdown-@mainCategory.Id">
+                @foreach (var sub in subCategories)
+                {
+                    <li>
+                        <a class="dropdown-item py-2 px-3 fw-medium" href="/kategoriler/@mainCategory.Slug/@sub.Slug">
+                            @sub.Name
+                        </a>
+                    </li>
+                }
+            </ul>
+        </li>
+    }
+    else
+    {
+        <li class="nav-item navbar-font">
+            <a class="nav-link navbar-font" href="/kategoriler/@mainCategory.Slug">
+                @mainCategory.Name
+            </a>
+        </li>
+    }
+}
 
-        @foreach (var mainCategory in Model.Where(c => c.ParentId == 0))
-        {
-            // Bu ana kategoriye ait alt kategorileri buluyoruz
-            var subCategories = Model.Where(c => c.ParentId == mainCategory.Id).ToList();
-
-            @if (subCategories.Any())
-            {
-                <li class="nav-item dropdown navbar-font">
-                    <a class="nav-link dropdown-toggle navbar-font" href="/kategoriler/@mainCategory.Slug"
-                        id="dropdown-@mainCategory.Id" onclick="window.location.href=this.href" data-bs-toggle="dropdown"
-                        aria-expanded="false">
-                        @mainCategory.Name
-                    </a>
-                    <ul class="dropdown-menu" aria-labelledby="dropdown-@mainCategory.Id">
-                        @foreach (var sub in subCategories)
-                        {
-                            <li>
-                                <a class="dropdown-item" href="/kategoriler/@mainCategory.Slug/@sub.Slug">
-                                    @sub.Name
-                                </a>
-                            </li>
-                        }
-                    </ul>
-                </li>
-            }
-            else
-            {
-                <li class="nav-item navbar-font">
-                    <a class="nav-link navbar-font" href="/kategoriler/@mainCategory.Slug">
-                        @mainCategory.Name
-                    </a>
-                </li>
-            }
+<script>
+    function handleCategoryClick(e, element) {
+        // 992px (Masaüstü) veya Menü zaten açıksa (show sınıfı varsa) linke git
+        // Değilse (mobilde ve kapalıysa), Bootstrap'in açmasına izin ver (gitme)
+        if (window.innerWidth >= 992 || element.classList.contains('show')) {
+            window.location.href = element.href;
         }
-    </ul>
-
-</div>
+    }
+</script>

@@ -5,12 +5,13 @@
 
 <section class="py-5">
     <div class="container">
-        
+
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h1 class="display-6 fw-bold m-0">Favorilerim</h1>
-            <a href="/Products" class="text-decoration-none text-primary fw-bold">
-                <i class="bi bi-arrow-left me-1"></i> Alışverişe Devam Et
-            </a>
+
+            <a class="text-decoration-none text-primary fw-bold" asp-controller="Products" asp-action="Index"
+                title="Alisverise Devam Et"> <i class="bi bi-arrow-left me-1"></i> Alışverişe
+                Devam Et</a>
         </div>
 
         @if (Model != null && Model.Any())
@@ -19,62 +20,70 @@
                 <div class="card-body p-0 p-md-3">
                     <!-- table-responsive kaldırıldı, artık her şey ekrana sığacak -->
                     <table class="table table-modern align-middle mb-0">
-                            <thead class="d-none d-md-table-header-group"> <!-- Başlıklar mobilde gizli -->
+                        <thead class="d-none d-md-table-header-group"> <!-- Başlıklar mobilde gizli -->
+                            <tr>
+                                <th class="ps-2 ps-md-4 py-3">Ürün</th>
+                                <th class="py-3">Fiyat</th>
+                                <th class="py-3 text-end pe-2 pe-md-4">İşlemler</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
                                 <tr>
-                                    <th class="ps-2 ps-md-4 py-3">Ürün</th>
-                                    <th class="py-3">Fiyat</th>
-                                    <th class="py-3 text-end pe-2 pe-md-4">İşlemler</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var item in Model)
-                                {
-                                    <tr>
-                                        <td class="ps-2 ps-md-4 py-3">
-                                            <div class="d-flex align-items-center">
-                                                <a href="/Products/Details/@item.Id">
-                                                    <img src="~/img/products/@item.Image" alt="@item.Name" 
-                                                         class="rounded-3 shadow-sm me-2 me-md-3 object-fit-cover" 
-                                                         style="width: clamp(50px, 8vw, 80px); height: clamp(50px, 8vw, 80px);" />
+                                    <td class="ps-2 ps-md-4 py-3">
+                                        <div class="d-flex align-items-center">
+                                            <a href="/Products/Details/@item.Id">
+                                                <img src="~/img/products/@item.Image" alt="@item.Name"
+                                                    class="rounded-3 shadow-sm me-2 me-md-3 object-fit-cover"
+                                                    style="width: clamp(50px, 8vw, 80px); height: clamp(50px, 8vw, 80px);" />
+                                            </a>
+                                            <div style="min-width: 0;">
+                                                <a href="/Products/Details/@item.Id"
+                                                    class="text-decoration-none fw-bold text-dark d-block mb-1 text-truncate"
+                                                    style="font-size: clamp(0.9rem, 2vw, 1.2rem); max-width: 35vw;">
+                                                    @item.Name
                                                 </a>
-                                                <div style="min-width: 0;">
-                                                    <a href="/Products/Details/@item.Id" class="text-decoration-none fw-bold text-dark d-block mb-1 text-truncate" style="font-size: clamp(0.9rem, 2vw, 1.2rem); max-width: 35vw;">
-                                                        @item.Name
-                                                    </a>
-                                                    <small class="text-muted d-none d-md-block">Ürün Kodu: @item.Id</small>
-                                                    <!-- Mobilde Fiyat Buraya Gelir -->
-                                                    <div class="fw-bold text-primary d-md-none mt-1">@item.Price.ToString("c")</div>
-                                                </div>
+                                                <small class="text-muted d-none d-md-block">Ürün Kodu: @item.Id</small>
+                                                <!-- Mobilde Fiyat Buraya Gelir -->
+                                                <div class="fw-bold text-primary d-md-none mt-1">@item.Price.ToString("c")</div>
                                             </div>
-                                        </td>
-                                        <!-- Masaüstünde Fiyat Ayrı Sütun -->
-                                        <td class="py-3 d-none d-md-table-cell">
-                                            <span class="fw-bold text-primary" style="font-size: clamp(0.9rem, 2vw, 1.2rem);">@item.Price.ToString("c")</span>
-                                        </td>
-                                        <td class="py-3 text-end pe-2 pe-md-4">
-                                            <div class="d-flex justify-content-end gap-1 gap-md-2">
-                                                <form asp-controller="Cart" asp-action="Add" method="post">
-                                                    <input type="hidden" name="ProductId" value="@item.Id">
-                                                    <input type="hidden" name="quantity" value="1">
-                                                    <button class="btn btn-sm btn-primary rounded-pill px-2 px-md-3 shadow-sm" type="submit">
-                                                        <!-- d-md-inline yerine d-lg-inline yapıldı. 992px altında sadece ikon görünür. -->
-                                                        <i class="bi bi-cart-plus"></i> <span class="d-none d-lg-inline ms-1">Sepete Ekle</span>
-                                                    </button>
-                                                </form>
-                                                
-                                                <form class="d-flex align-items-center" asp-controller="Favourites" asp-action="Remove" method="post">
-                                                    <input type="hidden" name="ProductId" value="@item.Id">
-                                                    <button class="btn btn-sm btn-outline-danger rounded-circle p-0 d-flex align-items-center justify-content-center" type="submit" 
-                                                            data-bs-toggle="tooltip" title="Favorilerden Kaldır" style="width: 32px; height: 32px;">
-                                                        <i class="bi bi-trash3"></i>
-                                                    </button>
-                                                </form>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
+                                        </div>
+                                    </td>
+                                    <!-- Masaüstünde Fiyat Ayrı Sütun -->
+                                    <td class="py-3 d-none d-md-table-cell">
+                                        <span class="fw-bold text-primary"
+                                            style="font-size: clamp(0.9rem, 2vw, 1.2rem);">@item.Price.ToString("c")</span>
+                                    </td>
+                                    <td class="py-3 text-end pe-2 pe-md-4">
+                                        <div class="d-flex justify-content-end gap-1 gap-md-2">
+                                            <form asp-controller="Cart" asp-action="Add" method="post">
+                                                <input type="hidden" name="ProductId" value="@item.Id">
+                                                <input type="hidden" name="quantity" value="1">
+                                                <button class="btn btn-sm btn-primary rounded-pill px-2 px-md-3 shadow-sm"
+                                                    type="submit">
+                                                    <!-- d-md-inline yerine d-lg-inline yapıldı. 992px altında sadece ikon görünür. -->
+                                                    <i class="bi bi-cart-plus"></i> <span class="d-none d-lg-inline ms-1">Sepete
+                                                        Ekle</span>
+                                                </button>
+                                            </form>
+
+                                            <form class="d-flex align-items-center" asp-controller="Favourites"
+                                                asp-action="Remove" method="post">
+                                                <input type="hidden" name="ProductId" value="@item.Id">
+                                                <button
+                                                    class="btn btn-sm btn-outline-danger rounded-circle p-0 d-flex align-items-center justify-content-center"
+                                                    type="submit" data-bs-toggle="tooltip" title="Favorilerden Kaldır"
+                                                    style="width: 32px; height: 32px;">
+                                                    <i class="bi bi-trash3"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
                 </div>
             </div>
         }
@@ -87,10 +96,11 @@
                             <i class="bi bi-heart-break text-muted opacity-25" style="font-size: 5rem;"></i>
                         </div>
                         <h3 class="fw-bold text-dark mb-3">Favori Listeniz Boş</h3>
-                        <p class="text-muted mb-4">Beğendiğiniz ürünleri favorilere ekleyerek daha sonra kolayca ulaşabilirsiniz.</p>
-                        <a href="/Products" class="btn btn-primary btn-lg px-5 rounded-pill shadow-sm">
-                            Ürünleri İncele
-                        </a>
+                        <p class="text-muted mb-4">Beğendiğiniz ürünleri favorilere ekleyerek daha sonra kolayca
+                            ulaşabilirsiniz.</p>
+                        <a class="btn btn-primary btn-lg px-5 rounded-pill shadow-sm" asp-controller="Products"
+                            asp-action="Index" title="Alisverise Devam Et"> Alışverişe
+                            Devam Et</a>
                     </div>
                 </div>
             </div>
