@@ -1,7 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -23,14 +20,12 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
             _context = context;
         }
 
-        // GET: Admin/Products
         public async Task<IActionResult> Index()
         {
             var databaseContext = _context.Products.Include(p => p.Brand).Include(p => p.Category);
             return View(await databaseContext.ToListAsync());
         }
 
-        // GET: Admin/Products/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -51,7 +46,6 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
             return View(product);
         }
 
-        // GET: Admin/Products/Create
         public IActionResult Create()
         {
             ViewData["BrandId"] = new SelectList(_context.Brands, "Id", "Name");
@@ -59,16 +53,19 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
             return View();
         }
 
-        // POST: Admin/Products/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Product product, IFormFile? Image)
         {
+            ModelState.Remove("Brand");
+            ModelState.Remove("Category");
+
             if (ModelState.IsValid)
             {
-                product.Image = await FileHelper.FileLoaderAsync(Image, "/img/products/");
+                if (Image != null)
+                {
+                    product.Image = await FileHelper.FileLoaderAsync(Image, "/img/products/");
+                }
 
                 string baseSlug = UrlHelper.FriendlyUrl(product.Name);
                 string finalSlug = baseSlug;
@@ -83,14 +80,13 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
 
                 _context.Add(product);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Index), new { area = "Admin" });
             }
             ViewData["BrandId"] = new SelectList(_context.Brands, "Id", "Name", product.BrandId);
             ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name", product.CategoryId);
-            return View();
+            return View(product);
         }
 
-        // GET: Admin/Products/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -108,9 +104,6 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
             return View(product);
         }
 
-        // POST: Admin/Products/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, Product product, IFormFile? Image, bool cbResmiSil)
@@ -119,6 +112,9 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
             {
                 return NotFound();
             }
+
+            ModelState.Remove("Brand");
+            ModelState.Remove("Category");
 
             if (ModelState.IsValid)
             {
@@ -146,14 +142,13 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Edit), new { id = product.Id, area = "Admin" });
+                return RedirectToAction(nameof(Index), new { area = "Admin" });
             }
             ViewData["BrandId"] = new SelectList(_context.Brands, "Id", "Name", product.BrandId);
             ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name", product.CategoryId);
             return View(product);
         }
 
-        // GET: Admin/Products/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -173,7 +168,6 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
             return View(product);
         }
 
-        // POST: Admin/Products/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
@@ -189,7 +183,7 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
             }
 
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(Index), new { area = "Admin" });
         }
 
         private bool ProductExists(int id)
@@ -197,5 +191,4 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
             return _context.Products.Any(e => e.Id == id);
         }
     }
-
 }

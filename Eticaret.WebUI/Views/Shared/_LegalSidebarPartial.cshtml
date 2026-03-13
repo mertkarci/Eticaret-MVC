@@ -1,0 +1,41 @@
+@{
+    // O anki sayfanın URL adresini alıp küçültüyoruz (karşılaştırma yapmak için)
+    var currentPath = Context.Request.Path.Value?.ToLower() ?? "";
+}
+
+<!-- Sol Sidebar (Masaüstü) -->
+<div class="col-md-4 col-lg-3 mb-4 mb-md-0 d-none d-md-block">
+    <div class="list-group shadow-sm border-0 rounded-3 overflow-hidden">
+        <a asp-action="TermsOfService" asp-controller="Home" class="list-group-item list-group-item-action border-0 py-3 @(currentPath == "/kullanim-kosullari" ? "active" : "")">
+            Kullanım Koşulları
+        </a>
+        <a asp-action="Privacy" asp-controller="Home" class="list-group-item list-group-item-action border-0 py-3 @(currentPath == "/gizlilik" ? "active" : "")">
+            Gizlilik Politikası
+        </a>
+        <a asp-action="MembershipClarification" asp-controller="Home" class="list-group-item list-group-item-action border-0 py-3 @(currentPath == "/uyelik-aydinlatma-metni" ? "active" : "")">
+            Üyelik Aydınlatma Metni
+        </a>
+        <a asp-action="CookiePolicy" asp-controller="Home" class="list-group-item list-group-item-action border-0 py-3 @(currentPath == "/cerez-politikasi" ? "active" : "")">
+            Çerez Politikası
+        </a>
+        <a asp-action="RefundPolicy" asp-controller="Home" class="list-group-item list-group-item-action border-0 py-3 @(currentPath == "/iptal-iade-kosullari" ? "active" : "")">
+            İptal ve İade Koşulları
+        </a>
+        <a asp-action="ContactUs" asp-controller="Home" class="list-group-item list-group-item-action border-0 py-3 @(currentPath == "/iletisim" ? "active" : "")">
+            İletişim
+        </a>
+    </div>
+</div>
+
+<!-- Mobil Menü (Select) -->
+<div class="col-12 d-md-none mb-4">
+    <select class="form-select p-3 shadow-sm border-0 rounded-3 text-secondary fw-medium" onchange="if(this.value) location.href=this.value;">
+        <option value="@Url.Action("TermsOfService", "Home")" selected="@(currentPath == "/kullanim-kosullari")">Kullanım Koşulları</option>
+        <option value="@Url.Action("Privacy", "Home")" selected="@(currentPath == "/gizlilik")">Gizlilik Politikası</option>
+        <option value="@Url.Action("MembershipClarification", "Home")" selected="@(currentPath == "/uyelik-aydinlatma-metni")">Üyelik Aydınlatma Metni</option>
+        <option value="@Url.Action("CookiePolicy", "Home")" selected="@(currentPath == "/cerez-politikasi")">Çerez Politikası</option>
+        <option value="#">Mesafeli Satış Sözleşmesi</option>
+        <option value="@Url.Action("RefundPolicy", "Home")" selected="@(currentPath == "/iptal-iade-kosullari")">İptal ve İade Koşulları</option>
+        <option value="@Url.Action("ContactUs", "Home")" selected="@(currentPath == "/iletisim")">İletişim</option>
+    </select>
+</div>

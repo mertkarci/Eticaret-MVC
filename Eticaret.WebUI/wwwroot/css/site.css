@@ -448,3 +448,38 @@ main > section:nth-of-type(even) {
     float: right;
     margin-top: 8px;
 }
+
+/* --- HUKUKİ SAYFALAR YAN MENÜ (LEGAL SIDEBAR) TASARIMI --- */
+
+/* Ana Kapsayıcı - Genel Şekil ve Gölge */
+.list-group {
+    border-radius: 8px !important; /* Kutunun köşe yuvarlaklığını buradan ayarlayabilirsiniz */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.07) !important; /* Daha belirgin ama yumuşak bir gölge */
+}
+
+/* Menüdeki Her Bir Link (Kutucuk) */
+.list-group-item-action {
+    font-weight: 500;
+    color: #555; /* Normal link rengi */
+    transition: all 0.2s ease-in-out;
+    padding: 1rem 1.25rem !important; /* İç boşlukları artırarak daha ferah bir görünüm */
+}
+
+/* Linklerin Üzerine Gelince (Hover) */
+.list-group-item-action:hover,
+.list-group-item-action:focus {
+    background-color: #f8f9fa; /* Çok hafif bir arkaplan rengi */
+    color: var(--main-color); /* Ana tema renginiz */
+    transform: translateX(5px); /* Hafifçe sağa kayma efekti */
+    z-index: 2; /* Diğer elemanların üzerine çıkması için */
+}
+
+/* Aktif Olan Sayfanın Linki */
+.list-group-item.active {
+    background-color: var(--main-color) !important; /* Arkaplan rengini ana tema rengi yap */
+    border-color: var(--main-color) !important;
+    color: white !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1); /* Aktif elemana özel gölge */
+    font-weight: 600 !important;
+    z-index: 3; /* Hover olanın da üzerine çıkması için */
+}

@@ -2,31 +2,44 @@
 </head>
 <section class="bg-light">
     <div class="container">
-        <footer class="d-flex flex-wrap justify-content-between align-items-center py-3 border-top">
-            <div class="col-md-4 d-flex align-items-center"> <a href="/"
-                    class=" me-2 mb-md-0 text-body-secondary text-decoration-none lh-1" aria-label="Bootstrap"> <svg
-                        class="bi" width="30" height="24" aria-hidden="true">
-                        <use xlink:href="#bootstrap"></use>
-                    </svg> </a> <span class="mb-md-0 text-body-secondary">© 2026 Merü, Fenerbahçe</span> </div>
-            <ul class="nav col-md-4 justify-content-end list-unstyled d-flex">
-                <li class="ms-3">
-                    <a class="social-icon insta" href="https://www.instagram.com/mertkarci_/" target="_blank">
-                        <i class="bi bi-instagram fs-4"></i>
+        <footer class="py-4 border-top">
+            <!-- Üst Satır: Telif Hakkı ve Sosyal Medya -->
+            <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
+                <div class="d-flex align-items-center">
+                    <a href="/" class="me-2 mb-0 text-body-secondary text-decoration-none lh-1">
+                        <svg class="bi" width="30" height="24"><use xlink:href="#bootstrap"></use></svg>
                     </a>
-                </li>
+                    <span class="text-body-secondary">© 2026 Merü, Fenerbahçe</span>
+                </div>
 
-                <li class="ms-3">
-                    <a class="social-icon face" href="https://www.facebook.com/"target="_blank">
-                        <i class="bi bi-facebook fs-4"></i>
-                    </a>
-                </li>
+                <ul class="nav list-unstyled d-flex mb-0">
+                    <li class="ms-3">
+                        <a class="social-icon insta text-body-secondary" href="https://www.instagram.com/mertkarci_/" target="_blank">
+                            <i class="bi bi-instagram fs-4"></i>
+                        </a>
+                    </li>
+                    <li class="ms-3">
+                        <a class="social-icon face text-body-secondary" href="https://www.facebook.com/" target="_blank">
+                            <i class="bi bi-facebook fs-4"></i>
+                        </a>
+                    </li>
+                    <li class="ms-3">
+                        <a class="social-icon twit text-body-secondary" href="https://www.x.com/" target="_blank">
+                            <i class="bi bi-twitter-x fs-4"></i>
+                        </a>
+                    </li>
+                </ul>
+            </div>
 
-                <li class="ms-3">
-                    <a class="social-icon twit" href="https://www.x.com/"target="_blank">
-                        <i class="bi bi-twitter-x fs-4"></i>
-                    </a>
-                </li>
-            </ul>
+            <!-- Alt Satır: Linkler (Yatay ve Küçük) -->
+            <div class="d-flex justify-content-center justify-content-md-center flex-wrap gap-3 small text-muted border-top pt-3">
+                <a asp-action="TermsOfService" asp-controller="Home" class="text-decoration-none text-muted hover-primary">Kullanım Koşulları</a>
+                <a asp-action="Privacy" asp-controller="Home" class="text-decoration-none text-muted hover-primary">Gizlilik Politikası</a>
+                <a asp-action="MembershipClarification" asp-controller="Home" class="text-decoration-none text-muted hover-primary">Üyelik Aydınlatma Metni</a>
+                <a asp-action="CookiePolicy" asp-controller="Home" class="text-decoration-none text-muted hover-primary">Çerez Politikası</a>
+                <a asp-action="RefundPolicy" asp-controller="Home" class="text-decoration-none text-muted hover-primary">İptal ve İade Koşulları</a>
+                <a asp-action="ContactUs" asp-controller="Home" class="text-decoration-none text-muted hover-primary">İletişim</a>
+            </div>
         </footer>
     </div>
 </section>

@@ -86,7 +86,7 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
             {
                 _context.Add(appUser);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Index), new { area = "Admin" });
             }
             return View(appUser);
         }
@@ -136,7 +136,7 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Index), new { area = "Admin" });
             }
             return View(appUser);
         }
@@ -205,7 +205,7 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
                 await _context.SaveChangesAsync();
             }
 
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(Index), new { area = "Admin" });
         }
 
         private bool AppUserExists(int id)

@@ -35,7 +35,28 @@ public class HomeController : Controller
         return View(model);
     }
 
+    [Route("gizlilik")]
     public IActionResult Privacy()
+    {
+        return View();
+    }
+    [Route("kullanim-kosullari")]
+    public IActionResult TermsOfService()
+    {
+        return View();
+    }
+    [Route("iptal-iade-kosullari")]
+    public IActionResult RefundPolicy()
+    {
+        return View();
+    }
+    [Route("cerez-politikasi")]
+    public IActionResult CookiePolicy()
+    {
+        return View();
+    }
+    [Route("uyelik-aydinlatma-metni")]
+    public IActionResult MembershipClarification()
     {
         return View();
     }
@@ -44,7 +65,6 @@ public class HomeController : Controller
     {
         return View();
     }
-    // GET: Sayfayı Gösterir
     [Route("iletisim")]
     public IActionResult ContactUs()
     {

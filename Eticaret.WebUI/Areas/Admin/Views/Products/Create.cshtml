@@ -4,7 +4,7 @@
     ViewData["Title"] = "Yeni Ürün Ekle";
 }
 
-<form asp-action="Create" enctype="multipart/form-data">
+<form asp-action="Create" asp-area="Admin" enctype="multipart/form-data">
     <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
 
     <div class="row g-4">
@@ -129,7 +129,7 @@
                             <button type="submit" class="btn btn-submit shadow-sm">
                                 <i class="bi bi-plus-circle me-2"></i> Ürünü Oluştur
                             </button>
-                            <a asp-action="Index" class="btn btn-outline-secondary">
+                            <a asp-action="Index" class="btn btn-outline-secondary" asp-area="Admin">
                                 <i class="bi bi-x-lg me-2"></i> İptal Et ve Geri Dön
                             </a>
                         </div>

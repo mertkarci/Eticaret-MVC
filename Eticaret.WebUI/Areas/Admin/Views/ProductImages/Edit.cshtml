@@ -14,7 +14,9 @@
         <div class="col-lg-8">
             <!-- Görsel Yükleme -->
             <div class="card card-admin">
-                <div class="card-header"><h5 class="card-title mb-0">Görsel</h5></div>
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Görsel</h5>
+                </div>
                 <div class="card-body">
                     <label for="file-upload" class="custom-file-upload-container">
                         <div class="icon"><i class="bi bi-cloud-arrow-up-fill"></i></div>
@@ -25,16 +27,31 @@
                     </label>
 
                     <div class="mt-3 text-center">
-                        <img id="image-preview" src="@(string.IsNullOrEmpty(Model.Name) ? "" : "/img/products/" + Model.Name)"
-                             alt="Görsel Önizleme"
-                             style="max-width: 100%; max-height: 300px; border-radius: 0.5rem; display: @(string.IsNullOrEmpty(Model.Name) ? "none" : "inline-block");" />
+                        <img id="image-preview"
+                            src="@(string.IsNullOrEmpty(Model.Name) ? "" : "/img/products/" + Model.Name)"
+                            alt="Görsel Önizleme"
+                            style="max-width: 100%; max-height: 300px; border-radius: 0.5rem; display: @(string.IsNullOrEmpty(Model.Name) ? "none" : "inline-block");" />
                     </div>
+                    @if (!string.IsNullOrEmpty(Model.Name))
+                    {
+                        <div class="mt-3 text-center">
+                            <div class="form-check form-check-inline form-switch">
+                                <input class="form-check-input" type="checkbox" id="cbResmiSil" name="cbResmiSil"
+                                    value="true">
+                                <label class="form-check-label text-danger fw-bold" for="cbResmiSil">
+                                    <i class="bi bi-trash"></i> Mevcut Resmi Sil
+                                </label>
+                            </div>
+                        </div>
+                    }
                 </div>
             </div>
 
             <!-- Görsel Bilgileri (Alt) -->
             <div class="card card-admin mt-4">
-                <div class="card-header"><h5 class="card-title mb-0">Görsel Bilgileri</h5></div>
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Görsel Bilgileri</h5>
+                </div>
                 <div class="card-body">
                     <div class="mb-3">
                         <label asp-for="Alt" class="form-label"></label>
@@ -46,7 +63,9 @@
 
             <!-- İlişkili Ürün -->
             <div class="card card-admin mt-4">
-                <div class="card-header"><h5 class="card-title mb-0">İlişkili Ürün</h5></div>
+                <div class="card-header">
+                    <h5 class="card-title mb-0">İlişkili Ürün</h5>
+                </div>
                 <div class="card-body">
                     <label asp-for="ProductId" class="form-label"></label>
                     <select asp-for="ProductId" class="form-select" asp-items="ViewBag.ProductId">
@@ -62,7 +81,9 @@
             <div class="sticky-form-sidebar">
                 <!-- Eylemler -->
                 <div class="card card-admin">
-                    <div class="card-header"><h5 class="card-title mb-0">Eylemler</h5></div>
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Eylemler</h5>
+                    </div>
                     <div class="card-body">
                         <div class="d-grid gap-2">
                             <button type="submit" class="btn btn-submit shadow-sm">
@@ -80,6 +101,8 @@
 </form>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-    <script>function previewImage(e){const r=new FileReader;r.onload=function(){const o=document.getElementById("image-preview");o.src=r.result,o.style.display="inline-block"},r.readAsDataURL(e.target.files[0])}</script>
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>function previewImage(e) { const r = new FileReader; r.onload = function () { const o = document.getElementById("image-preview"); o.src = r.result, o.style.display = "inline-block" }, r.readAsDataURL(e.target.files[0]) }</script>
 }

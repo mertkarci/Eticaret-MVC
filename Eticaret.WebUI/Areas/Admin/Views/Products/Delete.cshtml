@@ -34,13 +34,13 @@
                 </dl>
             </div>
             <div class="card-footer bg-light p-3">
-                <form asp-action="Delete">
+                <form asp-action="Delete" asp-area="Admin">
                     <input type="hidden" asp-for="Id" />
                     <div class="d-flex gap-2">
                         <button type="submit" class="btn btn-danger px-4 shadow-sm">
                             <i class="bi bi-trash me-2"></i> Evet, Sil
                         </button>
-                        <a asp-action="Index" class="btn btn-outline-secondary px-4">
+                        <a asp-action="Index" asp-area="Admin" class="btn btn-outline-secondary px-4">
                             İptal Et ve Geri Dön
                         </a>
                     </div>
