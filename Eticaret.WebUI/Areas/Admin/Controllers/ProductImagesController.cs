@@ -56,7 +56,6 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
         // GET: Admin/ProductImages/Create
         public IActionResult Create(string ProductId)
         {
-            // Dropdown'da ID yerine ürün ismi (Name) görünmesi için düzeltildi
             ViewData["ProductId"] = new SelectList(_context.Products, "Id", "Name", ProductId);
             return View();
         }
@@ -64,15 +63,14 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
         // POST: Admin/ProductImages/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        // DÜZELTME 1: IFormFile parametresini CSHTML'deki name attribute'u ile aynı yaptık (Image)
-        public async Task<IActionResult> Create(ProductImage productImage, IFormFile? Image)
+        public async Task<IActionResult> Create(ProductImage productImage, IFormFile? Name)
         {
             // DÜZELTME 2: İlişkili tablodan (Product) dolayı ModelState'in patlamasını engelliyoruz
             ModelState.Remove("Product");
 
             if (ModelState.IsValid)
             {
-                productImage.Name = await FileHelper.FileLoaderAsync(Image, "/img/products/");
+                productImage.Name = await FileHelper.FileLoaderAsync(Name, "/img/products/");
                 _context.Add(productImage);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));

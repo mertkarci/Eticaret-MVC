@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Eticaret.Core.Entities;
 using Eticaret.Data;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace Eticaret.WebUI.Areas.Admin.Controllers
 {
@@ -75,7 +76,7 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
         {
             if (id == null) return NotFound();
 
-            var order = await _context.Orders.FindAsync(id);
+            var order = await _context.Orders.Include(o=>o.AppUser).FirstOrDefaultAsync(m=>m.Id == id);
             if (order == null) return NotFound();
 
             // Müşteri listesini ViewBag'e ekle (Yoksa sayfa hata verince dropdown boşalır)
@@ -85,26 +86,39 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,OrderNumber,TotalPrice,OrderDate,AppUserId,CustomerId,BillingAddress,DeliveryAddress,OrderState,CustomerName,CustomerEmail,CustomerPhone")] Order order)
+        public async Task<IActionResult> Edit(int id, Order order)
         {
             if (id != order.Id) return NotFound();
+
+
+            var dbOrder = await _context.Orders.FirstOrDefaultAsync(x => x.Id == id);
+
+            if (dbOrder == null) return NotFound();
+
+            // ModelState.Remove("CustomerName");
+            // ModelState.Remove("CustomerEmail");
+            // ModelState.Remove("CustomerPhone");
+            // ModelState.Remove("AppUser"); 
 
             if (ModelState.IsValid)
             {
                 try
                 {
-                    _context.Update(order);
+                    dbOrder.OrderState = order.OrderState;
+                    dbOrder.OrderDate = order.OrderDate;
+                    dbOrder.TotalPrice = order.TotalPrice;
+
+                    _context.Update(dbOrder);
                     await _context.SaveChangesAsync();
+
                     return RedirectToAction(nameof(Index));
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
-                    ModelState.AddModelError("", "Kayıt sırasında bir veritabanı hatası oluştu.");
+                    ModelState.AddModelError("", "Güncelleme sırasında bir hata oluştu: " + ex.Message);
                 }
             }
 
-            // Hata varsa listeleri tekrar doldur
-            ViewData["AppUserId"] = new SelectList(_context.AppUsers, "Id", "Name", order.AppUserId);
             return View(order);
         }
         // GET: Admin/Orders/Delete/5

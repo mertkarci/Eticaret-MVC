@@ -10,13 +10,10 @@
     <input type="hidden" asp-for="Id" />
     <input type="hidden" asp-for="BillingAddress" />
     <input type="hidden" asp-for="DeliveryAddress" />
-    <input type="hidden" asp-for="CustomerId" />
-
-    <input type="hidden" asp-for="CustomerName" />
+    <input type="hidden" asp-for="OrderNumber" /> <input type="hidden" asp-for="CustomerName" />
     <input type="hidden" asp-for="CustomerEmail" />
     <input type="hidden" asp-for="CustomerPhone" />
-
-    <div class="row g-4">
+    <input type="hidden" asp-for="AppUserId" /> <div class="row g-4">
         <div class="col-lg-8">
             <div class="card card-admin">
                 <div class="card-header">
@@ -26,25 +23,24 @@
                     <div class="row g-3">
                         <div class="col-md-6">
                             <label asp-for="OrderNumber" class="form-label"></label>
-                            <input asp-for="OrderNumber" class="form-control" readonly /> <span asp-validation-for="OrderNumber" class="text-danger small"></span>
+                            <input value="@Model.OrderNumber" class="form-control bg-light" readonly />
                         </div>
                         
                         <div class="col-md-6">
-                            <label class="form-label">Müşteri</label>
-                            @if (Model.AppUserId != null)
-                            {
-                                <select asp-for="AppUserId" class="form-select" asp-items="ViewBag.AppUserId">
-                                    <option value="">Müşteri Seçiniz</option>
-                                </select>
-                            }
-                            else
-                            {
-                                <input type="hidden" asp-for="AppUserId" />
-                                <div class="input-group">
-                                    <span class="input-group-text bg-light"><i class="bi bi-person-badge"></i></span>
-                                    <input type="text" class="form-control bg-light text-muted" value="Misafir: @Model.CustomerName" readonly />
-                                </div>
-                            }
+                            <label class="form-label">Müşteri / Alıcı Bilgisi</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light"><i class="bi bi-person-badge"></i></span>
+                                @if (Model.AppUserId != null)
+                                {
+                                    <input type="text" class="form-control bg-light text-dark fw-bold" 
+                                           value="@Model.AppUser?.Name @Model.AppUser?.Surname" readonly />
+                                }
+                                else
+                                {
+                                    <input type="text" class="form-control bg-light text-muted" 
+                                           value="Misafir: @Model.CustomerName" readonly />
+                                }
+                            </div>
                         </div>
 
                         <div class="col-md-6">
@@ -93,9 +89,3 @@
         </div>
     </div>
 </form>
-
-@section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
-}

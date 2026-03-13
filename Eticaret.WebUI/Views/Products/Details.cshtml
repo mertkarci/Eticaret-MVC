@@ -124,22 +124,8 @@
         <div class="row gx-5 align-items-center">
 
             <div class="col-lg-6 mb-5 mb-lg-0">
-                <div class="position-relative product-image-wrapper border border-light">
-                    <span class="badge bg-danger position-absolute top-0 start-0 m-4 px-3 py-2 rounded-pill shadow"
-                        style="z-index: 10; font-size: 0.9rem; letter-spacing: 1px;">
-                        <i class="bi bi-tags-fill me-1"></i> %20 İNDİRİM
-                    </span>
-
-                    @if (Model.Product.ProductImages?.Count > 0)
-                    {
-                        <partial name="_ProductDetailSlider" model="Model.Product.ProductImages"></partial>
-                    }
-                    else
-                    {
-                        <img class="img-fluid w-100 rounded" src="/img/products/@Model.Product.Image"
-                            alt="@Model.Product.Name" style="object-fit: contain; max-height: 550px;">
-                    }
-
+                <div class="product-image-wrapper">
+                    <partial name="_ProductImageGallery" model="Model.Product" />
                 </div>
             </div>
 
