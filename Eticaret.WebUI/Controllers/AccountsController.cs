@@ -7,8 +7,8 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using BCrypt;
-using BCrypt.Net;
+using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace Eticaret.WebUI;
 
@@ -17,29 +17,29 @@ public class AccountsController : Controller
 {
     private readonly IService<AppUser> _service;
     private readonly IService<Order> _serviceOrder;
+    private readonly IAuthService _authService; 
 
-    public AccountsController(IService<AppUser> service, IService<Order> serviceOrder)
+    public AccountsController(IService<AppUser> service, IService<Order> serviceOrder, IAuthService authService)
     {
         _service = service;
         _serviceOrder = serviceOrder;
+        _authService = authService;
     }
+
+
 
     [Authorize]
     [HttpGet("")]
     public async Task<IActionResult> Index()
     {
-        // 1. Cookie'deki String Guid'i al
         var userGuidClaim = HttpContext.User.FindFirst("UserGuid");
-
         if (userGuidClaim == null) return RedirectToAction("SignIn");
 
-        // 2. String'i C# GUID nesnesine çevir (Güvenlik ve Performans için)
         if (!Guid.TryParse(userGuidClaim.Value, out Guid guidFromCookie))
         {
             await HttpContext.SignOutAsync();
             return RedirectToAction("SignIn");
         }
-
 
         AppUser user = await _service.GetAsync(p => p.UserGuid == guidFromCookie);
 
@@ -66,7 +66,6 @@ public class AccountsController : Controller
     [Authorize]
     public async Task<IActionResult> Index(UserEditViewModel model)
     {
-
         if (!string.IsNullOrWhiteSpace(model.Phone))
         {
             if (!System.Text.RegularExpressions.Regex.IsMatch(model.Phone, @"^05[0-9]{9}$"))
@@ -90,18 +89,15 @@ public class AccountsController : Controller
 
                 if (user is not null)
                 {
-
                     user.Name = model.Name;
                     user.Surname = model.Surname;
-
-                    // if(model.Phone != user.Phone) { SendSmsAndRedirectToVerification(...) }
 
                     if (user.Phone != model.Phone && await _service.GetAsync(u => u.Phone == model.Phone) != null)
                     {
                         ModelState.AddModelError("Phone", "Bu telefon numarası zaten kullanılıyor.");
                         return View(model);
                     }
-                    
+
                     user.Phone = model.Phone;
 
                     if (!string.IsNullOrEmpty(model.Password))
@@ -143,6 +139,60 @@ public class AccountsController : Controller
         return View(model);
     }
 
+    [Authorize]
+    [HttpGet("siparislerim")]
+    public async Task<IActionResult> MyOrders()
+    {
+        var userGuidClaim = HttpContext.User.FindFirst("UserGuid");
+        if (userGuidClaim == null) return RedirectToAction("SignIn");
+
+        if (!Guid.TryParse(userGuidClaim.Value, out Guid guidFromCookie))
+        {
+            await HttpContext.SignOutAsync();
+            return RedirectToAction("SignIn");
+        }
+
+        AppUser user = await _service.GetAsync(p => p.UserGuid == guidFromCookie);
+
+        if (user is null)
+        {
+            await HttpContext.SignOutAsync();
+            return RedirectToAction("SignIn");
+        }
+
+        var model = await _serviceOrder.GetQueryable()
+            .Where(p => p.AppUserId == user.Id)
+            .Include(p => p.OrderLines)
+                .ThenInclude(p => p.Product)
+            .ToListAsync();
+
+        return View(model);
+    }
+
+    [HttpGet("siparislerim/{orderNumber}")]
+    public async Task<IActionResult> MyOrderDetails(string orderNumber)
+    {
+        if (string.IsNullOrEmpty(orderNumber)) return NotFound();
+
+        var userGuidClaim = HttpContext.User.FindFirst("UserGuid");
+        if (userGuidClaim == null || !Guid.TryParse(userGuidClaim.Value, out Guid guidFromCookie))
+        {
+            return RedirectToAction("SignIn");
+        }
+
+        AppUser user = await _service.GetAsync(p => p.UserGuid == guidFromCookie);
+        if (user is null) return RedirectToAction("SignIn");
+
+        var order = await _serviceOrder.GetQueryable()
+            .Include(x => x.OrderLines)
+            .ThenInclude(x => x.Product)
+            .FirstOrDefaultAsync(x => x.OrderNumber == orderNumber && x.AppUserId == user.Id);
+
+        if (order == null) return NotFound("Sipariş bulunamadı!");
+
+        return View(order);
+    }
+
     [HttpGet("giris-yap")]
     public IActionResult SignIn(string returnUrl = null)
     {
@@ -168,103 +218,52 @@ public class AccountsController : Controller
             }
         }
 
-        var model = new LoginViewModel
-        {
-            ReturnUrl = returnUrl
-        };
-
-        return View(model);
+        return View(new LoginViewModel { ReturnUrl = returnUrl });
     }
 
     [HttpPost("giris-yap")]
     public async Task<IActionResult> SignInAsync(LoginViewModel loginViewModel)
     {
-        if (ModelState.IsValid)
+        if (!ModelState.IsValid) return View(loginViewModel);
+
+        var result = await _authService.LoginAsync(loginViewModel.Email, loginViewModel.Password, loginViewModel.ReturnUrl);
+
+        if (!result.IsSuccess)
         {
-            try
-            {
-                var account = await _service.GetAsync(p => p.Email == loginViewModel.Email && p.isActive);
-                if (account == null)
-                {
-                    ModelState.AddModelError("", "Giriş Başarısız!");
-                }
-                else if (!BCrypt.Net.BCrypt.Verify(loginViewModel.Password, account.Password))
-                {
-                    ModelState.AddModelError("", "Giriş Başarısız!");
-
-                }
-                else
-                {
-                    var claims = new List<Claim>()
-                    {
-                        new(ClaimTypes.Name, account.Name),
-                        new(ClaimTypes.Email, account.Email),
-                        new(ClaimTypes.Role, account.isAdmin ? "Admin" : "User"),
-                        new("UserId", account.Id.ToString()),
-                        new("UserGuid", account.UserGuid.ToString()),
-                        new("ReturnUrl", loginViewModel.ReturnUrl ?? "/")
-                    };
-
-                    var userIdentity = new ClaimsIdentity(claims, "Login");
-                    ClaimsPrincipal userPrincipal = new ClaimsPrincipal(userIdentity);
-                    await HttpContext.SignInAsync(userPrincipal);
-
-                    return Redirect(string.IsNullOrEmpty(loginViewModel.ReturnUrl) ? "/" : loginViewModel.ReturnUrl);
-                }
-            }
-            catch (Exception error)
-            {
-                Debug.WriteLine(error);
-                ModelState.AddModelError("", "Hata!!");
-            }
+            ModelState.AddModelError("", result.ErrorMessage);
+            return View(loginViewModel);
         }
-        return View();
+
+        await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, result.Principal);
+        return Redirect(string.IsNullOrEmpty(loginViewModel.ReturnUrl) ? "/" : loginViewModel.ReturnUrl);
     }
+
     [HttpGet("kayit-ol")]
-    public IActionResult SignUp()
-    {
-        return View();
-    }
+    public IActionResult SignUp() => View();
 
     [HttpPost("kayit-ol")]
     public async Task<IActionResult> SignUpAsync(AppUser appUser)
     {
-        appUser.isAdmin = false;
-        appUser.isActive = true;
-
-        if (!string.IsNullOrWhiteSpace(appUser.Phone))
-        {
-            if (!System.Text.RegularExpressions.Regex.IsMatch(appUser.Phone, @"^05[0-9]{9}$"))
-            {
-                ModelState.AddModelError("Phone", "Telefon numarası 05 ile başlamalı ve 11 haneli olmalıdır.");
-            }
-        }
+        if (!string.IsNullOrWhiteSpace(appUser.Phone) && !System.Text.RegularExpressions.Regex.IsMatch(appUser.Phone, @"^05[0-9]{9}$"))
+            ModelState.AddModelError("Phone", "Telefon numarası 05 ile başlamalı ve 11 haneli olmalıdır.");
 
         if (string.IsNullOrWhiteSpace(appUser.Password))
-        {
             ModelState.AddModelError("Password", "Şifre alanı boş geçilemez.");
-        }
-        appUser.Password = BCrypt.Net.BCrypt.HashPassword(appUser.Password);
-        if (ModelState.IsValid)
+
+        if (!ModelState.IsValid) return View(appUser);
+
+        var result = await _authService.RegisterAsync(appUser, appUser.Password);
+
+        if (!result.IsSuccess)
         {
-            if (await _service.GetAsync(u => u.Email == appUser.Email) != null)
-            {
-                ModelState.AddModelError("Email", "Bu e-posta adresi zaten kullanılıyor.");
-                return View(appUser);
-            }
-            if (await _service.GetAsync(u => u.Phone == appUser.Phone) != null)
-            {
-                ModelState.AddModelError("Phone", "Bu telefon numarası zaten kullanılıyor.");
-                return View(appUser);
-            }
-            await _service.AddAsync(appUser);
-            await _service.SaveChangesAsync();
-            TempData["Message"] = "Kaydınız başarıyla oluşturuldu. Lütfen giriş yapınız.";
-            return RedirectToAction(nameof(SignIn));
+            ModelState.AddModelError("", result.ErrorMessage);
+            return View(appUser);
         }
 
-        return View(appUser);
+        TempData["Message"] = "Kaydınız başarıyla oluşturuldu. Lütfen giriş yapınız.";
+        return RedirectToAction(nameof(SignIn));
     }
+
     [HttpGet("cikis-yap")]
     public async Task<IActionResult> SignOutAsync()
     {
@@ -272,193 +271,100 @@ public class AccountsController : Controller
         return RedirectToAction("SignIn");
     }
 
-    [Authorize]
-    [HttpGet("siparislerim")]
-    public async Task<IActionResult> MyOrders()
+    [HttpPost("google-ile-giris")]
+    [ValidateAntiForgeryToken]
+    public IActionResult GoogleLogin(string returnUrl = "/")
     {
-        var userGuidClaim = HttpContext.User.FindFirst("UserGuid");
+        var properties = new AuthenticationProperties { RedirectUri = Url.Action("GoogleResponse", "Accounts", new { returnUrl }) };
+        return Challenge(properties, GoogleDefaults.AuthenticationScheme);
+    }
 
-        if (userGuidClaim == null) return RedirectToAction("SignIn");
+    [HttpGet("google-donus")]
+    public async Task<IActionResult> GoogleResponse(string returnUrl = "/")
+    {
+        var authResult = await HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
 
-        if (!Guid.TryParse(userGuidClaim.Value, out Guid guidFromCookie))
+        if (!authResult.Succeeded || authResult.Principal == null)
+            return RedirectToAction("SignIn");
+
+        var email = authResult.Principal.FindFirstValue(ClaimTypes.Email);
+        var name = authResult.Principal.FindFirstValue(ClaimTypes.Name);
+        var surname = authResult.Principal.FindFirstValue(ClaimTypes.Surname);
+
+        if (string.IsNullOrEmpty(email)) return RedirectToAction("SignIn");
+
+        var result = await _authService.GoogleLoginAsync(email, name, surname, returnUrl);
+
+        if (!result.IsSuccess)
         {
-            await HttpContext.SignOutAsync();
+            TempData["Message"] = result.ErrorMessage; 
             return RedirectToAction("SignIn");
         }
 
-        AppUser user = await _service.GetAsync(p => p.UserGuid == guidFromCookie);
+        await HttpContext.SignOutAsync();
+        await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, result.Principal);
 
-        if (user is null)
-        {
-            await HttpContext.SignOutAsync();
-            return RedirectToAction("SignIn");
-        }
-
-        // Eager Loading (Include ve ThenInclude) ile Siparişleri Çekme
-        var model = await _serviceOrder.GetQueryable()
-            .Where(p => p.AppUserId == user.Id)
-            .Include(p => p.OrderLines)
-                .ThenInclude(p => p.Product)
-            .ToListAsync();
-
-        return View(model);
+        return Redirect(string.IsNullOrEmpty(returnUrl) ? "/" : returnUrl);
     }
 
     [HttpGet("sifremi-unuttum")]
-    public IActionResult PasswordRenew()
-    {
-        return View();
-    }
+    public IActionResult PasswordRenew() => View();
+
     [HttpPost("sifremi-unuttum")]
     public async Task<IActionResult> PasswordRenew(string Email)
     {
-        if (string.IsNullOrWhiteSpace(Email))
+        if (string.IsNullOrWhiteSpace(Email)) { ModelState.AddModelError("", "Email alanı boş olamaz!"); return View(); }
+
+        var result = await _authService.GeneratePasswordResetTokenAsync(Email);
+
+        if (!result.IsSuccess)
         {
-            ModelState.AddModelError("", "Email alanı boş olamaz!");
+            ModelState.AddModelError("", result.ErrorMessage);
             return View();
         }
 
-        AppUser user = await _service.GetAsync(p => p.Email == Email);
-        if (user is null)
-        {
-            ModelState.AddModelError("", "Geçersiz bir email girdiniz.");
-            return View();
-        }
-
-        string resetToken = Guid.NewGuid().ToString();
-
-        user.PasswordResetToken = resetToken;
-        user.ResetTokenExpires = DateTime.Now.AddHours(2);
-        _service.Update(user);
-        await _service.SaveChangesAsync();
-
-        string resetLink = Url.Action("PasswordChange", "Accounts", new { token = resetToken }, Request.Scheme);
-
+        string resetLink = Url.Action("PasswordChange", "Accounts", new { token = result.ResetToken }, Request.Scheme);
         string message = $@"
         <div style='font-family: Arial, sans-serif; padding: 20px;'>
             <h3>Şifre Sıfırlama Talebi</h3>
-            <p>Merhaba {user.Name},</p>
+            <p>Merhaba {result.UserName},</p>
             <p>Şifrenizi yenilemek için aşağıdaki bağlantıya tıklayabilirsiniz. Bu bağlantı sadece size özeldir.</p>
             <p><a href='{resetLink}' style='display: inline-block; padding: 10px 20px; background-color: #0d6efd; color: white; text-decoration: none; border-radius: 5px;'>Şifremi Yenile</a></p>
             <p style='font-size: 12px; color: #6c757d; margin-top: 20px;'>Eğer bu talebi siz yapmadıysanız, bu e-postayı görmezden gelebilirsiniz.</p>
         </div>";
+        
+        var mailSent = await MailHelper.SendmMailAsync(Email, message, "Şifremi Yenile");
 
-        var result = await MailHelper.SendmMailAsync(Email, message, "Şifremi Yenile");
-
-        if (result)
-        {
-            TempData["Message"] = @"<div class='alert alert-success'>Şifre sıfırlama bağlantınız mail adresinize başarıyla gönderilmiştir. Lütfen gelen kutunuzu (ve Spam klasörünü) kontrol edin.</div>";
-        }
-        else
-        {
-            TempData["Message"] = @"<div class='alert alert-danger'>Mail gönderilirken sistemsel bir hata oluştu! Lütfen daha sonra tekrar deneyin.</div>";
-
-        }
+        if (mailSent) TempData["Message"] = "<div class='alert alert-success'>Bağlantı mail adresinize gönderildi.</div>";
+        else TempData["Message"] = "<div class='alert alert-danger'>Sistemsel bir hata oluştu.</div>";
 
         return View();
     }
 
     [HttpGet("sifremi-yenile")]
-    public async Task<IActionResult> PasswordChange(string token) 
+    public IActionResult PasswordChange(string token)
     {
-        if (string.IsNullOrEmpty(token))
-        {
-            return BadRequest("Geçersiz istek!");
-        }
-
-
-        AppUser appUser = await _service.GetAsync(p => p.PasswordResetToken == token);
-
-        if (appUser is null || appUser.ResetTokenExpires < DateTime.Now)
-        {
-            return NotFound("Geçersiz veya süresi dolmuş bir şifre sıfırlama bağlantısı kullandınız.");
-        }
-
+        if (string.IsNullOrEmpty(token)) return BadRequest("Geçersiz istek!");
         ViewBag.Token = token;
-
         return View();
     }
 
     [HttpPost("sifremi-yenile")]
-    public async Task<IActionResult> PasswordChange(string token, string password) 
+    public async Task<IActionResult> PasswordChange(string token, string password)
     {
         ViewBag.Token = token;
+        if (string.IsNullOrEmpty(token) || string.IsNullOrEmpty(password)) { ModelState.AddModelError("", "Tüm alanları doldurun!"); return View(); }
+        if (password.Length < 6) { ModelState.AddModelError("", "Şifreniz en az 6 karakter olmalıdır."); return View(); }
 
-        if (string.IsNullOrEmpty(token) || string.IsNullOrEmpty(password))
+        var result = await _authService.ResetPasswordAsync(token, password);
+
+        if (result.IsSuccess)
         {
-            ModelState.AddModelError("", "Lütfen tüm alanları doldurun!");
-            return View();
-        }
-
-        if (password.Length < 6)
-        {
-            ModelState.AddModelError("", "Şifreniz güvenlik gereği en az 6 karakter uzunluğunda olmalıdır.");
-            return View();
-        }
-
-        if (password.Contains(" "))
-        {
-            ModelState.AddModelError("", "Şifreniz boşluk karakteri içeremez.");
-            return View();
-        }
-
-        AppUser appUser = await _service.GetAsync(p => p.PasswordResetToken == token);
-
-        if (appUser is null || appUser.ResetTokenExpires < DateTime.Now)
-        {
-            ModelState.AddModelError("", "Geçersiz veya süresi dolmuş bir şifre sıfırlama bağlantısı kullandınız.");
-            return View();
-        }
-
-        appUser.Password = BCrypt.Net.BCrypt.HashPassword(password);
-        appUser.PasswordResetToken = null; 
-        appUser.ResetTokenExpires = null;  
-
-        _service.Update(appUser);
-        var result = await _service.SaveChangesAsync();
-
-        if (result > 0)
-        {
-            TempData["Message"] = @"<div class='alert alert-success alert-dismissible fade show rounded-0' role='alert'>
-                Şifreniz başarıyla güncellenmiştir! Lütfen yeni şifrenizle giriş yapın.
-                <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
-            </div>";
-
+            TempData["Message"] = "<div class='alert alert-success alert-dismissible fade show rounded-0' role='alert'>Şifreniz başarıyla güncellenmiştir! Lütfen yeni şifrenizle giriş yapın.<button type='button' class='btn-close' data-bs-dismiss='alert'></button></div>";
             return RedirectToAction("SignIn");
         }
-        else
-        {
-            ModelState.AddModelError("", "Güncelleme başarısız veya aynı şifreyi girdiniz!");
-        }
-
+        
+        ModelState.AddModelError("", result.ErrorMessage);
         return View();
     }
-    [HttpGet("siparislerim/{orderNumber}")]
-    public async Task<IActionResult> MyOrderDetails(string orderNumber)
-    {
-        if (string.IsNullOrEmpty(orderNumber)) return NotFound();
-
-        var userGuidClaim = HttpContext.User.FindFirst("UserGuid");
-        if (userGuidClaim == null || !Guid.TryParse(userGuidClaim.Value, out Guid guidFromCookie))
-        {
-            return RedirectToAction("SignIn");
-        }
-
-        AppUser user = await _service.GetAsync(p => p.UserGuid == guidFromCookie);
-        if (user is null) return RedirectToAction("SignIn");
-
-        var order = await _serviceOrder.GetQueryable()
-            .Include(x => x.OrderLines)
-            .ThenInclude(x => x.Product)
-            .FirstOrDefaultAsync(x => x.OrderNumber == orderNumber && x.AppUserId == user.Id);
-
-        if (order == null)
-        {
-            return NotFound("Sipariş bulunamadı!");
-        }
-
-        return View(order);
-    }
-
-
 }

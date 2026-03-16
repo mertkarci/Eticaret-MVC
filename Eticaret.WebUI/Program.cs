@@ -3,7 +3,7 @@ using Eticaret.Data;
 using Eticaret.Service.Abstract;
 using Eticaret.Service.Concrete;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.EntityFrameworkCore; 
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -40,6 +40,7 @@ builder.Services.AddSession(options =>
 
 builder.Services.AddScoped(typeof(IService<>), typeof(Service<>));
 builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(p =>
@@ -50,11 +51,18 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     p.Cookie.Name = "Account";
     p.Cookie.HttpOnly = true; // JS ile çerez hırsızlığını engeller
     p.Cookie.SecurePolicy = CookieSecurePolicy.Always; // Sadece HTTPS
-    p.Cookie.SameSite = SameSiteMode.Strict; // Dış sitelerden gelen sahte POST isteklerini reddeder
+    p.Cookie.SameSite = SameSiteMode.Lax; 
     p.Cookie.IsEssential = true;
 
     p.ExpireTimeSpan = TimeSpan.FromDays(1);
     p.SlidingExpiration = true; // Kullanıcı aktifse süreyi otomatik uzatır
+})
+.AddGoogle(options =>
+{
+    options.ClientId = builder.Configuration["Authentication:Google:ClientId"];
+    options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
+
+    options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
 });
 
 // Authorization (Yetki) Ayarları
