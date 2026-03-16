@@ -17,13 +17,15 @@ public class AccountsController : Controller
 {
     private readonly IService<AppUser> _service;
     private readonly IService<Order> _serviceOrder;
-    private readonly IAuthService _authService; 
+    private readonly IAuthService _authService;
+    private readonly IUserService _userService;
 
-    public AccountsController(IService<AppUser> service, IService<Order> serviceOrder, IAuthService authService)
+    public AccountsController(IService<AppUser> service, IService<Order> serviceOrder, IAuthService authService, IUserService userService)
     {
         _service = service;
         _serviceOrder = serviceOrder;
         _authService = authService;
+        _userService = userService;
     }
 
 
@@ -76,60 +78,26 @@ public class AccountsController : Controller
 
         if (ModelState.IsValid)
         {
-            try
+            var userGuidClaim = HttpContext.User.FindFirst("UserGuid");
+            if (userGuidClaim == null || !Guid.TryParse(userGuidClaim.Value, out Guid guidFromCookie))
             {
-                var userGuidClaim = HttpContext.User.FindFirst("UserGuid");
-                if (userGuidClaim == null || !Guid.TryParse(userGuidClaim.Value, out Guid guidFromCookie))
-                {
-                    await HttpContext.SignOutAsync();
-                    return RedirectToAction("SignIn");
-                }
-
-                AppUser user = await _service.GetAsync(p => p.UserGuid == guidFromCookie);
-
-                if (user is not null)
-                {
-                    user.Name = model.Name;
-                    user.Surname = model.Surname;
-
-                    if (user.Phone != model.Phone && await _service.GetAsync(u => u.Phone == model.Phone) != null)
-                    {
-                        ModelState.AddModelError("Phone", "Bu telefon numarası zaten kullanılıyor.");
-                        return View(model);
-                    }
-
-                    user.Phone = model.Phone;
-
-                    if (!string.IsNullOrEmpty(model.Password))
-                    {
-                        user.Password = BCrypt.Net.BCrypt.HashPassword(model.Password);
-                    }
-
-                    _service.Update(user);
-                    var result = await _service.SaveChangesAsync();
-
-                    if (result > 0)
-                    {
-                        TempData["Message"] = @"<div class='alert alert-success alert-dismissible fade show rounded-0' role='alert'>
-                        <strong> Tebrikler! </strong> Bilgileriniz başarıyla güncellendi.
-                        <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
-                    </div>";
-                        return RedirectToAction("Index");
-                    }
-                    else
-                    {
-                        TempData["Message"] = @"<div class='alert alert-info alert-dismissible fade show rounded-0' role='alert'>
-                        Değişiklik yapılmadı.
-                        <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
-                    </div>";
-                        return RedirectToAction("Index");
-                    }
-                }
+                await HttpContext.SignOutAsync();
+                return RedirectToAction("SignIn");
             }
-            catch (Exception ex)
+
+            var result = await _userService.EditAccount(model.Phone, model.Name, model.Surname, guidFromCookie);
+
+            if (result.IsSuccess)
             {
-                ModelState.AddModelError("", "Güncelleme sırasında bir hata oluştu!");
-                Debug.WriteLine(ex);
+                TempData["Message"] = @"<div class='alert alert-success alert-dismissible fade show rounded-0' role='alert'>
+                <strong> Tebrikler! </strong> Bilgileriniz başarıyla güncellendi.
+                <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
+            </div>";
+                return RedirectToAction("Index");
+            }
+            else
+            {
+                ModelState.AddModelError(result.ErrorMessage.Contains("telefon") ? "Phone" : "", result.ErrorMessage);
             }
         }
 
@@ -252,7 +220,7 @@ public class AccountsController : Controller
 
         if (!ModelState.IsValid) return View(appUser);
 
-        var result = await _authService.RegisterAsync(appUser, appUser.Password);
+        var result = await _authService.RegisterAsync(appUser.Name, appUser.Surname, appUser.Email, appUser.Phone, appUser.Password);
 
         if (!result.IsSuccess)
         {
@@ -297,7 +265,7 @@ public class AccountsController : Controller
 
         if (!result.IsSuccess)
         {
-            TempData["Message"] = result.ErrorMessage; 
+            TempData["Message"] = result.ErrorMessage;
             return RedirectToAction("SignIn");
         }
 
@@ -332,7 +300,7 @@ public class AccountsController : Controller
             <p><a href='{resetLink}' style='display: inline-block; padding: 10px 20px; background-color: #0d6efd; color: white; text-decoration: none; border-radius: 5px;'>Şifremi Yenile</a></p>
             <p style='font-size: 12px; color: #6c757d; margin-top: 20px;'>Eğer bu talebi siz yapmadıysanız, bu e-postayı görmezden gelebilirsiniz.</p>
         </div>";
-        
+
         var mailSent = await MailHelper.SendmMailAsync(Email, message, "Şifremi Yenile");
 
         if (mailSent) TempData["Message"] = "<div class='alert alert-success'>Bağlantı mail adresinize gönderildi.</div>";
@@ -363,7 +331,7 @@ public class AccountsController : Controller
             TempData["Message"] = "<div class='alert alert-success alert-dismissible fade show rounded-0' role='alert'>Şifreniz başarıyla güncellenmiştir! Lütfen yeni şifrenizle giriş yapın.<button type='button' class='btn-close' data-bs-dismiss='alert'></button></div>";
             return RedirectToAction("SignIn");
         }
-        
+
         ModelState.AddModelError("", result.ErrorMessage);
         return View();
     }

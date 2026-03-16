@@ -54,18 +54,26 @@ public class AuthService : IAuthService
         return (true, string.Empty, CreatePrincipal(user, returnUrl));
     }
 
-    public async Task<(bool IsSuccess, string ErrorMessage)> RegisterAsync(AppUser user, string plainPassword)
+    public async Task<(bool IsSuccess, string ErrorMessage)> RegisterAsync(string name, string surname, string email, string phone, string plainPassword)
     {
-        if (await _serviceAppUser.GetAsync(u => u.Email == user.Email) != null)
+        if (await _serviceAppUser.GetAsync(u => u.Email == email) != null)
             return (false, "Bu e-posta adresi zaten kullanılıyor.");
 
-        if (await _serviceAppUser.GetAsync(u => u.Phone == user.Phone) != null)
+        // Telefon null değilse ve zaten varsa hata ver (Boş telefon numaralarının çakışmasını engeller)
+        if (!string.IsNullOrEmpty(phone) && await _serviceAppUser.GetAsync(u => u.Phone == phone) != null)
             return (false, "Bu telefon numarası zaten kullanılıyor.");
 
-        user.Password = BCrypt.Net.BCrypt.HashPassword(plainPassword);
-        user.isActive = true;
-        user.isAdmin = false;
-        user.UserGuid = Guid.NewGuid();
+        var user = new AppUser
+        {
+            Name = name,
+            Surname = surname,
+            Email = email,
+            Phone = phone,
+            Password = BCrypt.Net.BCrypt.HashPassword(plainPassword),
+            isActive = true,
+            isAdmin = false,
+            UserGuid = Guid.NewGuid()
+        };
 
         await _serviceAppUser.AddAsync(user);
         await _serviceAppUser.SaveChangesAsync();
