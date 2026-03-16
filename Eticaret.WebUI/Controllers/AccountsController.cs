@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication.Cookies;
-
+using Microsoft.AspNetCore.RateLimiting;
 namespace Eticaret.WebUI;
 
 [Route("hesabim")]
@@ -190,6 +190,7 @@ public class AccountsController : Controller
     }
 
     [HttpPost("giris-yap")]
+    [EnableRateLimiting("AuthLimit")]
     public async Task<IActionResult> SignInAsync(LoginViewModel loginViewModel)
     {
         if (!ModelState.IsValid) return View(loginViewModel);
@@ -210,6 +211,7 @@ public class AccountsController : Controller
     public IActionResult SignUp() => View();
 
     [HttpPost("kayit-ol")]
+    [EnableRateLimiting("AuthLimit")]
     public async Task<IActionResult> SignUpAsync(AppUser appUser)
     {
         if (!string.IsNullOrWhiteSpace(appUser.Phone) && !System.Text.RegularExpressions.Regex.IsMatch(appUser.Phone, @"^05[0-9]{9}$"))
@@ -279,6 +281,7 @@ public class AccountsController : Controller
     public IActionResult PasswordRenew() => View();
 
     [HttpPost("sifremi-unuttum")]
+    [EnableRateLimiting("AuthLimit")]
     public async Task<IActionResult> PasswordRenew(string Email)
     {
         if (string.IsNullOrWhiteSpace(Email)) { ModelState.AddModelError("", "Email alanı boş olamaz!"); return View(); }
@@ -318,6 +321,7 @@ public class AccountsController : Controller
     }
 
     [HttpPost("sifremi-yenile")]
+    [EnableRateLimiting("AuthLimit")]
     public async Task<IActionResult> PasswordChange(string token, string password)
     {
         ViewBag.Token = token;

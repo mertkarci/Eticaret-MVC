@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Eticaret.WebUI.Models;
 using Eticaret.Core.Entities;
 using Eticaret.Service.Abstract;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace Eticaret.WebUI.Controllers;
 
@@ -11,9 +12,9 @@ public class HomeController : Controller
     private readonly IService<Product> _serviceProduct;
     private readonly IService<Slider> _serviceSlider;
     private readonly IService<News> _serviceNews;
-        private readonly IService<Contact> _serviceContact;
+    private readonly IService<Contact> _serviceContact;
 
-    public HomeController(IService<Product> serviceProduct,IService<Slider> serviceSlider,IService<News> serviceNews, IService<Contact> serviceContact)
+    public HomeController(IService<Product> serviceProduct, IService<Slider> serviceSlider, IService<News> serviceNews, IService<Contact> serviceContact)
     {
         _serviceProduct = serviceProduct;
         _serviceSlider = serviceSlider;
@@ -28,7 +29,7 @@ public class HomeController : Controller
             Sliders = await _serviceSlider.GetAllAsync(),
             Products = await _serviceProduct.GetAllAsync(p => p.isActive && p.isHome),
             News = await _serviceNews.GetAllAsync()
-            
+
         };
 
 
@@ -73,10 +74,11 @@ public class HomeController : Controller
 
 
     [HttpPost, Route("iletisim")]
-    [ValidateAntiForgeryToken] 
+    [EnableRateLimiting("ContactLimit")]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> ContactUs(ContactViewModel model)
     {
- 
+
         if (ModelState.IsValid)
         {
             try
@@ -89,7 +91,7 @@ public class HomeController : Controller
                     Surname = model.Surname,
                     Phone = model.Phone,
                     Message = model.Message,
-                    CreateDate = DateTime.Now 
+                    CreateDate = DateTime.Now
                 };
 
                 // 3. Veritabanına Ekleme

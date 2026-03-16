@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Eticaret.WebUI.Controllers
 {
+    [Route("kampanyalar")]
     public class NewsController : Controller
     {
         private readonly IService<News> _service;
@@ -12,27 +13,26 @@ namespace Eticaret.WebUI.Controllers
         public NewsController(IService<News> service)
         {
             _service = service;
-
         }
+
+        // URL: /kampanyalar
+        [HttpGet("")]
         public async Task<IActionResult> Index()
         {
             return View(await _service.GetAllAsync());
         }
-                public async Task<IActionResult> Details(int? id)
+
+        // URL: /kampanyalar/5 veya /kampanyalar/detay/5
+        // "{id:int}" diyerek sadece rakam gelirse çalışacağını garantiye alıyoruz
+        [HttpGet("{id:int}")]
+        public async Task<IActionResult> Details(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
             var news = await _service.GetAsync(m => m.Id == id);
-            if (news == null)
-            {
-                return NotFound();
-            }
+            if (news == null) return NotFound();
 
             return View(news);
         }
-
     }
 }

@@ -2,22 +2,32 @@
 
 @foreach (var mainCategory in Model.Where(c => c.ParentId == 0))
 {
-    // Bu ana kategoriye ait alt kategorileri buluyoruz
     var subCategories = Model.Where(c => c.ParentId == mainCategory.Id).ToList();
 
     @if (subCategories.Any())
     {
         <li class="nav-item dropdown navbar-font">
-            <a class="nav-link dropdown-toggle navbar-font" href="/kategoriler/@mainCategory.Slug"
-                id="dropdown-@mainCategory.Id" onclick="handleCategoryClick(event, this)" data-bs-toggle="dropdown"
-                aria-expanded="false">
+            @* Ana Kategori Linki *@
+            <a class="nav-link dropdown-toggle navbar-font" 
+               asp-controller="Categories" 
+               asp-action="Index" 
+               asp-route-slug="@mainCategory.Slug"
+               id="dropdown-@mainCategory.Id" 
+               onclick="handleCategoryClick(event, this)" 
+               data-bs-toggle="dropdown"
+               aria-expanded="false">
                 @mainCategory.Name
             </a>
             <ul class="dropdown-menu border-0 shadow-lg rounded-4 mt-2" aria-labelledby="dropdown-@mainCategory.Id">
                 @foreach (var sub in subCategories)
                 {
                     <li>
-                        <a class="dropdown-item py-2 px-3 fw-medium" href="/kategoriler/@mainCategory.Slug/@sub.Slug">
+                        @* Alt Kategori Linki (mainSlug ve slug beraber) *@
+                        <a class="dropdown-item py-2 px-3 fw-medium" 
+                           asp-controller="Categories" 
+                           asp-action="Index" 
+                           asp-route-mainSlug="@mainCategory.Slug"
+                           asp-route-slug="@sub.Slug">
                             @sub.Name
                         </a>
                     </li>
@@ -28,13 +38,15 @@
     else
     {
         <li class="nav-item navbar-font">
-            <a class="nav-link navbar-font" href="/kategoriler/@mainCategory.Slug">
+            <a class="nav-link navbar-font" 
+               asp-controller="Categories" 
+               asp-action="Index" 
+               asp-route-slug="@mainCategory.Slug">
                 @mainCategory.Name
             </a>
         </li>
     }
 }
-
 <script>
     function handleCategoryClick(e, element) {
         // 992px (Masaüstü) veya Menü zaten açıksa (show sınıfı varsa) linke git

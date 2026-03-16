@@ -12,15 +12,18 @@ public class CartService : ICartService
 
         if (_product != null)
         {
-            _product.Quantity += quantity;
+    
+            if (_product.Quantity + quantity <= product.Stock)
+            {
+                _product.Quantity += quantity;
+            }
         }
         else
         {
-            CartLines.Add(new CartLine()
+            if (quantity <= product.Stock)
             {
-                Product = product,
-                Quantity = quantity
-            });
+                CartLines.Add(new CartLine() { Product = product, Quantity = quantity });
+            }
         }
 
     }
@@ -35,6 +38,11 @@ public class CartService : ICartService
         CartLines.RemoveAll(p => p.Product.Id == product.Id);
     }
 
+    public int TotalQuantity()
+    {
+        return CartLines.Sum(p => p.Quantity);
+    }
+
     public decimal TotalPrice()
     {
         return CartLines.Sum(p => p.Product.Price * p.Quantity);
@@ -46,22 +54,33 @@ public class CartService : ICartService
 
         if (_product != null)
         {
-            if(_product.Quantity + quantity <=0)
+            int newQuantity = _product.Quantity + quantity;
+            
+            if (newQuantity <= 0)
             {
                 CartLines.RemoveAll(p => p.Product.Id == product.Id);
             }
-            else
+            else if (newQuantity <= product.Stock) 
             {
-                _product.Quantity += quantity;
+                _product.Quantity = newQuantity;
             }
         }
         else
         {
-            CartLines.Add(new CartLine()
+            if (quantity <= product.Stock && quantity > 0)
             {
-                Product = product,
-                Quantity = quantity
-            });
+                CartLines.Add(new CartLine() { Product = product, Quantity = quantity });
+            }
         }
+    }
+
+    public decimal ShippingCost()
+    {
+        return TotalPrice() >= 1000m || TotalPrice() == 0 ? 0m : 99m;
+    }
+
+    public decimal GrandTotal()
+    {
+        return TotalPrice() + ShippingCost();
     }
 }

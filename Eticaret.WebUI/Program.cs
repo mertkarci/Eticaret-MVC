@@ -1,8 +1,10 @@
 using System.Security.Claims;
+using System.Threading.RateLimiting;
 using Eticaret.Data;
 using Eticaret.Service.Abstract;
 using Eticaret.Service.Concrete;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -26,12 +28,69 @@ builder.Services.AddControllersWithViews(options =>
     options.Filters.Add(new Microsoft.AspNetCore.Mvc.AutoValidateAntiforgeryTokenAttribute());
 });
 
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+    options.AddFixedWindowLimiter("AuthLimit", limiterOptions =>
+    {
+        limiterOptions.PermitLimit = 5;
+        limiterOptions.Window = TimeSpan.FromMinutes(1);
+        limiterOptions.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+        limiterOptions.QueueLimit = 0;
+    });
+
+    options.AddTokenBucketLimiter("ProductLimit", limiterOptions =>
+    {
+        limiterOptions.TokenLimit = 30;
+
+        limiterOptions.ReplenishmentPeriod = TimeSpan.FromSeconds(10);
+
+        limiterOptions.TokensPerPeriod = 10;
+
+        limiterOptions.QueueLimit = 0;
+    });
+    options.AddFixedWindowLimiter("CheckoutLimit", limiterOptions =>
+        {
+            limiterOptions.PermitLimit = 3;
+            limiterOptions.Window = TimeSpan.FromMinutes(1);
+            limiterOptions.QueueLimit = 0;
+        });
+    options.AddFixedWindowLimiter("ContactLimit", limiterOptions =>
+        {
+            limiterOptions.PermitLimit = 3;
+            limiterOptions.Window = TimeSpan.FromMinutes(1);
+            limiterOptions.QueueLimit = 0;
+        });
+
+    // options.AddFixedWindowLimiter("CouponLimit", limiterOptions =>
+    // {
+    //     limiterOptions.PermitLimit = 5; // 1 dakikada maksimum 5 kupon denemesi
+    //     limiterOptions.Window = TimeSpan.FromMinutes(1);
+    //     limiterOptions.QueueLimit = 0;
+    // });
+
+    options.AddTokenBucketLimiter("CartLimit", limiterOptions =>
+    {
+        limiterOptions.TokenLimit = 15;
+        limiterOptions.ReplenishmentPeriod = TimeSpan.FromSeconds(10);
+        limiterOptions.TokensPerPeriod = 2;
+        limiterOptions.QueueLimit = 0;
+    });
+    options.AddFixedWindowLimiter("FormLimit", limiterOptions =>
+    {
+        limiterOptions.PermitLimit = 10;
+        limiterOptions.Window = TimeSpan.FromMinutes(1);
+        limiterOptions.QueueLimit = 0;
+    });
+    
+});
 
 builder.Services.AddSession(options =>
 {
     options.Cookie.Name = ".Eticaret.Session";
     options.Cookie.HttpOnly = true; // JS ile okunmasını engeller (XSS koruması)
-    options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // Sadece HTTPS üzerinden iletilir
+    options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
     options.Cookie.SameSite = SameSiteMode.Strict; // CSRF koruması
     options.Cookie.IsEssential = true;
     options.IdleTimeout = TimeSpan.FromDays(1);
@@ -42,7 +101,8 @@ builder.Services.AddScoped(typeof(IService<>), typeof(Service<>));
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserService, UserService>();
-
+builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<IProductService, ProductService>();
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(p =>
 {
@@ -51,8 +111,8 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 
     p.Cookie.Name = "Account";
     p.Cookie.HttpOnly = true; // JS ile çerez hırsızlığını engeller
-    p.Cookie.SecurePolicy = CookieSecurePolicy.Always; // Sadece HTTPS
-    p.Cookie.SameSite = SameSiteMode.Lax; 
+    p.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+    p.Cookie.SameSite = SameSiteMode.Lax;
     p.Cookie.IsEssential = true;
 
     p.ExpireTimeSpan = TimeSpan.FromDays(1);
@@ -101,7 +161,7 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-
+app.UseRateLimiter();
 app.UseSession();
 app.UseAuthentication(); // Önce kimlik doğrulama
 app.UseAuthorization();  // Sonra yetkilendirme

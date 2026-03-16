@@ -24,6 +24,8 @@
         <aside class="col-lg-3 mb-4">
             <!-- ID ve DATA-ATTRIBUTE EKLENDİ -->
             <div class="filter-sidebar" id="filter-container" data-filter-url="/Categories/FilterProducts">
+                <!-- C# GÜVENLİK ANAHTARI (Anti-Forgery Token) -->
+                @Html.AntiForgeryToken()
                 <div class="filter-card">
                     <!-- Kategori ID Hidden Input -->
                     <input type="hidden" id="categoryIdHidden" value="@Model.CurrentCategory.Id" />
@@ -83,17 +85,18 @@
                         <div class="d-flex align-items-center gap-2 filter-price-inputs">
                             <div class="input-group input-group-sm shadow-sm">
                                 <span class="input-group-text bg-white">₺</span>
-                                <input type="number" id="minPriceInput" name="minPrice" class="form-control border-start-0"
-                                    placeholder="Min" min="0">
+                                <input type="number" id="minPriceInput" name="minPrice"
+                                    class="form-control border-start-0" placeholder="Min" min="0">
                             </div>
                             <span class="text-muted fw-bold">-</span>
                             <div class="input-group input-group-sm shadow-sm">
                                 <span class="input-group-text bg-white">₺</span>
-                                <input type="number" id="maxPriceInput" name="maxPrice" class="form-control border-start-0"
-                                    placeholder="Max" min="0">
+                                <input type="number" id="maxPriceInput" name="maxPrice"
+                                    class="form-control border-start-0" placeholder="Max" min="0">
                             </div>
                         </div>
-                        <small class="text-muted mt-2 d-block" style="font-size: 0.7rem;">* Yazdıkça otomatik filtrelenir.</small>
+                        <small class="text-muted mt-2 d-block" style="font-size: 0.7rem;">* Yazdıkça otomatik
+                            filtrelenir.</small>
                     </div>
                 </div>
             </div>
@@ -122,5 +125,5 @@
 </div>
 
 @section Scripts {
-    <script src="~/js/product-filter.js"></script>
+    <script src="~/js/product-filter.js" asp-append-version="true"></script>
 }

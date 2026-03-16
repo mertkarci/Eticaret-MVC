@@ -8,6 +8,7 @@ using Eticaret.WebUI.Models;
 
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 
 namespace Eticaret.WebUI.Controllers
@@ -43,6 +44,7 @@ namespace Eticaret.WebUI.Controllers
             return View(model);
         }
         [HttpPost("ekle")]
+        [EnableRateLimiting("CartLimit")]
         public IActionResult Add(int ProductId, int quantity = 1)
         {
             var product = _serviceProduct.Find(ProductId);
@@ -65,6 +67,7 @@ namespace Eticaret.WebUI.Controllers
             return RedirectToAction("Index");
         }
         [HttpPost("guncelle")]
+        [EnableRateLimiting("CartLimit")]
         public IActionResult Update(int ProductId, int quantity = 1)
         {
             var product = _serviceProduct.Find(ProductId);
@@ -78,6 +81,7 @@ namespace Eticaret.WebUI.Controllers
             return RedirectToAction("Index");
         }
         [HttpPost("sil")]
+        [EnableRateLimiting("CartLimit")]
         public IActionResult Remove(int ProductId)
         {
             var product = _serviceProduct.Find(ProductId);
@@ -130,6 +134,8 @@ namespace Eticaret.WebUI.Controllers
             return HttpContext.Session.GetJson<CartService>("Cart") ?? new CartService();
         }
         [HttpPost("ödeme")]
+        [EnableRateLimiting("CheckoutLimit")]
+
         public async Task<IActionResult> Checkout(
             // Kart Bilgileri
             string CardNumber, string CardNameSurname, string CardMonth, string CardYear, string CVV,
@@ -146,7 +152,7 @@ namespace Eticaret.WebUI.Controllers
                 return RedirectToAction("Index");
             }
 
-    
+
             AppUser? userToProcess = null;
             var requestModel = new CheckoutRequest
             {
@@ -157,7 +163,6 @@ namespace Eticaret.WebUI.Controllers
                 CVV = CVV
             };
 
-            // KULLANICI KONTROLÜ 
             if (User.Identity.IsAuthenticated)
             {
                 var userGuidClaim = HttpContext.User.FindFirst("UserGuid");

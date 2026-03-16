@@ -1,4 +1,4 @@
-﻿using Eticaret.Core;
+﻿﻿using Eticaret.Core;
 using Eticaret.Core.Entities;
 
 namespace Eticaret.Service;
@@ -10,4 +10,7 @@ public interface ICartService
     void RemoveProduct(Product product);
     decimal TotalPrice();
     void ClearAll();
+    int TotalQuantity();
+    decimal ShippingCost();
+    decimal GrandTotal();
 }

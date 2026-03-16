@@ -2,10 +2,12 @@ using Eticaret.Core.Entities;
 using Eticaret.Service.Abstract;
 using Eticaret.WebUI.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 
 namespace Eticaret.WebUI.Controllers
 {
+    [EnableRateLimiting("ProductLimit")]
     public class ProductsController : Controller
     {
         private readonly IService<Product> _service;
@@ -20,6 +22,7 @@ namespace Eticaret.WebUI.Controllers
         }
 
         [Route("urun")]
+        [EnableRateLimiting("ProductLimit")]
         public async Task<IActionResult> Index(string q = "")
         {
             var productQuery = _service.GetQueryable();
@@ -83,13 +86,12 @@ namespace Eticaret.WebUI.Controllers
         {
             if (string.IsNullOrWhiteSpace(slug))
             {
-                return RedirectToAction(nameof(Index)); 
+                return RedirectToAction(nameof(Index));
             }
-            // 1. ADIM: Servis kontrolü
             var queryable = _service.GetQueryable();
             if (queryable == null)
             {
-         
+
                 return Content("Hata: Veritabanı sorgu kaynağı (GetQueryable) boş döndü.");
             }
 
@@ -105,7 +107,7 @@ namespace Eticaret.WebUI.Controllers
             var relatedProducts = await queryable
                 .Where(p => p.isActive && p.CategoryId == product.CategoryId && p.Id != product.Id)
                 .Take(4)
-                .ToListAsync() ?? new List<Product>(); 
+                .ToListAsync() ?? new List<Product>();
 
             var model = new ProductDetailViewModel()
             {

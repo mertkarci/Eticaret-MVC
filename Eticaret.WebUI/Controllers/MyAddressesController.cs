@@ -2,6 +2,8 @@ using Eticaret.Core.Entities;
 using Eticaret.Service.Abstract;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting; // Added for Rate Limiting
+using System.Security.Claims;
 
 namespace Eticaret.WebUI.Controllers
 {
@@ -16,123 +18,105 @@ namespace Eticaret.WebUI.Controllers
         {
             _serviceAppUser = serviceAppUser;
             _serviceAddress = serviceAddress;
-
         }
+
+        private async Task<AppUser?> GetCurrentUserAsync()
+        {
+            var userGuidStr = HttpContext.User.FindFirst("UserGuid")?.Value;
+            
+            if (string.IsNullOrEmpty(userGuidStr) || !Guid.TryParse(userGuidStr, out Guid parsedGuid))
+                return null;
+
+            return await _serviceAppUser.GetAsync(p => p.UserGuid == parsedGuid); 
+        }
+
+
         [HttpGet("")]
         public async Task<IActionResult> Index()
         {
-            var userGuidStr = HttpContext.User.FindFirst("UserGuid")?.Value;
-
-            if (string.IsNullOrEmpty(userGuidStr))
-            {
-                return NotFound("Oturumda UserGuid bulunamadı.");
-            }
-
-            var appUser = await _serviceAppUser.GetAsync(p => p.UserGuid.ToString().ToLower() == userGuidStr.ToLower());
-
-            if (appUser == null)
-            {
-                return NotFound("Kullanıcı bulunamadı! Veritabanında bu Guid'e sahip bir kayıt olmayabilir.");
-            }
+            var appUser = await GetCurrentUserAsync();
+            if (appUser == null) return RedirectToAction("SignIn", "Accounts");
 
             var model = await _serviceAddress.GetAllAsync(p => p.AppUserId == appUser.Id);
-
             return View(model);
         }
+
         [HttpGet("ekle")]
         public IActionResult Create()
         {
             return View();
         }
+
         [HttpPost("ekle")]
+        [ValidateAntiForgeryToken] 
+        [EnableRateLimiting("FormLimit")]
+
         public async Task<IActionResult> Create(Address address)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                try
-                {
-                    var userGuidStr = HttpContext.User.FindFirst("UserGuid")?.Value;
-
-                    if (string.IsNullOrEmpty(userGuidStr))
-                    {
-                        return NotFound("Oturumda UserGuid bulunamadı.");
-                    }
-
-                    // Karşılaştırmayı daha güvenli hale getirelim (büyük/küçük harf duyarlılığını ortadan kaldırarak)
-                    var appUser = await _serviceAppUser.GetAsync(p => p.UserGuid.ToString().ToLower() == userGuidStr.ToLower());
-                    if (appUser != null)
-                    {
-                        address.AppUserId = appUser.Id;
-                        _serviceAddress.Add(address);
-                        await _serviceAddress.SaveChangesAsync();
-                        return RedirectToAction(nameof(Index));
-                    }
-                }
-                catch (Exception)
-                {
-                    ModelState.AddModelError("", "Hata Oluştu");
-                }
-
+                ModelState.AddModelError("", "Lütfen formdaki hataları düzeltin.");
+                return View(address);
             }
-            ModelState.AddModelError("", "Kayıt Başarısız!");
-            return View(address);
+
+            try
+            {
+                var appUser = await GetCurrentUserAsync();
+                if (appUser == null) return RedirectToAction("SignIn", "Accounts");
+
+                address.AppUserId = appUser.Id;
+                
+                // Ensure new addresses get a fresh Guid if your DB doesn't generate it automatically
+                if (address.AddressGuid == Guid.Empty) 
+                    address.AddressGuid = Guid.NewGuid();
+
+                await _serviceAddress.AddAsync(address); // Prefer AddAsync if your service supports it
+                await _serviceAddress.SaveChangesAsync();
+                
+                TempData["Message"] = "Adres başarıyla eklendi.";
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception)
+            {
+                ModelState.AddModelError("", "Kayıt sırasında sistemsel bir hata oluştu.");
+                return View(address);
+            }
         }
+
         [HttpGet("duzenle/{**name}")]
         public async Task<IActionResult> Edit(string name)
         {
             if (string.IsNullOrEmpty(name)) return RedirectToAction(nameof(Index));
 
-            var userGuidStr = HttpContext.User.FindFirst("UserGuid")?.Value;
-
-            if (string.IsNullOrEmpty(userGuidStr))
-            {
-                return NotFound("Oturumda UserGuid bulunamadı. Lütfen tekrar giriş yapın.");
-            }
-
-            var appUser = await _serviceAppUser.GetAsync(p =>
-                p.UserGuid.ToString().ToLower() == userGuidStr.ToLower());
-
-            if (appUser == null)
-            {
-
-                return NotFound($"Kullanıcı bulunamadı! Aranan Guid: {userGuidStr}");
-            }
+            var appUser = await GetCurrentUserAsync();
+            if (appUser == null) return RedirectToAction("SignIn", "Accounts");
 
             var model = await _serviceAddress.GetAsync(p => p.Title == name && p.AppUserId == appUser.Id);
 
-            if (model != null) return View(model);
-
-            return NotFound("Adres bulunamadı!");
+            if (model == null) return NotFound("Adres bulunamadı!");
+            
+            return View(model);
         }
 
         [HttpPost("duzenle/{**name}")]
+        [ValidateAntiForgeryToken]
+        [EnableRateLimiting("FormLimit")]
+
         public async Task<IActionResult> Edit(string name, [FromForm] string id, Address address)
         {
-            if (string.IsNullOrEmpty(id)) return BadRequest("Geçersiz işlem: ID bulunamadı.");
-            var userGuidStr = HttpContext.User.FindFirst("UserGuid")?.Value;
+            if (string.IsNullOrEmpty(id) || !Guid.TryParse(id, out Guid parsedGuid)) 
+                return BadRequest("Geçersiz işlem: ID bulunamadı veya bozuk.");
 
-            if (string.IsNullOrEmpty(userGuidStr))
-            {
-                return NotFound("Oturumda UserGuid bulunamadı. Lütfen tekrar giriş yapın.");
-            }
-
-            var appUser = await _serviceAppUser.GetAsync(p =>
-                p.UserGuid.ToString().ToLower() == userGuidStr.ToLower());
-
-            if (appUser == null)
-            {
-                return NotFound($"Kullanıcı bulunamadı! Aranan Guid: {userGuidStr}");
-            }
-
-            if (!Guid.TryParse(id, out Guid parsedGuid))
-            {
-                return BadRequest("Bozuk veya geçersiz bir ID gönderildi.");
-            }
+            var appUser = await GetCurrentUserAsync();
+            if (appUser == null) return RedirectToAction("SignIn", "Accounts");
 
             var model = await _serviceAddress.GetAsync(p => p.AddressGuid == parsedGuid && p.AppUserId == appUser.Id);
 
-            if (model != null)
+            if (model == null) return NotFound("Adres bulunamadı veya bu adresi düzenleme yetkiniz yok!");
+
+            try
             {
+                // Update properties
                 model.Title = address.Title;
                 model.District = address.District;
                 model.City = address.City;
@@ -141,98 +125,74 @@ namespace Eticaret.WebUI.Controllers
                 model.IsBillingAddress = address.IsBillingAddress;
                 model.IsActive = address.IsActive;
 
+                // Handle Default Address Logic
                 if (model.IsDeliveryAddress || model.IsBillingAddress)
                 {
                     var otherAddresses = await _serviceAddress.GetAllAsync(p => p.AppUserId == appUser.Id && p.Id != model.Id);
                     foreach (var otherAddress in otherAddresses)
                     {
                         if (model.IsDeliveryAddress) otherAddress.IsDeliveryAddress = false;
-                        if (model.IsBillingAddress) otherAddress.IsBillingAddress = false;
+                        if (model.IsBillingAddress)  otherAddress.IsBillingAddress = false;
                         _serviceAddress.Update(otherAddress);
                     }
                 }
 
-                try
-                {
-                    _serviceAddress.Update(model);
-                    await _serviceAddress.SaveChangesAsync();
-                    return RedirectToAction(nameof(Index));
-                }
-                catch (Exception)
-                {
-                    ModelState.AddModelError("", "Kayıt sırasında bir hata oluştu.");
-                }
+                _serviceAddress.Update(model);
+                await _serviceAddress.SaveChangesAsync();
+                
+                TempData["Message"] = "Adres başarıyla güncellendi.";
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception)
+            {
+                ModelState.AddModelError("", "Kayıt sırasında bir hata oluştu.");
                 return View(model);
             }
-
-            return NotFound("Adres bulunamadı!");
         }
+
         [HttpGet("sil/{**name}")]
         public async Task<IActionResult> Delete(string name)
         {
-            var userGuidStr = HttpContext.User.FindFirst("UserGuid")?.Value;
+            if (string.IsNullOrEmpty(name)) return RedirectToAction(nameof(Index));
 
-            if (string.IsNullOrEmpty(userGuidStr))
-            {
-                return NotFound("Oturumda UserGuid bulunamadı.");
-            }
-
-            var appUser = await _serviceAppUser.GetAsync(p => p.UserGuid.ToString().ToLower() == userGuidStr.ToLower());
-
-            if (appUser == null)
-            {
-                return NotFound("Kullanıcı bulunamadı! Veritabanında bu Guid'e sahip bir kayıt olmayabilir.");
-            }
-
+            var appUser = await GetCurrentUserAsync();
+            if (appUser == null) return RedirectToAction("SignIn", "Accounts");
 
             var model = await _serviceAddress.GetAsync(p => p.Title.ToLower() == name.ToLower() && p.AppUserId == appUser.Id);
 
-            if (model != null)
-            {
-                return View(model);
-            }
-            else
-            {
-                return NotFound("Adres bulunamadı! Veritabanında bu isme sahip bir kayıt olmayabilir.");
-            }
+            if (model == null) return NotFound("Adres bulunamadı!");
+            
+            return View(model);
         }
 
-        [HttpPost("sil/{name}")]
+        [HttpPost("sil/{**name}")]
+        [ValidateAntiForgeryToken]
+        [EnableRateLimiting("FormLimit")]
         public async Task<IActionResult> Delete(string name, [FromForm] string id)
         {
-            var userGuidStr = HttpContext.User.FindFirst("UserGuid")?.Value;
+            if (string.IsNullOrEmpty(id) || !Guid.TryParse(id, out Guid parsedGuid)) 
+                return BadRequest("Geçersiz ID.");
 
-            if (string.IsNullOrEmpty(userGuidStr)) return NotFound("Oturumda UserGuid bulunamadı.");
+            var appUser = await GetCurrentUserAsync();
+            if (appUser == null) return RedirectToAction("SignIn", "Accounts");
 
-            var appUser = await _serviceAppUser.GetAsync(p => p.UserGuid.ToString().ToLower() == userGuidStr.ToLower());
+            var model = await _serviceAddress.GetAsync(p => p.AddressGuid == parsedGuid && p.AppUserId == appUser.Id);
 
-            if (appUser == null) return NotFound("Kullanıcı bulunamadı!");
+            if (model == null) return NotFound("Adres bulunamadı veya silmeye yetkiniz yok.");
 
-
-            if (string.IsNullOrEmpty(id)) return BadRequest("Silinecek adresin kimliği (ID) bulunamadı.");
-
-
-            var model = await _serviceAddress.GetAsync(p => p.AddressGuid.ToString().ToLower() == id.ToLower() && p.AppUserId == appUser.Id);
-
-            if (model != null)
+            try
             {
-                try
-                {
-                    _serviceAddress.Delete(model);
-                    await _serviceAddress.SaveChangesAsync();
-                    return RedirectToAction(nameof(Index)); 
-                }
-                catch (Exception)
-                {
-                    ModelState.AddModelError("", "Silme işlemi sırasında bir hata oluştu.");
-                }
-                return View(model); 
+                _serviceAddress.Delete(model);
+                await _serviceAddress.SaveChangesAsync();
+                
+                TempData["Message"] = "Adres başarıyla silindi.";
+                return RedirectToAction(nameof(Index)); 
             }
-            else
+            catch (Exception)
             {
-                return NotFound("Adres bulunamadı veya silmeye yetkiniz yok.");
+                ModelState.AddModelError("", "Silme işlemi sırasında bir hata oluştu.");
+                return View(model); 
             }
         }
     }
-
 }
