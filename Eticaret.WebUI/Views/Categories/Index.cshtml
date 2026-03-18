@@ -4,112 +4,117 @@
     ViewData["Title"] = Model.CurrentCategory.Name;
 }
 
-<link rel="stylesheet" href="~/css/category-filter.css" asp-append-version="true" />
-
-<div class="bg-light py-4 mb-5 border-bottom">
-    <div class="container">
-        <h1 class="h3 mb-0 text-dark fw-bold">@Model.CurrentCategory.Name</h1>
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb mb-0 mt-2 small">
-                <li class="breadcrumb-item"><a href="/" class="text-decoration-none text-muted">Ana Sayfa</a></li>
-                <li class="breadcrumb-item active" aria-current="page">@Model.CurrentCategory.Name</li>
+<!-- ÜST BİLGİ VE BREADCRUMB -->
+<div class="bg-gray-50 dark:bg-slate-800/50 py-6 md:py-8 border-b border-gray-200 dark:border-slate-700">
+    <div class="container mx-auto px-4 max-w-7xl">
+        <nav aria-label="breadcrumb" class="mb-3">
+            <ol class="flex flex-wrap items-center text-xs font-semibold tracking-wide text-gray-400 dark:text-gray-500 uppercase gap-y-2">
+                <li class="flex items-center">
+                    <a href="/" class="hover:text-gray-900 dark:hover:text-gray-200 transition-colors no-underline text-inherit">Ana Sayfa</a>
+                </li>
+                <li class="flex items-center px-2"><span class="text-gray-300 dark:text-gray-600">/</span></li>
+                <li class="text-gray-800 dark:text-gray-300 truncate" aria-current="page">@Model.CurrentCategory.Name</li>
             </ol>
         </nav>
+        <h1 class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white m-0 tracking-tight">@Model.CurrentCategory.Name</h1>
     </div>
 </div>
 
-<div class="container mb-5">
-    <div class="row">
+<div class="container mx-auto px-4 py-8 max-w-7xl mb-8">
+    <div class="flex flex-col lg:flex-row gap-8 items-start">
 
-        <aside class="col-lg-3 mb-4">
-            <!-- ID ve DATA-ATTRIBUTE EKLENDİ -->
-            <div class="filter-sidebar" id="filter-container" data-filter-url="/Categories/FilterProducts">
-                <!-- C# GÜVENLİK ANAHTARI (Anti-Forgery Token) -->
+        <!-- SOL MENÜ (FİLTRELER) -->
+        <aside class="w-full lg:w-1/4 flex-shrink-0 lg:sticky lg:top-24">
+            <div id="filter-container" data-filter-url="/Categories/FilterProducts" class="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl p-5 md:p-6 shadow-sm">
                 @Html.AntiForgeryToken()
-                <div class="filter-card">
-                    <!-- Kategori ID Hidden Input -->
-                    <input type="hidden" id="categoryIdHidden" value="@Model.CurrentCategory.Id" />
 
-                    <div class="mb-4">
-                        <div class="filter-title">Ürün Ara</div>
-                        <div class="input-group">
-                            <input type="text" id="searchInput" class="form-control form-control-sm bg-light border-0"
-                                placeholder="Kelime yazın...">
-                            <button class="btn btn-light border-0" type="button"><i class="bi bi-search"></i></button>
+                <input type="hidden" id="categoryIdHidden" value="@Model.CurrentCategory.Id" />
+
+                <!-- Arama Kutusu -->
+                <div class="mb-6">
+                    <h3 class="text-xs font-bold text-gray-900 dark:text-white uppercase tracking-wider mb-3 pb-2 border-b border-gray-100 dark:border-slate-700">Ürün Ara</h3>
+                    <div class="relative">
+                        <input type="text" id="searchInput" class="w-full bg-gray-50 dark:bg-slate-900 text-gray-800 dark:text-gray-200 text-sm rounded-lg border border-gray-200 dark:border-slate-600 pl-3 pr-10 py-2.5 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all placeholder-gray-400" placeholder="Kelime yazın...">
+                        <button class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-primary transition-colors focus:outline-none bg-transparent border-0 p-0" type="button">
+                            <i class="bi bi-search"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Markalar -->
+                @if (Model.AvailableBrands != null && Model.AvailableBrands.Any())
+                {
+                    <div class="mb-6">
+                        <h3 class="text-xs font-bold text-gray-900 dark:text-white uppercase tracking-wider mb-3 pb-2 border-b border-gray-100 dark:border-slate-700">Markalar</h3>
+                        <div class="filter-brand-list space-y-3 max-h-48 overflow-y-auto pr-2 custom-scrollbar">
+                            @foreach (var brand in Model.AvailableBrands)
+                            {
+                                <!-- Modern Custom Checkbox Yapısı -->
+                                <label class="flex items-center gap-3 cursor-pointer group !mb-0" for="brand_@brand.Id">
+                                    <div class="relative flex items-center justify-center flex-shrink-0">
+                                        <input type="checkbox" name="SelectedBrands" value="@brand.Id" id="brand_@brand.Id" class="peer sr-only filter-checkbox">
+                                        <div class="w-5 h-5 bg-white dark:bg-slate-800 border-2 border-gray-300 dark:border-slate-600 rounded-[4px] peer-checked:!bg-primary peer-checked:!border-primary transition-all flex items-center justify-center group-hover:border-primary/60 shadow-sm">
+                                            <i class="bi bi-check2 text-white text-lg opacity-0 peer-checked:opacity-100 transition-opacity mt-0.5"></i>
+                                        </div>
+                                    </div>
+                                    <span class="text-sm font-medium text-gray-700 dark:text-gray-300 group-hover:text-primary transition-colors select-none">@brand.Name</span>
+                                </label>
+                            }
                         </div>
                     </div>
+                }
 
-                    @if (Model.AvailableBrands != null && Model.AvailableBrands.Any())
-                    {
-                        <div>
-                            <div class="filter-title">Markalar</div>
-                            <div class="filter-brand-list">
-                                @foreach (var brand in Model.AvailableBrands)
-                                {
-                                    <div class="form-check custom-checkbox mb-2">
-                                        <input class="form-check-input filter-checkbox" type="checkbox" name="SelectedBrands"
-                                            value="@brand.Id" id="brand_@brand.Id">
-                                        <label class="form-check-label d-flex justify-content-between align-items-center"
-                                            for="brand_@brand.Id">
-                                            <span>@brand.Name</span>
-                                        </label>
+                <!-- Alt Kategoriler -->
+                @if (Model.SubCategories != null && Model.SubCategories.Any())
+                {
+                    <div class="mb-6">
+                        <h3 class="text-xs font-bold text-gray-900 dark:text-white uppercase tracking-wider mb-3 pb-2 border-b border-gray-100 dark:border-slate-700">Alt Kategoriler</h3>
+                        <div class="filter-categories-list space-y-3 max-h-48 overflow-y-auto pr-2 custom-scrollbar">
+                            @foreach (var subCategory in Model.SubCategories)
+                            {
+                                <label class="flex items-center gap-3 cursor-pointer group !mb-0" for="subCategory_@subCategory.Id">
+                                    <div class="relative flex items-center justify-center flex-shrink-0">
+                                        <input type="checkbox" name="SelectedCategories" value="@subCategory.Id" id="subCategory_@subCategory.Id" class="peer sr-only filter-checkbox">
+                                        <div class="w-5 h-5 bg-white dark:bg-slate-800 border-2 border-gray-300 dark:border-slate-600 rounded-[4px] peer-checked:!bg-primary peer-checked:!border-primary transition-all flex items-center justify-center group-hover:border-primary/60 shadow-sm">
+                                            <i class="bi bi-check2 text-white text-lg opacity-0 peer-checked:opacity-100 transition-opacity mt-0.5"></i>
+                                        </div>
                                     </div>
-                                }
-                            </div>
+                                    <span class="text-sm font-medium text-gray-700 dark:text-gray-300 group-hover:text-primary transition-colors select-none">@subCategory.Name</span>
+                                </label>
+                            }
                         </div>
-                    }
+                    </div>
+                }
 
-                    @if (Model.SubCategories != null && Model.SubCategories.Any())
-                    {
-                        <div class="mt-4">
-                            <div class="filter-title">Alt Kategoriler</div>
-                            <div class="filter-categories-list">
-                                @foreach (var subCategory in Model.SubCategories)
-                                {
-                                    <div class="form-check custom-checkbox mb-2">
-                                        <input class="form-check-input filter-checkbox" type="checkbox"
-                                            name="SelectedCategories" value="@subCategory.Id" id="subCategory_@subCategory.Id">
-                                        <label class="form-check-label d-flex justify-content-between align-items-center"
-                                            for="subCategory_@subCategory.Id">
-                                            <span>@subCategory.Name</span>
-                                        </label>
-                                    </div>
-                                }
-                            </div>
+                <!-- Fiyat Aralığı -->
+                <div class="mb-2">
+                    <h3 class="text-xs font-bold text-gray-900 dark:text-white uppercase tracking-wider mb-3 pb-2 border-b border-gray-100 dark:border-slate-700">Fiyat Aralığı</h3>
+                    
+                    <div class="flex items-center justify-between gap-3 filter-price-inputs">
+                        <div class="relative flex-1">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500 dark:text-gray-400 font-medium text-sm pointer-events-none">₺</span>
+                            <input type="number" id="minPriceInput" name="minPrice" class="w-full bg-gray-50 dark:bg-slate-900 text-gray-800 dark:text-gray-200 text-sm rounded-lg border border-gray-200 dark:border-slate-600 !pl-8 pr-2 py-2.5 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all placeholder-gray-400" placeholder="Min" min="0">
                         </div>
-                    }
-
-                    <div class="mb-4 mt-4">
-                        <div class="filter-title">Fiyat Aralığı</div>
-
-                        <div class="d-flex align-items-center gap-2 filter-price-inputs">
-                            <div class="input-group input-group-sm shadow-sm">
-                                <span class="input-group-text bg-white">₺</span>
-                                <input type="number" id="minPriceInput" name="minPrice"
-                                    class="form-control border-start-0" placeholder="Min" min="0">
-                            </div>
-                            <span class="text-muted fw-bold">-</span>
-                            <div class="input-group input-group-sm shadow-sm">
-                                <span class="input-group-text bg-white">₺</span>
-                                <input type="number" id="maxPriceInput" name="maxPrice"
-                                    class="form-control border-start-0" placeholder="Max" min="0">
-                            </div>
+                        <span class="text-gray-400 font-bold">-</span>
+                        <div class="relative flex-1">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500 dark:text-gray-400 font-medium text-sm pointer-events-none">₺</span>
+                            <input type="number" id="maxPriceInput" name="maxPrice" class="w-full bg-gray-50 dark:bg-slate-900 text-gray-800 dark:text-gray-200 text-sm rounded-lg border border-gray-200 dark:border-slate-600 !pl-8 pr-2 py-2.5 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all placeholder-gray-400" placeholder="Max" min="0">
                         </div>
-                        <small class="text-muted mt-2 d-block" style="font-size: 0.7rem;">* Yazdıkça otomatik
-                            filtrelenir.</small>
                     </div>
                 </div>
             </div>
         </aside>
 
-        <main class="col-lg-9">
-            <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
-                <span class="text-muted small fw-medium">
-                    <i class="bi bi-box-seam me-1"></i> Toplam <strong
-                        class="text-dark">@Model.FilteredProducts.Count</strong> ürün listeleniyor.
-                </span>
+        <!-- SAĞ MENÜ (ÜRÜN LİSTESİ) -->
+        <main class="w-full lg:w-3/4 flex flex-col">
+            
+            <!-- Filtre Barı (Sayfa Başı) -->
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 pb-4 border-b border-gray-200 dark:border-slate-700">
+                <div class="text-sm text-gray-500 dark:text-gray-400 font-medium">
+                    <i class="bi bi-box-seam me-1"></i> Toplam <strong id="productCount" class="text-gray-900 dark:text-white font-bold">@Model.FilteredProducts.Count</strong> ürün listeleniyor.
+                </div>
 
-                <select class="form-select form-select-sm border-0 bg-light w-auto fw-medium shadow-none">
+                <select id="sortSelect" class="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 text-gray-700 dark:text-gray-200 text-sm rounded-lg focus:ring-primary focus:border-primary block py-2 px-3 outline-none shadow-sm cursor-pointer min-w-[160px]">
                     <option value="recommended">Önerilen Sıralama</option>
                     <option value="price_asc">En Düşük Fiyat</option>
                     <option value="price_desc">En Yüksek Fiyat</option>
@@ -117,7 +122,8 @@
                 </select>
             </div>
 
-            <div id="productListContainer" class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4">
+            <!-- Ürünlerin Geldiği Grid -->
+            <div id="productListContainer" class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
                 <partial name="_ProductListPartial" model="Model.FilteredProducts"></partial>
             </div>
         </main>

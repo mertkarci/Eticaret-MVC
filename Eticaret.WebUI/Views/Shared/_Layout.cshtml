@@ -1,5 +1,5 @@
 ﻿﻿<!DOCTYPE html>
-<html lang="tr">
+<html lang="tr" class="light">
 
 <head>
     <meta charset="utf-8" />
@@ -15,9 +15,38 @@
     <!-- Dinamik Tema Ayarları (ViewComponent) -->
     @await Component.InvokeAsync("Theme")
     @await RenderSectionAsync("Styles", required: false)
+
+    <!-- Tailwind CSS ve Dark Mode Ayarları -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class', // Karanlık mod için 'dark' sınıfını baz alır
+            corePlugins: {
+                preflight: false, // Bootstrap ile çakışmayı önlemek için varsayılan sıfırlamayı kapatır
+            },
+            theme: {
+                extend: {
+                    colors: {
+                        // ViewComponent'ten (site.css'den) gelen CSS değişkenlerini Tailwind ile eşleştiriyoruz
+                        primary: 'var(--main-color)',
+                        secondary: 'var(--secondary-color)',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- FOUC (Sayfa yüklenirken parlama) Engellemek için Dark Mode Kontrolü -->
+    <script>
+        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    </script>
 </head>
 
-<body>
+<body class="!bg-white dark:!bg-slate-900 !text-gray-800 dark:!text-gray-200 transition-colors duration-300">
     <partial name="_Header"></partial>
     <div class="d-flex flex-column flex-grow-1">
         <main role="main" class="main-page flex-grow-1">
@@ -29,6 +58,7 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/favourites.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 
     @if (ViewData["ShowCart"] as bool? == true)

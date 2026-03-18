@@ -4,93 +4,98 @@
     ViewData["Title"] = "Adresi Düzenle";
 }
 
-<div class="container py-4 py-md-5">
-    <div class="row justify-content-center align-items-center" style="min-height: 75vh;">
-        <div class="col-12 col-md-10 col-lg-8">
-            <div class="shadow-sm p-4 p-md-5">
-                <div class="d-flex align-items-center mb-3 mb-md-4">
-                    <a href="@Url.Action("Index")" class="btn btn-outline-secondary rounded-circle me-3 d-flex align-items-center justify-content-center flex-shrink-0" style="width: 40px; height: 40px;">
-                        <i class="bi bi-arrow-left"></i>
+<div class="min-h-[75vh] bg-gray-50 dark:bg-slate-900/50 py-8 sm:py-12 px-4 flex items-start sm:items-center justify-center">
+    <div class="w-full max-w-lg mx-auto">
+        
+        <div class="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden">
+            
+            <div class="px-5 sm:px-6 py-4 border-b border-gray-100 dark:border-slate-700/50 flex items-center justify-between bg-gray-50/50 dark:bg-slate-800/50">
+                <div class="flex items-center gap-3">
+                    <a href="@Url.Action("Index")" class="w-8 h-8 flex items-center justify-center bg-white dark:bg-slate-700 border border-gray-200 dark:border-slate-600 text-gray-600 dark:text-gray-300 rounded-md hover:bg-gray-100 dark:hover:bg-slate-600 transition-all shadow-sm focus:outline-none">
+                        <i class="bi bi-arrow-left text-sm"></i>
                     </a>
+                    <h2 class="text-lg font-bold text-gray-900 dark:text-white m-0 tracking-tight">Adresi Düzenle</h2>
+                </div>
+                <a asp-action="Delete" asp-route-name="@Model.Title" class="w-8 h-8 flex items-center justify-center text-red-500 bg-red-50 hover:bg-red-500 hover:text-white dark:bg-red-500/10 dark:hover:bg-red-500 rounded-md transition-all duration-300 focus:outline-none" title="Adresi Sil">
+                    <i class="bi bi-trash text-sm"></i>
+                </a>
+            </div>
+
+            <form asp-action="Edit" asp-route-name="@Model.Title" method="post">
+                
+                <div asp-validation-summary="ModelOnly" class="text-red-500 text-xs px-5 pt-4 pb-1"></div>
+                
+                <input type="hidden" name="id" value="@Model.AddressGuid" />
+                <input type="hidden" asp-for="Id" />
+                <input type="hidden" asp-for="CreateDate" />
+
+                <div class="p-5 sm:p-6 space-y-4">
+                    
                     <div>
-                        <h2 class="fw-bold text-dark mb-0 fs-3 fs-md-2">Adresi Düzenle</h2>
-                        <p class="text-muted small mb-0 text-break">" @Model.Title " başlıklı adresinizi güncelleyin.</p>
+                        <label asp-for="Title" class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1.5 uppercase tracking-wide"></label>
+                        <input asp-for="Title" class="w-full bg-gray-50 dark:bg-slate-900 text-gray-900 dark:text-white text-sm border border-gray-200 dark:border-slate-600 rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all duration-200" placeholder="Örn: Ev Adresim, İş Adresim" />
+                        <span asp-validation-for="Title" class="text-red-500 text-[11px] mt-1 block"></span>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label asp-for="City" class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1.5 uppercase tracking-wide"></label>
+                            <input asp-for="City" class="w-full bg-gray-50 dark:bg-slate-900 text-gray-900 dark:text-white text-sm border border-gray-200 dark:border-slate-600 rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all duration-200" />
+                            <span asp-validation-for="City" class="text-red-500 text-[11px] mt-1 block"></span>
+                        </div>
+                        <div>
+                            <label asp-for="District" class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1.5 uppercase tracking-wide"></label>
+                            <input asp-for="District" class="w-full bg-gray-50 dark:bg-slate-900 text-gray-900 dark:text-white text-sm border border-gray-200 dark:border-slate-600 rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all duration-200" />
+                            <span asp-validation-for="District" class="text-red-500 text-[11px] mt-1 block"></span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label asp-for="OpenAddress" class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1.5 uppercase tracking-wide"></label>
+                        <textarea asp-for="OpenAddress" rows="2" class="w-full bg-gray-50 dark:bg-slate-900 text-gray-900 dark:text-white text-sm border border-gray-200 dark:border-slate-600 rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all duration-200 resize-y" placeholder="Mahalle, sokak, bina ve daire no..."></textarea>
+                        <span asp-validation-for="OpenAddress" class="text-red-500 text-[11px] mt-1 block"></span>
+                    </div>
+
+                    <hr class="border-gray-100 dark:border-slate-700/50 my-1">
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
+                        <div>
+                            <h6 class="font-bold text-gray-900 dark:text-white mb-3 text-[11px] uppercase tracking-wider">Adres Türü</h6>
+                            
+                            <label class="flex items-start cursor-pointer group mb-3">
+                                <input type="checkbox" asp-for="IsDeliveryAddress" class="sr-only peer">
+                                <div class="relative flex-shrink-0 w-11 h-6 mt-0.5 shadow-inner bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary"></div>
+                                <span class="ml-3 text-sm font-medium text-gray-700 dark:text-gray-300 group-hover:text-primary transition-colors leading-snug">Teslimat Adresi</span>
+                            </label>
+                            
+                            <label class="flex items-start cursor-pointer group">
+                                <input type="checkbox" asp-for="IsBillingAddress" class="sr-only peer">
+                                <div class="relative flex-shrink-0 w-11 h-6 mt-0.5 shadow-inner bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary"></div>
+                                <span class="ml-3 text-sm font-medium text-gray-700 dark:text-gray-300 group-hover:text-primary transition-colors leading-snug">Fatura Adresi</span>
+                            </label>
+                        </div>
+                        
+                        <div>
+                            <h6 class="font-bold text-gray-900 dark:text-white mb-3 text-[11px] uppercase tracking-wider">Durum</h6>
+                            
+                            <label class="flex items-start cursor-pointer group">
+                                <input type="checkbox" asp-for="IsActive" class="sr-only peer">
+                                <div class="relative flex-shrink-0 w-11 h-6 mt-0.5 shadow-inner bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-emerald-500"></div>
+                                <span class="ml-3 text-sm font-medium text-gray-700 dark:text-gray-300 group-hover:text-emerald-500 transition-colors leading-snug">Bu adresi aktif olarak kullan</span>
+                            </label>
+                        </div>
                     </div>
                 </div>
 
-                <form asp-action="Edit" asp-route-name="@Model.Title" method="post">
-                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
-                    
-                    <input type="hidden" name="id" value="@Model.AddressGuid" />
-                    
-                    <input type="hidden" asp-for="Id" />
-                    <input type="hidden" asp-for="CreateDate" />
-
-                    <div class="card border-0">
-                        <div class="card-body p-3 p-md-4 ">
-                            <div class="mb-4">
-                                <label asp-for="Title" class="form-label fw-bold"></label>
-                                <input asp-for="Title" class="form-control form-control-lg" placeholder="Örn: Ev Adresim, İş Adresim" />
-                                <span asp-validation-for="Title" class="text-danger small"></span>
-                            </div>
-
-                            <div class="row g-3 mb-4">
-                                <div class="col-md-6">
-                                    <label asp-for="City" class="form-label fw-bold"></label>
-                                    <input asp-for="City" class="form-control" />
-                                    <span asp-validation-for="City" class="text-danger small"></span>
-                                </div>
-                                <div class="col-md-6">
-                                    <label asp-for="District" class="form-label fw-bold"></label>
-                                    <input asp-for="District" class="form-control" />
-                                    <span asp-validation-for="District" class="text-danger small"></span>
-                                </div>
-                            </div>
-
-                            <div class="mb-4">
-                                <label asp-for="OpenAddress" class="form-label fw-bold"></label>
-                                <textarea asp-for="OpenAddress" class="form-control" rows="3" placeholder="Mahalle, sokak, bina ve daire no..."></textarea>
-                                <span asp-validation-for="OpenAddress" class="text-danger small"></span>
-                            </div>
-
-                            <hr class="my-4">
-
-                            <div class="row">
-                                <div class="col-md-6 px-4">
-                                    <h6 class="fw-bold mb-3">Adres Türü</h6>
-                                    <div class="form-check form-switch mb-2">
-                                        <input class="form-check-input" asp-for="IsDeliveryAddress" />
-                                        <label class="form-check-label" asp-for="IsDeliveryAddress">Teslimat Adresi</label>
-                                    </div>
-                                    <div class="form-check form-switch">
-                                        <input class="form-check-input" asp-for="IsBillingAddress" />
-                                        <label class="form-check-label" asp-for="IsBillingAddress">Fatura Adresi</label>
-                                    </div>
-                                </div>
-                                <div class="col-md-6 mt-3 mt-md-0 px-4" >
-                                    <h6 class="fw-bold mb-3">Durum</h6>
-                                    <div class="form-check form-switch">
-                                        <input class="form-check-input" asp-for="IsActive" />
-                                        <label class="form-check-label" asp-for="IsActive">Bu adresi aktif olarak kullan</label>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="card-footer bg-light p-3 d-flex flex-column flex-md-row gap-2 align-items-center">
-                            
-                            <a asp-action="Delete" asp-route-name="@Model.Title" class="btn btn-outline-danger rounded-pill px-4 w-100 w-md-auto me-md-auto order-2 order-md-0 text-nowrap">
-                                <i class="bi bi-trash me-1"></i> Sil
-                            </a>
-                            
-                            <a asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4 w-100 w-md-auto order-1 order-md-1 text-nowrap">İptal</a>
-                            
-                            <button type="submit" value="Kaydet" class="btn btn-primary rounded-pill px-4 w-100 w-md-auto order-0 order-md-2 text-nowrap">
-                                <i class="bi bi-check-circle me-1 d-none d-lg-inline"></i> Değişiklikleri Kaydet
-                            </button>
-                        </div>
-                    </div>
-                </form>
-            </div>
+                <div class="bg-gray-50/80 dark:bg-slate-800/80 border-t border-gray-100 dark:border-slate-700 p-4 sm:px-6 flex justify-end gap-2">
+                    <a asp-action="Index" class="w-full sm:w-auto px-5 py-2 text-sm font-semibold text-gray-700 hover:text-gray-900 bg-white hover:bg-gray-50 dark:bg-slate-700 dark:text-gray-300 dark:hover:bg-slate-600 dark:hover:text-white border border-gray-300 dark:border-slate-600 rounded-lg transition-all duration-300 text-center shadow-sm focus:outline-none">
+                        İptal
+                    </a>
+                    <button type="submit" class="w-full sm:w-auto inline-flex justify-center items-center px-6 py-2 bg-primary hover:bg-primary/90 text-white text-sm font-bold rounded-lg shadow-sm hover:shadow-md transform hover:-translate-y-0.5 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-primary/30">
+                        <i class="bi bi-check-circle me-1.5 hidden sm:inline-block"></i> Kaydet
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 </div>

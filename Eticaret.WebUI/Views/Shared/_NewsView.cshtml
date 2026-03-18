@@ -1,67 +1,56 @@
 @model Eticaret.Core.Entities.News
 
-<div class="col mb-4">
-    <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden news-card-hover">
-        <a asp-controller="News" asp-action="Details" asp-route-id="@Model.Id" class="...">
-            <div class="position-relative overflow-hidden" style="height: 240px;">
-                @if (!string.IsNullOrEmpty(Model.Image))
-                {
-                    <img src="/img/news/@Model.Image" class="w-100 h-100 object-fit-cover transition-scale"
-                        alt="@Model.Name">
-                }
-                else
-                {
-                    <div class="w-100 h-100 bg-light d-flex align-items-center justify-content-center">
-                        <i class="bi bi-image text-muted fs-1"></i>
-                    </div>
-                }
-
-                <div class="position-absolute top-0 end-0 m-3">
-                    <span class="badge bg-white text-dark shadow-sm rounded-pill px-3 py-2">
-                        <i class="bi bi-calendar-event me-1 text-primary"></i> @Model.CreateDate.ToString("dd MMM")
-                    </span>
-                </div>
+<!-- Modern SaaS Stili: Dışarıda padding, içeride yuvarlatılmış resim -->
+<div class="group relative bg-white dark:bg-slate-800 rounded-[2rem] p-3 border border-gray-100/80 dark:border-slate-700/80 shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 flex flex-col h-full">
+    
+    <!-- İç İçe Yuvarlatılmış Resim Alanı -->
+    <div class="relative h-56 w-full rounded-[1.5rem] overflow-hidden bg-gray-50 dark:bg-slate-700 flex-shrink-0">
+        @if (!string.IsNullOrEmpty(Model.Image))
+        {
+            <img src="/img/news/@Model.Image" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-in-out" alt="@Model.Name">
+        }
+        else
+        {
+            <div class="w-full h-full flex items-center justify-center">
+                <i class="bi bi-image text-gray-300 dark:text-gray-500 text-5xl"></i>
             </div>
-        </a>
+        }
 
+        <!-- Hover anında beliren çok hafif karanlık katman -->
+        <div class="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+    </div>
 
-        <div class="card-body p-4 d-flex flex-column">
-            <h5 class="fw-bold mb-3 text-truncate">@Model.Name</h5>
-
-            <p class="text-secondary small mb-4 flex-grow-1"
-                style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.6;">
-                @Model.Description
-            </p>
-
-            <div class="d-flex align-items-center justify-content-between pt-3 border-top border-light mt-auto">
-                <span class="text-primary fw-bold small">Devamını Oku</span>
-                <i class="bi bi-arrow-right text-primary"></i>
-            </div>
+    <!-- İçerik Alanı -->
+    <div class="px-4 py-5 flex flex-col flex-grow">
+        
+        <!-- Etiket ve Tarih -->
+        <div class="flex items-center justify-between mb-4">
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 text-primary text-[11px] font-black uppercase tracking-wider">
+                <i class="bi bi-megaphone-fill"></i> Duyuru
+            </span>
+            <span class="text-gray-400 dark:text-gray-500 text-xs font-semibold flex items-center gap-1.5">
+                <i class="bi bi-calendar3"></i> @Model.CreateDate.ToString("dd MMM yyyy")
+            </span>
         </div>
-        </a>
+
+        <!-- Başlık (Linkin kapsama alanını genişleten sihirli before hilesi kullanıldı) -->
+        <h5 class="font-bold text-xl text-gray-900 dark:text-white mb-3 line-clamp-2 group-hover:text-primary transition-colors leading-snug">
+            <a asp-controller="News" asp-action="Details" asp-route-id="@Model.Id" class="before:absolute before:inset-0 text-decoration-none text-inherit">
+                @Model.Name
+            </a>
+        </h5>
+
+        <!-- Açıklama -->
+        <p class="text-gray-500 dark:text-gray-400 text-sm line-clamp-3 mb-6 leading-relaxed">
+            @Model.Description
+        </p>
+
+        <!-- Yuvarlak Ok Animasyonlu Devamını Oku Butonu -->
+        <div class="mt-auto flex items-center gap-3 text-primary font-bold text-sm">
+            <span>İncele</span>
+            <span class="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 group-hover:bg-primary group-hover:text-white transition-all duration-300 transform group-hover:translate-x-2">
+                <i class="bi bi-arrow-right"></i>
+            </span>
+        </div>
     </div>
 </div>
-
-<style>
-    .news-card-hover {
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-        background-color: #fff;
-    }
-
-    .news-card-hover:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1) !important;
-    }
-
-    .news-card-hover:hover .transition-scale {
-        transform: scale(1.05);
-    }
-
-    .transition-scale {
-        transition: transform 0.5s ease;
-    }
-
-    .object-fit-cover {
-        object-fit: cover;
-    }
-</style>

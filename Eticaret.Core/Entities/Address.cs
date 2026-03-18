@@ -30,11 +30,22 @@ namespace Eticaret.Core.Entities
         [Display(Name = "Kayıt Tarihi"), ScaffoldColumn(false)]
         public DateTime CreateDate { get; set; } = DateTime.Now;
 
+        [Display(Name = "TC Kimlik No"), StringLength(11)]
+        public string? TcNo { get; set; }
+
+        [Display(Name = "Vergi No"), StringLength(20)]
+        public string? TaxNumber { get; set; }
+
+        [Display(Name = "Vergi Dairesi"), StringLength(50)]
+        public string? TaxOffice { get; set; }
+
+        [Display(Name = "Kurumsal Fatura Mı?")]
+        public bool IsCorporate { get; set; }
+
         [ScaffoldColumn(false)]
         public Guid? AddressGuid { get; set; } = Guid.NewGuid();
 
-        public int? AppUserId {get;set;}
-        public AppUser? AppUser {get; set;}
-    
+        public int? AppUserId { get; set; }
+        public AppUser? AppUser { get; set; }
     }
 }

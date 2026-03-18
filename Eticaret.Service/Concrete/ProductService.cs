@@ -30,7 +30,6 @@ public class ProductService : IProductService
     {
         var query = _productService.GetQueryable().Include(p => p.Brand).Include(p => p.Category).AsQueryable();
 
-        // Marka ve Kategori Filtreleri
         if (selectedBrands != null && selectedBrands.Any())
             query = query.Where(p => selectedBrands.Contains(p.BrandId));
 

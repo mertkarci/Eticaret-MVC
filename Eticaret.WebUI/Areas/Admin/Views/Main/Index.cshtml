@@ -1,122 +1,296 @@
 @{
     ViewData["Title"] = "Admin Ana Sayfa";
 }
-<div class="row">
-    <div class="col-xl-3 col-md-6">
-        <div class="card bg-primary text-white mb-4">
-            <div class="card-body">Primary Card</div>
-            <div class="card-footer d-flex align-items-center justify-content-between">
-                <a class="small text-white stretched-link" href="#">View Details</a>
-                <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+
+<!-- Tailwind CSS CDN ve Ayarları -->
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+    tailwind.config = {
+        corePlugins: {
+            preflight: false, // Bootstrap ile çakışmayı önlemek için sıfırlamayı kapatıyoruz
+        }
+    }
+</script>
+
+<div class="p-4" style="font-family: 'Inter', system-ui, sans-serif;">
+    
+    <!-- İSTATİSTİK KARTLARI (Grid Yapısı) -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        
+        <!-- Ciro Kartı -->
+        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col justify-between">
+            <div class="p-6 flex justify-between items-center">
+                <div>
+                    <p class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-1">Toplam Satış</p>
+                    <h4 class="text-2xl font-bold text-gray-800 m-0">@ViewBag.TotalSales.ToString("C")</h4>
+                </div>
+                <div class="w-14 h-14 rounded-xl flex items-center justify-center bg-blue-50 text-blue-600">
+                    <i class="fas fa-wallet text-2xl"></i>
+                </div>
+            </div>
+            <div class="border-t border-gray-50 px-6 py-3 bg-gray-50/50 rounded-b-2xl">
+                <a asp-area="Admin" asp-controller="Orders" asp-action="Index" class="text-sm font-medium text-blue-600 hover:text-blue-800 flex items-center gap-2 group transition-colors" style="text-decoration: none;">
+                    Siparişlere Git <i class="fas fa-arrow-right text-xs transform group-hover:translate-x-1 transition-transform"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- Toplam Sipariş Kartı -->
+        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col justify-between">
+            <div class="p-6 flex justify-between items-center">
+                <div>
+                    <p class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-1">Sipariş Sayısı</p>
+                    <h4 class="text-2xl font-bold text-gray-800 m-0">@ViewBag.TotalOrders <span class="text-sm font-normal text-gray-400">adet</span></h4>
+                </div>
+                <div class="w-14 h-14 rounded-xl flex items-center justify-center bg-indigo-50 text-indigo-500">
+                    <i class="fas fa-shopping-bag text-2xl"></i>
+                </div>
+            </div>
+            <div class="border-t border-gray-50 px-6 py-3 bg-gray-50/50 rounded-b-2xl">
+                <a asp-area="Admin" asp-controller="Orders" asp-action="Index" class="text-sm font-medium text-indigo-500 hover:text-indigo-700 flex items-center gap-2 group transition-colors" style="text-decoration: none;">
+                    Siparişlere Git <i class="fas fa-arrow-right text-xs transform group-hover:translate-x-1 transition-transform"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- Onay Bekleyen Siparişler Kartı -->
+        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col justify-between">
+            <div class="p-6 flex justify-between items-center">
+                <div>
+                    <p class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-1">Onay Bekleyen</p>
+                    <h4 class="text-2xl font-bold text-gray-800 m-0">@ViewBag.PendingOrders <span class="text-sm font-normal text-gray-400">adet</span></h4>
+                </div>
+                <div class="w-14 h-14 rounded-xl flex items-center justify-center bg-orange-50 text-orange-500">
+                    <i class="fas fa-clock text-2xl"></i>
+                </div>
+            </div>
+            <div class="border-t border-gray-50 px-6 py-3 bg-gray-50/50 rounded-b-2xl">
+                <a asp-area="Admin" asp-controller="Orders" asp-action="Index" class="text-sm font-medium text-orange-500 hover:text-orange-700 flex items-center gap-2 group transition-colors" style="text-decoration: none;">
+                    İncele <i class="fas fa-arrow-right text-xs transform group-hover:translate-x-1 transition-transform"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- İptal Edilen Siparişler Kartı -->
+        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col justify-between">
+            <div class="p-6 flex justify-between items-center">
+                <div>
+                    <p class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-1">İptal Edilen</p>
+                    <h4 class="text-2xl font-bold text-gray-800 m-0">@ViewBag.CancelledOrders <span class="text-sm font-normal text-gray-400">adet</span></h4>
+                </div>
+                <div class="w-14 h-14 rounded-xl flex items-center justify-center bg-red-50 text-red-500">
+                    <i class="fas fa-times-circle text-2xl"></i>
+                </div>
+            </div>
+            <div class="border-t border-gray-50 px-6 py-3 bg-gray-50/50 rounded-b-2xl">
+                <a asp-area="Admin" asp-controller="Orders" asp-action="Index" class="text-sm font-medium text-red-600 hover:text-red-800 flex items-center gap-2 group transition-colors" style="text-decoration: none;">
+                    Detaylar <i class="fas fa-arrow-right text-xs transform group-hover:translate-x-1 transition-transform"></i>
+                </a>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- GRAFİKLER ALANI -->
+    <div class="mb-8">
+        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+            <div class="flex items-center gap-3 mb-6">
+                <div class="w-10 h-10 rounded-lg flex items-center justify-center bg-emerald-50 text-emerald-600">
+                    <i class="fas fa-bolt text-lg"></i>
+                </div>
+                <h2 class="text-lg font-bold text-gray-800 m-0">Bugünün Siparişleri <span class="text-sm font-normal text-gray-400 ml-2">(Saatlik Kasa Durumu)</span></h2>
+            </div>
+            <div class="relative w-full" style="height: 300px;">
+                <canvas id="todayChart"></canvas>
             </div>
         </div>
     </div>
-    <div class="col-xl-3 col-md-6">
-        <div class="card bg-warning text-white mb-4">
-            <div class="card-body">Warning Card</div>
-            <div class="card-footer d-flex align-items-center justify-content-between">
-                <a class="small text-white stretched-link" href="#">View Details</a>
-                <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+            <div class="flex items-center gap-3 mb-6">
+                <div class="w-10 h-10 rounded-lg flex items-center justify-center bg-blue-50 text-blue-600">
+                    <i class="fas fa-chart-line text-lg"></i>
+                </div>
+                <h2 class="text-lg font-bold text-gray-800 m-0">Aylık Satış Grafiği <span class="text-sm font-normal text-gray-400 ml-2">(Son 6 Ay)</span></h2>
+            </div>
+            <div class="relative w-full" style="height: 300px;">
+                <canvas id="myAreaChart"></canvas>
+            </div>
+        </div>
+        
+        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+            <div class="flex items-center gap-3 mb-6">
+                <div class="w-10 h-10 rounded-lg flex items-center justify-center bg-indigo-50 text-indigo-600">
+                    <i class="fas fa-chart-pie text-lg"></i>
+                </div>
+                <h2 class="text-lg font-bold text-gray-800 m-0">Sipariş Durumları Dağılımı</h2>
+            </div>
+            <div class="relative w-full" style="height: 300px;">
+                <canvas id="myBarChart"></canvas>
             </div>
         </div>
     </div>
-    <div class="col-xl-3 col-md-6">
-        <div class="card bg-success text-white mb-4">
-            <div class="card-body">Success Card</div>
-            <div class="card-footer d-flex align-items-center justify-content-between">
-                <a class="small text-white stretched-link" href="#">View Details</a>
-                <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+
+    <!-- ÜRÜNLER TABLOSU -->
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden mb-4">
+        <div class="px-6 py-5 border-b border-gray-100 flex justify-between items-center bg-white">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl flex items-center justify-center bg-blue-50 text-blue-600 border border-blue-100">
+                    <i class="fas fa-box-open text-lg"></i>
+                </div>
+                <h2 class="text-lg font-bold text-gray-800 m-0">Son Eklenen Ürünler</h2>
             </div>
+            <a asp-area="Admin" asp-controller="Products" asp-action="Index" class="text-sm font-semibold text-blue-600 hover:text-blue-800 flex items-center gap-1 group transition-colors" style="text-decoration: none;">
+                Tümünü Gör <i class="fas fa-arrow-right text-xs transform group-hover:translate-x-1 transition-transform"></i>
+            </a>
         </div>
-    </div>
-    <div class="col-xl-3 col-md-6">
-        <div class="card bg-danger text-white mb-4">
-            <div class="card-body">Danger Card</div>
-            <div class="card-footer d-flex align-items-center justify-content-between">
-                <a class="small text-white stretched-link" href="#">View Details</a>
-                <div class="small text-white"><i class="fas fa-angle-right"></i></div>
-            </div>
-        </div>
-    </div>
-</div>
-<div class="row">
-    <div class="col-xl-6">
-        <div class="card mb-4">
-            <div class="card-header">
-                <i class="fas fa-chart-area me-1"></i>
-                Area Chart Example
-            </div>
-            <div class="card-body"><canvas id="myAreaChart" width="100%" height="40"></canvas></div>
-        </div>
-    </div>
-    <div class="col-xl-6">
-        <div class="card mb-4">
-            <div class="card-header">
-                <i class="fas fa-chart-bar me-1"></i>
-                Bar Chart Example
-            </div>
-            <div class="card-body"><canvas id="myBarChart" width="100%" height="40"></canvas></div>
-        </div>
-    </div>
-</div>
-<div class="card mb-4">
-    <div class="card-header">
-        <i class="fas fa-table me-1"></i>
-        Ürünler
-    </div>
-    <div class="card-body">
-        <table id="datatablesSimple">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse text-sm">
             <thead>
-                <tr>
-                    <th>Ürün Adı</th>
-                    <th>Kayıt Tarihi</th>
-                    <th>Görsel</th>
-                    <th>Fiyat</th>
-                    <th>Ürün Kodu</th>
-                    <th>Stok</th>
+                <tr class="bg-gray-50/50">
+                    <th class="py-3 px-4 font-bold text-xs text-gray-500 uppercase tracking-wider border-b border-gray-100">Ürün Bilgisi</th>
+                    <th class="py-3 px-4 font-bold text-xs text-gray-500 uppercase tracking-wider border-b border-gray-100 whitespace-nowrap">Fiyat</th>
+                    <th class="py-3 px-4 font-bold text-xs text-gray-500 uppercase tracking-wider border-b border-gray-100 whitespace-nowrap">Stok</th>
+                    <th class="py-3 px-4 font-bold text-xs text-gray-500 uppercase tracking-wider border-b border-gray-100 whitespace-nowrap">Ürün Kodu</th>
+                    <th class="py-3 px-4 font-bold text-xs text-gray-500 uppercase tracking-wider border-b border-gray-100 text-right whitespace-nowrap">Kayıt Tarihi</th>
                 </tr>
             </thead>
-            <tfoot>
-                <tr>
-                    <th>Ürün Adı</th>
-                    <th>Kayıt Tarihi</th>
-                    <th>Görsel</th>
-                    <th>Fiyat</th>
-                    <th>Ürün Kodu</th>
-                    <th>Stok</th>
-                </tr>
-            </tfoot>
-            <tbody>
+            <tbody class="divide-y divide-gray-50">
                 @foreach (var item in ViewBag.Products)
                 {
-                    <tr>
-                        <td>@item.Name</td>
-                        <td>@item.CreateDate</td>
-                        <td>@if (!string.IsNullOrEmpty(item.Image))
-                            {
-                                <img src="/img/products/@item.Image" alt="@item.Name"
-                                    style="width: 50px; height: 50px; object-fit: cover; border-radius: 5px;" />
-                            }
-                                                else
-                            {
-                                <span class="text-muted small">Resim Yok</span>
-                            }
+                    <!-- Kritik stoklarda satır arkaplanını kırmızı yapar -->
+                    <tr class="transition-colors group border-b border-gray-100 @(item.Stock < 10 ? "bg-red-50/60 hover:bg-red-100/70" : "hover:bg-gray-50/80")">
+                        <td class="py-3 px-4">
+                            <div class="flex items-center gap-3">
+                                @if (!string.IsNullOrEmpty(item.Image))
+                                {
+                                    <div class="relative w-10 h-10 flex-shrink-0 rounded-lg overflow-hidden shadow-sm group-hover:shadow transition-shadow border border-gray-100">
+                                        <img src="/img/products/@item.Image" alt="@item.Name" class="w-full h-full object-cover" />
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="w-10 h-10 flex-shrink-0 rounded-lg bg-gray-50 flex items-center justify-center text-gray-400 shadow-sm border border-gray-100">
+                                        <i class="fas fa-image"></i>
+                                    </div>
+                                }
+                                <div class="min-w-0">
+                                    <!-- truncate ve max-w eklenerek çok uzun isimlerin tabloyu esnetmesi engellendi -->
+                                    <a asp-area="Admin" asp-controller="Products" asp-action="Edit" asp-route-id="@item.Id" class="font-bold text-gray-800 text-sm truncate max-w-[160px] sm:max-w-[250px] lg:max-w-[350px] xl:max-w-[450px] hover:text-blue-600 transition-colors block" style="text-decoration: none;" title="@item.Name">
+                                        @item.Name
+                                    </a>
+                                </div>
+                            </div>
                         </td>
-                        <td>@item.Price</td>
-                        <td>@item.ProductCode</td>
-                        <td>@item.Stock</td>
+                        <td class="py-3 px-4 whitespace-nowrap">
+                            <span class="font-bold text-gray-800">@item.Price.ToString("C")</span>
+                        </td>
+                        <td class="py-3 px-4 whitespace-nowrap">
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold border @(item.Stock > 10 ? "bg-emerald-50 text-emerald-700 border-emerald-200" : "bg-red-50 text-red-700 border-red-200")">
+                                <span class="w-1.5 h-1.5 rounded-full @(item.Stock > 10 ? "bg-emerald-500" : "bg-red-500")"></span>
+                                @item.Stock Adet
+                            </span>
+                        </td>
+                        <td class="py-3 px-4 whitespace-nowrap">
+                            <span class="text-gray-600 text-xs font-bold bg-gray-100 px-2 py-1 rounded">@item.ProductCode</span>
+                        </td>
+                        <td class="py-3 px-4 text-right text-sm text-gray-500 font-medium whitespace-nowrap">
+                            @item.CreateDate.ToString("dd MMM yyyy")
+                        </td>
                     </tr>
                 }
             </tbody>
         </table>
+        </div>
     </div>
 </div>
+
 @section Scripts
 {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js" crossorigin="anonymous"></script>
-    <script src="/admin/assets/demo/chart-area-demo.js"></script>
-    <script src="/admin/assets/demo/chart-bar-demo.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/umd/simple-datatables.min.js"
         crossorigin="anonymous"></script>
     <script src="/admin/js/datatables-simple-demo.js"></script>
+
+    <script>
+        // Controller'dan gelen verileri JSON'a çevirerek JS değişkenlerine aktarıyoruz.
+        // Veri gelmezse hata vermemesi için varsayılan boş listeler ekledik.
+        var areaLabels = @Html.Raw(Json.Serialize(ViewBag.AreaChartLabels ?? new[] { "Ocak", "Şubat", "Mart", "Nisan", "Mayıs" }));
+        var areaData = @Html.Raw(Json.Serialize(ViewBag.AreaChartData ?? new[] { 0, 0, 0, 0, 0 }));
+
+        var barLabels = @Html.Raw(Json.Serialize(ViewBag.BarChartLabels ?? new[] { "Kategori 1", "Kategori 2" }));
+        var barData = @Html.Raw(Json.Serialize(ViewBag.BarChartData ?? new[] { 0, 0 }));
+
+        // YENİ: Bugünün Siparişleri Grafiği
+        var todayLabels = @Html.Raw(Json.Serialize(ViewBag.TodayChartLabels ?? new[] { "00:00" }));
+        var todayData = @Html.Raw(Json.Serialize(ViewBag.TodayChartData ?? new[] { 0 }));
+
+        var ctxToday = document.getElementById("todayChart");
+        if (ctxToday) {
+            new Chart(ctxToday, {
+                type: 'line',
+                data: {
+                    labels: todayLabels,
+                    datasets: [{
+                        label: "Satış Tutarı (₺)",
+                        lineTension: 0.4,
+                        backgroundColor: "rgba(16, 185, 129, 0.1)", // Tailwind emerald-500
+                        borderColor: "rgba(16, 185, 129, 1)",
+                        pointRadius: 4,
+                        pointBackgroundColor: "rgba(16, 185, 129, 1)",
+                        pointBorderColor: "#fff",
+                        pointBorderWidth: 2,
+                        data: todayData,
+                    }],
+                },
+                options: { legend: { display: false }, maintainAspectRatio: false }
+            });
+        }
+
+        // Area Chart (Çizgi Grafik - Örn: Aylık Satışlar)
+        var ctxArea = document.getElementById("myAreaChart");
+        if (ctxArea) {
+            new Chart(ctxArea, {
+                type: 'line',
+                data: {
+                    labels: areaLabels,
+                    datasets: [{
+                        label: "Satış Tutarı (₺)",
+                        lineTension: 0.4, // Çizgiyi daha yumuşak (kavisli) yapar
+                        backgroundColor: "rgba(59, 130, 246, 0.1)", // Tailwind blue-500
+                        borderColor: "rgba(59, 130, 246, 1)",
+                        pointRadius: 5,
+                        pointBackgroundColor: "rgba(59, 130, 246, 1)",
+                        pointBorderColor: "#fff",
+                        pointHoverRadius: 5,
+                        pointHoverBackgroundColor: "rgba(59, 130, 246, 1)",
+                        pointHitRadius: 50,
+                        pointBorderWidth: 3,
+                        data: areaData,
+                    }],
+                },
+                options: { legend: { display: false }, maintainAspectRatio: false }
+            });
+        }
+
+        // Bar Chart (Sütun Grafik - Örn: En Çok Satan Kategoriler)
+        var ctxBar = document.getElementById("myBarChart");
+        if(ctxBar) {
+            new Chart(ctxBar, {
+                type: 'bar',
+                data: {
+                    labels: barLabels,
+                    datasets: [{
+                        label: "Adet",
+                        backgroundColor: "rgba(99, 102, 241, 0.8)", // Tailwind indigo-500
+                        borderColor: "rgba(99, 102, 241, 1)",
+                        borderWidth: 1,
+                        data: barData,
+                    }],
+                },
+                options: { legend: { display: false }, maintainAspectRatio: false, scales: { yAxes: [{ ticks: { beginAtZero: true } }] } }
+            });
+        }
+    </script>
 }

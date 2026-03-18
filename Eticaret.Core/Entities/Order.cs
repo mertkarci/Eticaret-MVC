@@ -21,8 +21,9 @@ public class Order : IEntity
     [Display(Name = "Ad Soyad"), StringLength(100)]
     public string CustomerName { get; set; }
     [Display(Name = "Müşteri"), StringLength(50)]
-
     public string? CustomerId { get; set; }
+    [Display(Name = "TC Kimlik No"), StringLength(11)]
+    public string? BillingTC { get; set; }
 
     [Display(Name = "E-Posta"), StringLength(100)]
     public string CustomerEmail { get; set; }

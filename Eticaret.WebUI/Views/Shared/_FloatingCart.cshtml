@@ -5,43 +5,23 @@
 
     var cart = Context.Session.GetJson<CartService>("Cart");
     int cartCount = cart?.CartLines.Sum(x => x.Quantity) ?? 0;
+
+    // Sepet durumuna göre dinamik class'lar
+    string cartClasses = cartCount > 0 
+        ? "bg-primary text-white shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:shadow-[0_8px_30px_var(--main-color)] hover:scale-110 scale-100 opacity-100 border-2 border-transparent focus:ring-4 focus:ring-primary/30" 
+        : "bg-white text-gray-400 border-2 border-gray-300 opacity-70 scale-90 hover:scale-100 hover:opacity-100 hover:border-primary hover:text-primary hover:shadow-md focus:outline-none";
 }
 
-<style>
-    .floating-cart-btn {
-        position: fixed;
-        /* EKRAN SABIT KALMASI */
+<!-- Modern Yüzen Sepet Butonu -->
+<a id="floating-cart-btn" asp-controller="Cart" asp-action="Index" title="Sepete Git"
+   class="fixed bottom-6 right-6 z-[1050] flex items-center justify-center h-14 w-14 rounded-full transition-all duration-500 ease-out no-underline @cartClasses">
+    
+    <i class="bi bi-cart3 text-2xl relative z-10"></i>
 
-        bottom: 30px;
-
-        right: 30px;
-
-        z-index: 1050;
-
-        width: 60px;
-        height: 60px;
-        border-radius: 50%;
-
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: transform 0.2s;
-
-    }
-
-    .floating-cart-btn:hover {
-        transform: scale(1.2);
-    }
-</style>
-
-
-<a class="btn btn-primary shadow-lg floating-cart-btn" asp-controller="Cart" asp-action="Index" title="Sepetim"> <i
-        class="bi bi-cart3" style="font-size: 1.5rem;"></i>
     @if (cartCount > 0)
     {
-        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-light">
+        <span class="absolute -top-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full bg-red-500 border-2 border-white text-[11px] font-black text-white shadow-sm z-20">
             @cartCount
-            <span class="visually-hidden">Sepetteki Ürünler</span>
         </span>
     }
 </a>

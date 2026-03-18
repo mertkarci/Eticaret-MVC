@@ -7,157 +7,189 @@
     var favourites = Context.Session.GetJson<List<Product>>("GetFavourites") ?? new List<Product>();
 }
 
-@* CSS kısımları aynı kalacak... *@
-
-<section class="py-5">
-    <div class="container px-4 px-lg-5 my-4">
+<!-- ANA ÜRÜN KISMI -->
+<section class="py-6 md:py-10">
+    <div class="container mx-auto px-4 max-w-7xl">
 
         @* --- BREADCRUMB DİNAMİKLEŞTİRİLDİ --- *@
-        <nav aria-label="breadcrumb" class="mb-5">
-            <ol class="breadcrumb bg-transparent p-0 m-0">
-                <li class="breadcrumb-item">
-                    <a asp-controller="Home" asp-action="Index" class="text-decoration-none text-muted">
-                        <i class="bi bi-house-door"></i> Ana Sayfa
-                    </a>
+        <nav aria-label="breadcrumb" class="mb-6">
+            <ol class="flex flex-wrap items-center text-sm text-gray-500 dark:text-gray-400 gap-y-2">
+                <li class="flex items-center">
+                    <a asp-controller="Home" asp-action="Index" class="hover:text-primary transition-colors no-underline text-inherit">Ana Sayfa</a>
                 </li>
-                <li class="breadcrumb-item">
-                    <a asp-controller="Products" asp-action="Index" class="text-decoration-none text-muted">Ürünler</a>
+                <li class="flex items-center px-2"><span class="text-gray-300 dark:text-gray-600">/</span></li>
+                <li class="flex items-center">
+                    <a asp-controller="Products" asp-action="Index" class="hover:text-primary transition-colors no-underline text-inherit">Ürünler</a>
                 </li>
-                <li class="breadcrumb-item active fw-bold text-dark" aria-current="page">@Model.Product.Name</li>
+                <li class="flex items-center px-2"><span class="text-gray-300 dark:text-gray-600">/</span></li>
+                <li class="text-gray-800 dark:text-gray-300 font-medium truncate max-w-[180px] sm:max-w-xs md:max-w-md" aria-current="page" title="@Model.Product.Name">@Model.Product.Name</li>
             </ol>
         </nav>
 
-        <div class="row gx-5 align-items-center">
-            <div class="col-lg-6 mb-5 mb-lg-0">
-                <div class="product-image-wrapper">
+        <div class="flex flex-col lg:flex-row gap-8 xl:gap-12 items-start">
+            
+            @* --- SOL ALAN: RESİM GALERİSİ --- *@
+            <div class="w-full lg:w-7/12">
+                <div class="product-gallery-wrapper border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 rounded-lg p-4 lg:p-8">
                     <partial name="_ProductImageGallery" model="Model.Product" />
                 </div>
             </div>
 
-            <div class="col-lg-6 ps-lg-5">
-                <div class="badge bg-dark text-white mb-3 px-3 py-2 rounded-pill shadow-sm">
-                    Ürün Kodu: @Model.Product.Id
-                </div>
-
-                <h1 class="product-title fw-bold mb-3 text-dark">@Model.Product.Name</h1>
-
-                <div class="d-flex align-items-end mb-4 bg-light p-3 rounded-4 border">
-                    <div class="me-3">
-                        <span class="d-block text-muted text-decoration-line-through small mb-1">
-                            Eski Fiyat: @((Model.Product.Price * 1.2m).ToString("c"))
-                        </span>
-                        <span class="display-6 fw-bold text-primary">@Model.Product.Price.ToString("c")</span>
-                    </div>
-                    <div class="pb-1">
-                        <span class="badge bg-success text-white px-2 py-1"><i class="bi bi-truck me-1"></i> Ücretsiz Kargo</span>
+            @* --- SAĞ ALAN: VATAN TARZI SATIN ALMA KUTUSU --- *@
+            <div class="w-full lg:w-5/12 flex flex-col">
+                
+                <!-- Başlık ve Ürün Kodu -->
+                <div class="mb-6 pb-6 border-b border-gray-200 dark:border-slate-700">
+                    <h1 class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white leading-tight mb-3">@Model.Product.Name</h1>
+                    <div class="text-sm text-gray-500 dark:text-gray-400 font-medium">
+                        Ürün Kodu: <span class="text-gray-800 dark:text-gray-200 font-bold">@Model.Product.ProductCode</span>
                     </div>
                 </div>
 
-                <div class="description-box mb-5 shadow-sm text-secondary">
-                    <h6 class="text-dark fw-bold mb-2"><i class="bi bi-info-circle me-2"></i>Ürün Açıklaması</h6>
-                    <p class="m-0" style="line-height: 1.7;">@Model.Product.Description</p>
-                </div>
-
-                @* --- MOBİL MİKTAR VE FAVORİ ALANI --- *@
-                <div class="d-lg-none mb-4">
-                    <div class="d-flex align-items-center justify-content-between gap-3">
-                        <div class="input-group shadow-sm rounded-pill overflow-hidden" style="width: 140px; border: 1px solid #e2e8f0;">
-                            <button class="btn qty-btn" type="button" onclick="decreaseQty()">-</button>
-                            <input class="form-control text-center qty-input px-0" type="number" value="1" min="1" readonly />
-                            <button class="btn qty-btn" type="button" onclick="increaseQty()">+</button>
+                <!-- Buy Box (Gri Arkaplanlı Kutu) -->
+                <div class="bg-gray-50 dark:bg-slate-800/80 border border-gray-200 dark:border-slate-700 rounded-lg p-6 mb-6">
+                    
+                    <!-- Fiyatlar -->
+                    <div class="mb-6">
+                        <div class="text-sm text-gray-500 dark:text-gray-400 line-through mb-1 font-medium">Eski Fiyat: @((Model.Product.Price * 1.2m).ToString("c"))</div>
+                        <div class="text-4xl font-extrabold text-primary">@Model.Product.Price.ToString("c")</div>
+                        <div class="mt-3 inline-flex items-center gap-1.5 text-xs font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-900/30 px-3 py-1.5 rounded">
+                            <i class="bi bi-truck text-base"></i> ÜCRETSİZ KARGO
                         </div>
+                    </div>
 
-                        <form asp-controller="Favourites" asp-action="Add" method="post" class="m-0">
-                            <input type="hidden" name="productId" value="@Model.Product.Id">
-                            <button class="btn btn-outline-danger shadow-sm rounded-circle d-flex align-items-center justify-content-center" type="submit" style="width: 50px; height: 50px;">
-                                @if (favourites.Any(x => x.Id == Model.Product.Id))
-                                {
-                                    <i class="bi bi-heart-fill fs-4"></i>
-                                }
-                                else
-                                {
-                                    <i class="bi bi-heart fs-4"></i>
-                                }
-                            </button>
+                    <!-- Satın Alma Butonları -->
+                    <div class="hidden lg:block">
+                        <form asp-controller="Cart" asp-action="Add" method="post" class="m-0">
+                            <input type="hidden" name="ProductId" value="@Model.Product.Id">
+                            
+                            <div class="flex flex-col xl:flex-row gap-3">
+                                <!-- Adet Seçici -->
+                                <div class="flex items-center border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-900 rounded h-12 w-full xl:w-32 flex-shrink-0">
+                                    <button type="button" onclick="decreaseQty()" class="qty-btn w-10 h-full flex items-center justify-center text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors focus:outline-none"><i class="bi bi-dash text-lg"></i></button>
+                                    <input id="desktopQtyInput" name="quantity" type="number" value="1" min="1" readonly class="qty-input flex-1 w-full h-full text-center font-bold text-gray-900 dark:text-white bg-transparent border-none focus:ring-0 p-0" />
+                                    <button type="button" onclick="increaseQty()" class="qty-btn w-10 h-full flex items-center justify-center text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors focus:outline-none"><i class="bi bi-plus text-lg"></i></button>
+                                </div>
+
+                                <!-- Sepete Ekle -->
+                                <button type="submit" class="flex-1 h-12 bg-primary hover:opacity-90 hover:shadow-md hover:-translate-y-0.5 text-white text-base font-bold uppercase tracking-wide rounded flex items-center justify-center gap-2 transition-all duration-300 focus:outline-none shadow">
+                                    <i class="bi bi-cart3 text-xl"></i> SEPETE EKLE
+                                </button>
+                                
+                                <!-- Favori -->
+                                <button type="button" data-product-id="@Model.Product.Id" title="@(favourites.Any(x => x.Id == Model.Product.Id) ? "Favorilerden Çıkar" : "Favorilere Ekle")"
+                                        class="fav-toggle-btn w-12 h-12 flex-shrink-0 flex items-center justify-center rounded border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-gray-500 hover:text-red-500 hover:border-red-500 transition-colors focus:outline-none">
+                                    <i class="bi @(favourites.Any(x => x.Id == Model.Product.Id) ? "bi-heart-fill text-red-500" : "bi-heart") text-xl"></i>
+                                </button>
+                            </div>
                         </form>
                     </div>
                 </div>
 
-                @* --- MASAÜSTÜ SEPETE EKLE ALANI --- *@
-                <div class="d-none d-lg-flex align-items-center gap-3">
-                    <form asp-controller="Cart" asp-action="Add" method="post" class="d-flex align-items-center gap-3 flex-fill">
-                        <input type="hidden" name="ProductId" value="@Model.Product.Id">
-
-                        <div class="input-group shadow-sm rounded-pill overflow-hidden flex-shrink-0" style="width: 130px; border: 1px solid #e2e8f0;">
-                            <button class="btn qty-btn" type="button" onclick="decreaseQty()">-</button>
-                            <input class="form-control text-center qty-input px-0" name="quantity" type="number" value="1" min="1" readonly />
-                            <button class="btn qty-btn" type="button" onclick="increaseQty()">+</button>
-                        </div>
-
-                        <button class="btn btn-primary btn-lg flex-fill rounded-pill shadow" type="submit">
-                            <i class="bi bi-cart-plus-fill me-2 fs-5"></i> <span class="fw-bold">Hemen Sepete Ekle</span>
-                        </button>
-                    </form>
-
-                    <form asp-controller="Favourites" asp-action="Add" method="post" class="m-0">
-                        <input type="hidden" name="productId" value="@Model.Product.Id">
-                        <button class="btn btn-outline-danger shadow-sm rounded-circle d-flex align-items-center justify-content-center transition-all"
-                                type="submit" style="width: 54px; height: 54px;" 
-                                data-bs-toggle="tooltip" data-bs-placement="top" 
-                                title="@(favourites.Any(x => x.Id == Model.Product.Id) ? "Favorilerimden Çıkar" : "Favorilere Ekle")">
-                            <i class="bi @(favourites.Any(x => x.Id == Model.Product.Id) ? "bi-heart-fill" : "bi-heart") fs-4"></i>
-                        </button>
-                    </form>
+                <!-- Bilgilendirme Kutucukları -->
+                <div class="grid grid-cols-1 gap-3 text-sm font-medium text-gray-700 dark:text-gray-300">
+                    <div class="flex items-center gap-3 p-3 border border-gray-200 dark:border-slate-700 rounded bg-white dark:bg-slate-800">
+                        <i class="bi bi-shield-check text-2xl text-primary"></i> <span>Orijinal Ürün Garantisi</span>
+                    </div>
+                    <div class="flex items-center gap-3 p-3 border border-gray-200 dark:border-slate-700 rounded bg-white dark:bg-slate-800">
+                        <i class="bi bi-arrow-counterclockwise text-2xl text-primary"></i> <span>14 Gün İçinde Kolay İade</span>
+                    </div>
                 </div>
 
-                <div class="d-flex align-items-center mt-4 pt-4 border-top text-muted small">
-                    <div class="me-4"><i class="bi bi-shield-check text-success fs-5 me-1"></i> Güvenli Ödeme</div>
-                    <div class="me-4"><i class="bi bi-arrow-counterclockwise text-primary fs-5 me-1"></i> 14 Gün İade</div>
-                    <div><i class="bi bi-award text-warning fs-5 me-1"></i> 2 Yıl Garanti</div>
-                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- AÇIKLAMA (ÖZELLİKLER) KISMI -->
+<section class="py-10 bg-gray-50 dark:bg-slate-800/50 border-t border-b border-gray-200 dark:border-slate-700">
+    <div class="container mx-auto px-4 max-w-7xl">
+        <div class="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg p-6 md:p-10 shadow-sm">
+            <h2 class="text-xl md:text-2xl font-bold text-gray-900 dark:text-white mb-6 pb-4 border-b border-gray-200 dark:border-slate-700">Ürün Açıklaması</h2>
+            <div class="text-gray-600 dark:text-gray-300 leading-relaxed text-sm md:text-base prose dark:prose-invert max-w-none">
+                @Model.Product.Description
             </div>
         </div>
     </div>
 </section>
 
 @* --- İLGİLİ ÜRÜNLER ALANI --- *@
-<section class="py-5 related-section">
-    <div class="container px-4 px-lg-5 mt-4">
-        <div class="d-flex justify-content-between align-items-end mb-5">
-            <div>
-                <span class="text-primary fw-bold text-uppercase tracking-wider small"><i class="bi bi-stars"></i> Sizin İçin Seçtiklerimiz</span>
-                <h2 class="fw-bold m-0 mt-2 display-6">Bunları da Beğenebilirsiniz</h2>
-            </div>
-            <a asp-controller="Products" asp-action="Index" class="btn btn-outline-dark rounded-pill px-4 d-none d-md-inline-block">
-                Tümünü İncele <i class="bi bi-arrow-right ms-1"></i>
-            </a>
+<section class="py-12 bg-white dark:bg-slate-900">
+    <div class="container mx-auto px-4 max-w-7xl">
+        <div class="mb-8 flex items-center justify-between">
+            <h2 class="text-2xl font-bold text-gray-900 dark:text-white m-0">Önerilen Ürünler</h2>
+            <a asp-controller="Products" asp-action="Index" class="text-primary font-bold text-sm hover:text-secondary transition-colors no-underline">Tümünü Gör <i class="bi bi-arrow-right"></i></a>
         </div>
 
-        <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
             @if (Model.RelatedProducts != null && Model.RelatedProducts.Any())
             {
-                @foreach (var item in Model.RelatedProducts)
+                @foreach (var item in Model.RelatedProducts.Take(5))
                 {
-                    <div class="col mb-5">
-                        <partial name="_ProductView" model="item" />
-                    </div>
+                    <partial name="_ProductView" model="item" />
                 }
             }
         </div>
     </div>
 </section>
 
-@* --- MOBIL STICKY BOTTOM BAR --- *@
-<div class="mobile-bottom-bar d-lg-none">
-    <div>
-        <span class="d-block text-muted small" style="font-size: 0.75rem;">Birim Fiyat</span>
-        <span class="fw-bold text-primary fs-4">@Model.Product.Price.ToString("c")</span>
+@* --- MOBIL STICKY BOTTOM BAR (Sadece mobilde görünür, alta yapışır) --- *@
+<div class="lg:hidden fixed bottom-0 left-0 w-full bg-white dark:bg-slate-900 border-t border-gray-200 dark:border-slate-700 p-3 z-40 shadow-[0_-4px_15px_rgba(0,0,0,0.1)] flex items-center justify-between gap-3" style="padding-bottom: max(0.75rem, env(safe-area-inset-bottom));">
+    
+    <div class="flex flex-col">
+        <span class="text-xs text-gray-500 dark:text-gray-400 line-through mb-0.5">@((Model.Product.Price * 1.2m).ToString("c"))</span>
+        <span class="text-xl font-black text-primary leading-none">@Model.Product.Price.ToString("c")</span>
     </div>
-    <form asp-controller="Cart" asp-action="Add" method="post" class="flex-fill">
-        <input type="hidden" name="ProductId" value="@Model.Product.Id">
-        <input type="hidden" name="quantity" id="mobileQtyInput" value="1">
-        <button class="btn btn-primary w-100 rounded-pill py-2 fw-bold shadow-sm" type="submit" onclick="syncQty()">
-            Sepete Ekle
+    
+    <div class="flex items-center gap-2 flex-1 justify-end">
+         <!-- Mobil Favori Butonu -->
+        <button type="button" data-product-id="@Model.Product.Id" title="@(favourites.Any(x => x.Id == Model.Product.Id) ? "Favorilerden Çıkar" : "Favorilere Ekle")"
+                class="fav-toggle-btn w-11 h-11 flex items-center justify-center rounded border border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-800 text-gray-500 focus:outline-none">
+            <i class="bi @(favourites.Any(x => x.Id == Model.Product.Id) ? "bi-heart-fill text-red-500" : "bi-heart") text-lg"></i>
         </button>
-    </form>
+
+        <!-- Mobil Sepete Ekle Butonu -->
+        <form asp-controller="Cart" asp-action="Add" method="post" class="flex-1 m-0 max-w-[180px]">
+            <input type="hidden" name="ProductId" value="@Model.Product.Id">
+            <input type="hidden" name="quantity" id="mobileQtyInput" value="1">
+            <button class="w-full h-11 bg-primary hover:opacity-90 active:scale-95 text-white font-bold text-sm uppercase rounded transition-all focus:outline-none flex items-center justify-center gap-2 shadow" type="submit" onclick="syncQty()">
+                Sepete Ekle
+            </button>
+        </form>
+    </div>
 </div>
+
+@section Scripts {
+    <script>
+        // Miktar Arttırma
+        function increaseQty() {
+            var input = document.getElementById('desktopQtyInput');
+            if(input) {
+                var currentVal = parseInt(input.value) || 1;
+                input.value = currentVal + 1;
+            }
+            syncQty();
+        }
+
+        // Miktar Azaltma
+        function decreaseQty() {
+            var input = document.getElementById('desktopQtyInput');
+            if(input) {
+                var currentVal = parseInt(input.value) || 1;
+                if (currentVal > 1) {
+                    input.value = currentVal - 1;
+                }
+            }
+            syncQty();
+        }
+
+        // Mobil sepet butonu için değeri eşitle
+        function syncQty() {
+            var desktopInput = document.getElementById('desktopQtyInput');
+            var mobileInput = document.getElementById('mobileQtyInput');
+            if (desktopInput && mobileInput) {
+                mobileInput.value = desktopInput.value;
+            }
+        }
+    </script>
+}

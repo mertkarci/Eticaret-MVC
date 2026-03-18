@@ -28,30 +28,48 @@ namespace Eticaret.WebUI.Controllers
 
 
         }
-        public IActionResult Add(int productId)
+
+        [HttpPost]
+        [IgnoreAntiforgeryToken] // Sayfada token olmasa bile 400 Bad Request vermesini engeller
+        [Route("favorilerim/toggle")]
+        public IActionResult Toggle(int productId)
         {
-            var favourites = GetFavourites();
             var product = _service.Find(productId);
-            if (product != null && !favourites.Any(p => p.Id == productId))
+            if (product == null)
+            {
+                return Json(new { success = false, message = "Ürün bulunamadı." });
+            }
+
+            var favourites = GetFavourites();
+            var isCurrentlyFavorite = favourites.Any(p => p.Id == productId);
+            bool isNowFavorite;
+
+            if (isCurrentlyFavorite)
+            {
+                favourites.RemoveAll(i => i.Id == productId);
+                isNowFavorite = false;
+            }
+            else
             {
                 favourites.Add(product);
-                HttpContext.Session.SetJson("GetFavourites", favourites);
-
+                isNowFavorite = true;
             }
-            return RedirectToAction("Index");
+
+            HttpContext.Session.SetJson("GetFavourites", favourites);
+
+            return Json(new { success = true, isFavorite = isNowFavorite, count = favourites.Count });
         }
+
+        [HttpPost]
         public IActionResult Remove(int productId)
         {
             var favourites = GetFavourites();
-            var product = _service.Find(productId);
-            if (product != null && favourites.Any(p => p.Id == productId))
+            if (favourites.Any(p => p.Id == productId))
             {
                 favourites.RemoveAll(i => i.Id == productId);
                 HttpContext.Session.SetJson("GetFavourites", favourites);
-
             }
             return RedirectToAction("Index");
         }
-
     }
 }

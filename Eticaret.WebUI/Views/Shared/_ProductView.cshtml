@@ -17,43 +17,42 @@
     }
 }
 
-<div class="col mb-4">
-    <div class="product-card-wrapper">
-        <div class="card product-card">
+<!-- "col" sınıfı diğer Bootstrap sayfaları (Kategoriler vb.) bozulmasın diye korundu, Tailwind Grid içinde esnek çalışır -->
+<div class="col relative group flex flex-col h-full !bg-white dark:!bg-slate-800 rounded-xl border border-gray-100 dark:border-slate-700 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden">
+    
+    <!-- Favori Butonu (Cam Efekti) -->
+    <div class="absolute top-3 right-3 z-10">
+        <button type="button" class="fav-toggle-btn flex items-center justify-center w-8 h-8 rounded-full bg-white/90 dark:bg-slate-800/90 backdrop-blur shadow-sm hover:scale-110 transition-transform border border-gray-100 dark:border-slate-600 focus:outline-none"
+                data-product-id="@Model.Id" title="@(isFavorite ? "Favorilerden Çıkar" : "Favorilere Ekle")">
+            <i class="bi @(isFavorite ? "bi-heart-fill text-red-500" : "bi-heart text-gray-400 dark:text-gray-400 hover:text-red-500 transition-colors")"></i>
+        </button>
+    </div>
 
-            <div class="@(isFavorite ? "badge-discount-yes" : "badge-discount") position-absolute">
-                <form asp-action="Add" asp-controller="Favourites" method="post">
-                    <input type="hidden" name="productId" value="@Model.Id">
-                    <button class="btn btn-transparent" type="submit" style="box-shadow: none">
-                        <i class="bi @(isFavorite ? "bi-heart-fill text-danger" : "bi-heart")"></i>
-                    </button>
-                </form>
-            </div>
+    <!-- Ürün Görseli (Kare Oran & Zoom Animasyonu) -->
+    <a asp-route="ProductDetail" asp-route-slug="@Model.Slug" class="block relative aspect-square overflow-hidden !bg-white dark:!bg-slate-800 p-0">
+        <img class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500 mix-blend-multiply dark:mix-blend-normal" src="~/img/products/@Model.Image" alt="@Model.Name">
+    </a>
 
-            @* Rota ismi (ProductDetail) ile yönlendirme *@
-            <a asp-route="ProductDetail" asp-route-slug="@Model.Slug" class="img-wrapper d-block">
-                <img class="img-fit" src="~/img/products/@Model.Image" alt="@Model.Name">
+    <!-- Ürün Bilgileri -->
+    <div class="p-4 flex flex-col flex-grow border-t border-gray-50 dark:border-slate-700/50">
+        <h3 class="mb-2 h-[2.5rem]">
+            <a asp-route="ProductDetail" asp-route-slug="@Model.Slug" class="text-sm font-semibold text-gray-800 dark:text-gray-200 line-clamp-2 hover:text-primary transition-colors no-underline leading-tight" title="@Model.Name">
+                @Model.Name
             </a>
-
-            <div class="card-body-compact text-center">
-                <h6 class="mb-1">
-                    @* Rota ismi (ProductDetail) ile yönlendirme *@
-                    <a asp-route="ProductDetail" asp-route-slug="@Model.Slug" class="title-compact d-block" title="@Model.Name">
-                        @Model.Name
-                    </a>
-                </h6>
-                <div class="price-area">
-                    <span class="price-old">@((Model.Price + 500).ToString("c"))</span>
-                    <span class="price-new">@Model.Price.ToString("c")</span>
-                </div>
-            </div>
-
-            <form asp-action="Add" asp-controller="Cart" method="post">
-                <input type="hidden" name="ProductId" value="@Model.Id">
-                <button class="btn btn-compact" type="submit" style="box-shadow: none">
-                    <i class="bi bi-cart-plus me-1"></i> SEPETE EKLE
-                </button>
-            </form>
+        </h3>
+        
+        <div class="mt-auto flex flex-col items-start">
+            <span class="text-xs text-gray-400 dark:text-gray-500 line-through mb-0.5">@((Model.Price + 500).ToString("c"))</span>
+            <span class="text-lg font-extrabold text-primary leading-none">@Model.Price.ToString("c")</span>
         </div>
     </div>
+
+    <!-- Sepete Ekle Butonu -->
+    <form asp-action="Add" asp-controller="Cart" method="post" class="m-0 mt-auto">
+        <input type="hidden" name="ProductId" value="@Model.Id">
+        <button class="w-full py-3 !bg-gray-50 dark:!bg-slate-700/50 text-gray-700 dark:text-gray-200 text-sm font-bold flex items-center justify-center gap-2 group-hover:!bg-primary group-hover:text-white transition-colors border-t border-gray-100 dark:border-slate-700 focus:outline-none" type="submit">
+            <i class="bi bi-cart-plus text-lg"></i> SEPETE EKLE
+        </button>
+    </form>
+
 </div>

@@ -98,7 +98,7 @@ builder.Services.AddSession(options =>
 });
 
 builder.Services.AddScoped(typeof(IService<>), typeof(Service<>));
-builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<IOrderIyService, OrderIyService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();

@@ -43,12 +43,12 @@ namespace Eticaret.WebUI.Controllers
                                 .ToListAsync();
 
             var brands = await _brandService.GetAllAsync(b => b.isActive);
-            var categories = await _categoryService.GetAllAsync(c => c.isActive && c.ParentId == 0); // Ana kategoriler
+            var allCategories = await _categoryService.GetAllAsync(c => c.isActive);
 
             var model = new CategoryFilterViewModel
             {
                 CurrentCategory = new Category { Name = "Tüm Ürünler", Id = 0 }, // Dummy kategori
-                SubCategories = categories.ToList(),
+                SubCategories = allCategories.ToList(),
                 FilteredProducts = products,
                 AvailableBrands = brands.ToList()
             };
@@ -57,7 +57,7 @@ namespace Eticaret.WebUI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> FilterProducts(List<int> selectedBrands, List<int> selectedCategories, decimal? minPrice, decimal? maxPrice, string searchTerm)
+        public async Task<IActionResult> FilterProducts(List<int> selectedBrands, List<int> selectedCategories, decimal? minPrice, decimal? maxPrice, string searchTerm, string sort = "recommended")
         {
             var productQuery = _service.GetQueryable().Where(p => p.isActive);
 
@@ -65,7 +65,30 @@ namespace Eticaret.WebUI.Controllers
                 productQuery = productQuery.Where(p => p.BrandId != 0 && selectedBrands.Contains(p.BrandId));
 
             if (selectedCategories != null && selectedCategories.Any())
-                productQuery = productQuery.Where(p => p.CategoryId.HasValue && selectedCategories.Contains(p.CategoryId.Value));
+            {
+                var allCategories = await _categoryService.GetAllAsync();
+                var categoryIdsToSearch = new HashSet<int>(selectedCategories);
+
+                bool addedNew;
+                do
+                {
+                    addedNew = false;
+                    // Şu anki listemizde ParentId'si bulunan ama kendisi listede olmayan kategorileri bul
+                    var subCatIds = allCategories
+                        .Where(c => categoryIdsToSearch.Contains(c.ParentId) && !categoryIdsToSearch.Contains(c.Id))
+                        .Select(c => c.Id)
+                        .ToList();
+
+                    if (subCatIds.Any())
+                    {
+                        foreach (var id in subCatIds) categoryIdsToSearch.Add(id);
+                        addedNew = true; // Yeni alt kategoriler eklendi, onların da alt kategorisi olabilir diye döngüyü tekrarla
+                    }
+                } while (addedNew);
+
+                var finalCategoryIds = categoryIdsToSearch.ToList();
+                productQuery = productQuery.Where(p => p.CategoryId.HasValue && finalCategoryIds.Contains(p.CategoryId.Value));
+            }
 
             if (minPrice.HasValue) productQuery = productQuery.Where(p => p.Price >= minPrice.Value);
             if (maxPrice.HasValue) productQuery = productQuery.Where(p => p.Price <= maxPrice.Value);
@@ -75,6 +98,14 @@ namespace Eticaret.WebUI.Controllers
                 searchTerm = searchTerm.ToLower().Trim();
                 productQuery = productQuery.Where(p => p.Name.ToLower().Contains(searchTerm));
             }
+
+            productQuery = sort switch
+            {
+                "price_asc" => productQuery.OrderBy(p => p.Price),
+                "price_desc" => productQuery.OrderByDescending(p => p.Price),
+                "newest" => productQuery.OrderByDescending(p => p.Id),
+                _ => productQuery
+            };
 
             var products = await productQuery.Include(p => p.Brand).Include(p => p.Category).ToListAsync();
 

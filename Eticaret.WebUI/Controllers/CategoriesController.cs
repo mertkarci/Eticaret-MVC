@@ -1,3 +1,4 @@
+using Eticaret.Core.Entities;
 using Eticaret.Service.Abstract;
 using Eticaret.WebUI.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -39,13 +40,23 @@ namespace Eticaret.WebUI.Controllers
         [HttpPost]
         [EnableRateLimiting("ProductLimit")]
 
-        public async Task<IActionResult> FilterProducts(int? categoryId, List<int> selectedBrands, List<int> selectedCategories, decimal? minPrice, decimal? maxPrice, string searchTerm)
+        public async Task<IActionResult> FilterProducts(int? categoryId, List<int> selectedBrands, List<int> selectedCategories, decimal? minPrice, decimal? maxPrice, string searchTerm, string sort = "recommended")
         {
             int safeCategoryId = categoryId ?? 0;
 
             var filteredProducts = await _categoryService.FilterCategoryProductsAsync(safeCategoryId, selectedBrands, selectedCategories, minPrice, maxPrice, searchTerm);
 
-            return PartialView("_ProductListPartial", filteredProducts);
+            IEnumerable<Product> sortedProducts = filteredProducts;
+            
+            sortedProducts = sort switch
+            {
+                "price_asc" => sortedProducts.OrderBy(p => p.Price),
+                "price_desc" => sortedProducts.OrderByDescending(p => p.Price),
+                "newest" => sortedProducts.OrderByDescending(p => p.Id),
+                _ => sortedProducts // recommended (Varsayılan sıralama)
+            };
+
+            return PartialView("_ProductListPartial", sortedProducts.ToList());
         }
     }
 }

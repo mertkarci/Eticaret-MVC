@@ -17,11 +17,8 @@
 <section class="py-4 py-md-5 mb-5 mb-lg-0">
     <div class="container">
 
-        <!-- Başlık ve Geri Dön -->
         <div class="d-flex align-items-center mb-4 mb-lg-5">
-
-            <a class="btn btn-light rounded-circle shadow-sm me-3" title="Sepete Dön asp-controller=" Products"
-                asp-action="Index"> <i class="bi bi-arrow-left"></i></a>
+            <a class="btn btn-light rounded-circle shadow-sm me-3" title="Sepete Dön" asp-controller="Products" asp-action="Index"> <i class="bi bi-arrow-left"></i></a>
             <div>
                 <h1 class="display-6 fw-bold m-0">Ödeme</h1>
                 <p class="text-muted m-0 small">Siparişinizi güvenle tamamlayın.</p>
@@ -33,17 +30,13 @@
             <form asp-controller="Cart" asp-action="Checkout" method="post" id="checkoutForm">
                 <div class="row g-4 g-lg-5">
 
-                    <!-- SOL KOLON: Adres ve Ödeme -->
                     <div class="col-lg-8">
 
-                        <!-- 1. ADIM: TESLİMAT ADRESİ -->
                         <div class="card shadow-sm border-0 mb-4 rounded-4 overflow-hidden">
                             <div class="card-header bg-white py-3 px-4 border-bottom">
                                 <h5 class="mb-0 fw-bold d-flex align-items-center">
-                                    <span
-                                        class="badge bg-primary rounded-circle me-2 d-flex align-items-center justify-content-center"
-                                        style="width: 28px; height: 28px;">1</span>
-                                    Teslimat Adresi
+                                    <span class="badge bg-primary rounded-circle me-2 d-flex align-items-center justify-content-center" style="width: 28px; height: 28px;">1</span>
+                                    Teslimat ve İletişim Bilgileri
                                 </h5>
                             </div>
                             <div class="card-body p-4">
@@ -54,9 +47,7 @@
                                         <div class="text-center py-4">
                                             <i class="bi bi-geo-alt-fill text-warning display-4 mb-3"></i>
                                             <h5 class="fw-bold">Kayıtlı Adresiniz Yok</h5>
-                                            <p class="text-muted mb-4">Sipariş verebilmek için lütfen bir teslimat adresi
-                                                ekleyin.
-                                            </p>
+                                            <p class="text-muted mb-4">Sipariş verebilmek için lütfen bir teslimat adresi ekleyin.</p>
                                             <a href="/adreslerim/ekle" class="btn btn-primary rounded-pill px-4">
                                                 <i class="bi bi-plus-lg me-1"></i> Yeni Adres Ekle
                                             </a>
@@ -68,22 +59,15 @@
                                             @foreach (var item in Model.Addresses)
                                             {
                                                 <div class="col-md-6">
-                                                    <label
-                                                        class="card h-100 address-card rounded-3 position-relative p-3 @(item.IsDeliveryAddress ? "selected" : "")"
-                                                        onclick="selectAddress(this)">
+                                                    <label class="card h-100 address-card rounded-3 position-relative p-3 @(item.IsDeliveryAddress ? "selected" : "")" onclick="selectAddress(this)">
                                                         <div class="d-flex align-items-start">
                                                             <div class="form-check mt-1">
-                                                                <input class="form-check-input" type="radio" name="DeliveryAddress"
-                                                                    value="@item.AddressGuid" @(item.IsDeliveryAddress ? "checked" : "")
-                                                                    required>
+                                                                <input class="form-check-input" type="radio" name="DeliveryAddressGuid" value="@item.AddressGuid" @(item.IsDeliveryAddress ? "checked" : "") required>
                                                             </div>
                                                             <div class="ms-2">
                                                                 <span class="fw-bold d-block text-dark">@item.Title</span>
-                                                                <small class="text-muted d-block text-truncate"
-                                                                    style="max-width: 200px;">@item.City /
-                                                                    @item.District</small>
-                                                                <small class="text-muted d-block text-truncate"
-                                                                    style="max-width: 200px;">@item.OpenAddress</small>
+                                                                <small class="text-muted d-block text-truncate" style="max-width: 200px;">@item.City / @item.District</small>
+                                                                <small class="text-muted d-block text-truncate" style="max-width: 200px;">@item.OpenAddress</small>
                                                             </div>
                                                         </div>
                                                     </label>
@@ -93,32 +77,25 @@
 
                                         <div class="mt-4 pt-3 border-top">
                                             <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" id="sameAddress" checked
-                                                    onchange="toggleBillingSection()">
-                                                <label class="form-check-label fw-medium user-select-none" for="sameAddress">
-                                                    Fatura adresim teslimat adresimle aynı olsun.
-                                                </label>
+                                                <input class="form-check-input" type="checkbox" id="sameAddress" checked onchange="toggleBillingSection()">
+                                                <label class="form-check-label fw-medium user-select-none" for="sameAddress">Fatura adresim teslimat adresimle aynı olsun.</label>
                                             </div>
                                         </div>
 
-                                        <!-- Gizli Fatura Adresi Seçimi -->
                                         <div id="billingSection" class="mt-4" style="display: none;">
                                             <h6 class="fw-bold mb-3 text-secondary">Fatura Adresi Seçin</h6>
                                             <div class="row g-3">
                                                 @foreach (var item in Model.Addresses)
                                                 {
                                                     <div class="col-md-6">
-                                                        <label class="card h-100 address-card rounded-3 position-relative p-3"
-                                                            onclick="selectBillingAddress(this)">
+                                                        <label class="card h-100 address-card rounded-3 position-relative p-3" onclick="selectBillingAddress(this)">
                                                             <div class="d-flex align-items-start">
                                                                 <div class="form-check mt-1">
-                                                                    <input class="form-check-input" type="radio" name="BillingAddress"
-                                                                        value="@item.AddressGuid">
+                                                                    <input class="form-check-input" type="radio" name="BillingAddressGuid" value="@item.AddressGuid">
                                                                 </div>
                                                                 <div class="ms-2">
                                                                     <span class="fw-bold d-block text-dark">@item.Title</span>
-                                                                    <small class="text-muted d-block">@item.City /
-                                                                        @item.District</small>
+                                                                    <small class="text-muted d-block">@item.City / @item.District</small>
                                                                 </div>
                                                             </div>
                                                         </label>
@@ -126,170 +103,113 @@
                                                 }
                                             </div>
                                         </div>
-
-                                        <!-- Default Billing Value (Hidden) -->
-                                        <input type="hidden" name="BillingAddress" id="billingAddressDefault"
-                                            value="@Model.Addresses.FirstOrDefault(x => x.IsDeliveryAddress)?.AddressGuid">
+                                        <input type="hidden" name="BillingAddressGuid" id="billingAddressDefault" value="@Model.Addresses.FirstOrDefault(x => x.IsDeliveryAddress)?.AddressGuid">
                                     }
                                 }
                                 else
                                 {
-                                    <!-- GUEST CHECKOUT FORM -->
-                                    <h6 class="fw-bold mb-3 text-secondary border-bottom pb-2"><i
-                                            class="bi bi-person-lines-fill me-2"></i>İletişim Bilgileri</h6>
+                                    <h6 class="fw-bold mb-3 text-secondary border-bottom pb-2"><i class="bi bi-person-lines-fill me-2"></i>İletişim Bilgileri</h6>
                                     <div class="row g-3 mb-4">
                                         <div class="col-md-6">
-                                            <label class="form-label small fw-medium">Ad <span
-                                                    class="text-danger">*</span></label>
-                                            <input type="text" name="GuestName" class="form-control"
-                                                placeholder="Adınızı girin.." required>
+                                            <label class="form-label small fw-medium">Ad <span class="text-danger">*</span></label>
+                                            <input type="text" name="GuestName" class="form-control" required>
                                         </div>
                                         <div class="col-md-6">
-                                            <label class="form-label small fw-medium">Soyad <span
-                                                    class="text-danger">*</span></label>
-                                            <input type="text" name="GuestSurname" class="form-control"
-                                                placeholder="Soyadınızı girin.." required>
+                                            <label class="form-label small fw-medium">Soyad <span class="text-danger">*</span></label>
+                                            <input type="text" name="GuestSurname" class="form-control" required>
                                         </div>
                                         <div class="col-md-6">
-                                            <label class="form-label small fw-medium">E-posta <span
-                                                    class="text-danger">*</span></label>
-                                            <input type="email" name="GuestEmail" class="form-control"
-                                                placeholder="ornek@mail.com" required>
+                                            <label class="form-label small fw-medium">E-posta <span class="text-danger">*</span></label>
+                                            <input type="email" name="GuestEmail" class="form-control" required>
                                         </div>
                                         <div class="col-md-6">
-                                            <label class="form-label small fw-medium">Telefon <span
-                                                    class="text-danger">*</span></label>
-                                            <input type="tel" name="GuestPhone" class="form-control"
-                                                placeholder="05XX XXX XX XX" pattern="05[0-9]{9}" maxlength="11" minlength="11"
-                                                title="Lütfen telefon numaranızı 05 ile başlayarak 11 haneli olacak şekilde giriniz (Örn: 05523233344)"
-                                                oninput="this.value = this.value.replace(/[^0-9]/g, '')" required>
+                                            <label class="form-label small fw-medium">Telefon <span class="text-danger">*</span></label>
+                                            <input type="tel" name="GuestPhone" class="form-control" maxlength="11" oninput="this.value = this.value.replace(/[^0-9]/g, '')" required>
                                         </div>
                                     </div>
 
-                                    <h6 class="fw-bold mb-3 text-secondary border-bottom pb-2 mt-2"><i
-                                            class="bi bi-truck me-2"></i>Teslimat Adresi</h6>
+                                    <h6 class="fw-bold mb-3 text-secondary border-bottom pb-2 mt-2"><i class="bi bi-truck me-2"></i>Teslimat Adresi</h6>
                                     <div class="row g-3">
                                         <div class="col-12">
-                                            <label class="form-label small fw-medium">Açık Adres <span
-                                                    class="text-danger">*</span></label>
-                                            <textarea name="GuestOpenAddress" class="form-control" rows="3" maxlength="250"
-                                        placeholder="Mahalle, sokak, bina ve daire numaranızı detaylıca giriniz (Maksimum 250 karakter).."
-                                        required></textarea>
-                                            <div class="form-text text-end" style="font-size: 0.75rem;">Maks: 250 karakter</div>
+                                            <label class="form-label small fw-medium">Açık Adres <span class="text-danger">*</span></label>
+                                            <textarea name="GuestOpenAddress" class="form-control" rows="3" required></textarea>
                                         </div>
                                         <div class="col-md-6">
-                                            <label class="form-label small fw-medium">Şehir <span
-                                                    class="text-danger">*</span></label>
-                                            <select id="GuestCity" name="GuestCity" class="form-select" required>
-                                                <option value="">İl Seçiniz</option>
-                                                <option value="İstanbul" selected>İstanbul</option>
-                                                <option value="Ankara">Ankara</option>
-                                                <option value="İzmir">İzmir</option>
-                                                <option value="Denizli">Denizli</option>
-                                            </select>
+                                            <label class="form-label small fw-medium">Şehir <span class="text-danger">*</span></label>
+                                            <input type="text" name="GuestCity" class="form-control" required>
                                         </div>
                                         <div class="col-md-6">
-                                            <label class="form-label small fw-medium">İlçe <span
-                                                    class="text-danger">*</span></label>
-                                            <select id="GuestDistrict" name="GuestDistrict" class="form-select" required>
-                                                <option value="">İlçe Seçiniz</option>
-                                                <option value="Kadıköy" selected>Kadıköy</option>
-                                                <option value="Beşiktaş">Beşiktaş</option>
-                                                <option value="Üsküdar">Üsküdar</option>
-                                            </select>
+                                            <label class="form-label small fw-medium">İlçe <span class="text-danger">*</span></label>
+                                            <input type="text" name="GuestDistrict" class="form-control" required>
                                         </div>
                                     </div>
                                 }
                             </div>
                         </div>
 
-                        <!-- 2. ADIM: ÖDEME BİLGİLERİ -->
                         <div class="card shadow-sm border-0 rounded-4 overflow-hidden">
                             <div class="card-header bg-white py-3 px-4 border-bottom">
                                 <h5 class="mb-0 fw-bold d-flex align-items-center">
-                                    <span
-                                        class="badge bg-primary rounded-circle me-2 d-flex align-items-center justify-content-center"
-                                        style="width: 28px; height: 28px;">2</span>
-                                    Kart Bilgileri
+                                    <span class="badge bg-primary rounded-circle me-2 d-flex align-items-center justify-content-center" style="width: 28px; height: 28px;">2</span>
+                                    Fatura ve Güvenlik Bilgileri
                                 </h5>
                             </div>
                             <div class="card-body p-4">
+                                
+                                <div class="mb-4 p-3 bg-light rounded-3 border">
+                                    <label class="form-label d-block fw-bold text-dark mb-3"><i class="bi bi-receipt me-2"></i>Fatura Türü</label>
+                                    <div class="form-check form-check-inline me-4">
+                                        <input class="form-check-input" type="radio" name="IsCorporateInvoice" id="faturaBireysel" value="false" checked onchange="toggleInvoice()">
+                                        <label class="form-check-label fw-medium user-select-none" style="cursor: pointer;" for="faturaBireysel">Bireysel Fatura</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="IsCorporateInvoice" id="faturaKurumsal" value="true" onchange="toggleInvoice()">
+                                        <label class="form-check-label fw-medium user-select-none" style="cursor: pointer;" for="faturaKurumsal">Kurumsal Fatura</label>
+                                    </div>
+                                </div>
+
                                 <div class="row g-4">
-                                    <div class="col-12">
-                                        <label class="form-label fw-bold text-muted small">Kart Üzerindeki İsim</label>
+                                    <div class="col-12" id="alanBireysel">
+                                        <label class="form-label fw-bold text-muted small">TC Kimlik Numarası <span class="text-danger">*</span></label>
                                         <div class="input-group">
-                                            <span class="input-group-text bg-light border-end-0 text-muted"><i
-                                                    class="bi bi-person"></i></span>
-                                            <input type="text" name="CardNameSurname"
-                                                class="form-control border-start-0 ps-0 py-2" maxlength="50"
-                                                placeholder="Ad Soyad" required>
+                                            <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-person-badge"></i></span>
+                                            <input type="text" name="TcNo" id="inputTc" class="form-control border-start-0 ps-0 py-2" maxlength="11" oninput="this.value = this.value.replace(/[^0-9]/g, '')" required>
                                         </div>
                                     </div>
-                                    <div class="col-12">
-                                        <label class="form-label fw-bold text-muted small">Kart Numarası</label>
-                                        <div class="input-group">
-                                            <span class="input-group-text bg-light border-end-0 text-muted"><i
-                                                    class="bi bi-credit-card-2-front"></i></span>
-                                            <input type="text" inputmode="numeric" pattern="[0-9 ]*" maxlength="19"
-                                                name="CardNumber" class="form-control border-start-0 ps-0 py-2"
-                                                placeholder="0000 0000 0000 0000" required
-                                                oninput="this.value = this.value.replace(/[^0-9]/g, '').replace(/(.{4})/g, '$1 ').trim()">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label class="form-label fw-bold text-muted small">Ay</label>
-                                        <select class="form-select py-2" name="CardMonth" required>
-                                            <option value="" selected disabled>Seçiniz</option>
-                                            @for (int i = 1; i <= 12; i++)
-                                            {
-                                                <option value="@i">@i.ToString("00")</option>
-                                            }
-                                        </select>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label class="form-label fw-bold text-muted small">Yıl</label>
-                                        <select class="form-select py-2" name="CardYear" required>
-                                            <option value="" selected disabled>Seçiniz</option>
-                                            @for (int i = DateTime.Now.Year; i <= DateTime.Now.Year + 15; i++)
-                                            {
-                                                <option value="@i">@i</option>
-                                            }
-                                        </select>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label class="form-label fw-bold text-muted small">CVV</label>
-                                        <div class="input-group">
-                                            <span class="input-group-text bg-light border-end-0 text-muted"><i
-                                                    class="bi bi-lock"></i></span>
-                                            <input type="text" name="CVV" class="form-control border-start-0 ps-0 py-2"
-                                                inputmode="numeric" pattern="[0-9 ]*"
-                                                oninput="this.value = this.value.replace(/[^0-9]/g, '').replace(/(.{4})/g, '$1 ').trim()"
-                                                placeholder="***" maxlength="3" required>
+
+                                    <div class="col-12" id="alanKurumsal" style="display: none;">
+                                        <div class="row g-3">
+                                            <div class="col-12">
+                                                <label class="form-label fw-bold text-muted small">Firma Ünvanı <span class="text-danger">*</span></label>
+                                                <input type="text" name="CompanyName" id="inputSirket" class="form-control py-2 bg-light">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label fw-bold text-muted small">Vergi Dairesi <span class="text-danger">*</span></label>
+                                                <input type="text" name="TaxOffice" id="inputVd" class="form-control py-2 bg-light">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label fw-bold text-muted small">Vergi Numarası <span class="text-danger">*</span></label>
+                                                <input type="text" name="TaxNumber" id="inputVno" class="form-control py-2 bg-light" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
 
                                 <div class="alert alert-light border mt-4 mb-0 d-flex align-items-center gap-3">
                                     <i class="bi bi-shield-check text-success fs-2"></i>
-                                    <div class="small text-muted">
-                                        Ödeme bilgileriniz <strong>256-bit SSL</strong> sertifikası ile şifrelenmektedir.
-                                        Kart bilgileriniz sistemimizde saklanmaz.
-                                    </div>
+                                    <div class="small text-muted">Bir sonraki adımda <strong>İyzico Güvenli Ödeme</strong> sayfasına yönlendirileceksiniz. Ödeme bilgileriniz 256-bit SSL sertifikası ile şifrelenmektedir.</div>
                                 </div>
                             </div>
                         </div>
 
                     </div>
 
-                    <!-- SAĞ KOLON: Sipariş Özeti (Sticky) -->
                     <div class="col-lg-4">
                         <div class="sticky-summary">
                             <div class="card shadow-sm border-0 rounded-4 overflow-hidden">
                                 <div class="card-header bg-white py-3 px-4 border-bottom">
                                     <h5 class="mb-0 fw-bold">Sipariş Özeti</h5>
                                 </div>
-
-                                <!-- Ürün Listesi (Scrollable) -->
                                 <div class="card-body p-0">
                                     <div style="max-height: 350px; overflow-y: auto;">
                                         <ul class="list-group list-group-flush">
@@ -297,29 +217,19 @@
                                             {
                                                 <li class="list-group-item d-flex align-items-center gap-3 py-3 px-4">
                                                     <div class="position-relative flex-shrink-0">
-                                                        <img src="~/img/products/@item.Product.Image" alt="@item.Product.Name"
-                                                            class="rounded shadow-sm object-fit-cover"
-                                                            style="width: 56px; height: 56px;">
-                                                        <span
-                                                            class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-secondary border border-white"
-                                                            style="font-size: 0.7rem;">@item.Quantity</span>
+                                                        <img src="~/img/products/@item.Product.Image" alt="@item.Product.Name" class="rounded shadow-sm object-fit-cover" style="width: 56px; height: 56px;">
+                                                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-secondary border border-white" style="font-size: 0.7rem;">@item.Quantity</span>
                                                     </div>
                                                     <div class="flex-grow-1" style="min-width: 0;">
-                                                        <h6 class="mb-1 text-truncate fw-bold text-dark"
-                                                            style="font-size: 0.9rem;">@item.Product.Name</h6>
-                                                        <small class="text-muted">Birim:
-                                                            @item.Product.Price.ToString("c")</small>
+                                                        <h6 class="mb-1 text-truncate fw-bold text-dark" style="font-size: 0.9rem;">@item.Product.Name</h6>
+                                                        <small class="text-muted">Birim: @item.Product.Price.ToString("c")</small>
                                                     </div>
-                                                    <div class="fw-bold text-primary">
-                                                        @((item.Product.Price * item.Quantity).ToString("c"))
-                                                    </div>
+                                                    <div class="fw-bold text-primary">@((item.Product.Price * item.Quantity).ToString("c"))</div>
                                                 </li>
                                             }
                                         </ul>
                                     </div>
                                 </div>
-
-                                <!-- Toplamlar -->
                                 <div class="card-footer bg-light p-4">
                                     <div class="d-flex justify-content-between mb-2 small text-muted">
                                         <span>Ara Toplam</span>
@@ -327,35 +237,17 @@
                                     </div>
                                     <div class="d-flex justify-content-between mb-3 small text-muted">
                                         <span>Kargo Ücreti</span>
-                                        @if (shippingCost == 0)
-                                        {
-                                            <span class="text-success fw-bold">Ücretsiz</span>
-                                        }
-                                        else
-                                        {
-                                            <span class="fw-medium text-dark">@shippingCost.ToString("c")</span>
-                                        }
+                                        @if (shippingCost == 0) { <span class="text-success fw-bold">Ücretsiz</span> }
+                                        else { <span class="fw-medium text-dark">@shippingCost.ToString("c")</span> }
                                     </div>
-
                                     <hr class="text-muted opacity-25 my-3">
-
                                     <div class="d-flex justify-content-between align-items-center mb-4">
                                         <span class="fs-5 fw-bold text-dark">Toplam Tutar</span>
                                         <span class="fs-4 fw-bold text-primary">@finalTotal.ToString("c")</span>
                                     </div>
-
-                                    <button type="submit"
-                                        class="btn btn-primary w-100 rounded-pill py-3 fw-bold shadow-sm transition-all d-none d-lg-block">
-                                        Ödemeyi Tamamla <i class="bi bi-chevron-right ms-1"></i>
+                                    <button type="submit" class="btn btn-primary w-100 rounded-pill py-3 fw-bold shadow-sm d-none d-lg-block">
+                                        Güvenli Ödemeye Geç <i class="bi bi-chevron-right ms-1"></i>
                                     </button>
-
-                                    <div class="text-center mt-3">
-                                        <small class="text-muted" style="font-size: 0.75rem;">
-                                            "Ödemeyi Tamamla" butonuna tıklayarak <a href="#"
-                                                class="text-decoration-none">Mesafeli Satış Sözleşmesi</a>'ni kabul etmiş
-                                            olursunuz.
-                                        </small>
-                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -367,12 +259,9 @@
         else
         {
             <div class="text-center py-5">
-                <div class="mb-4">
-                    <i class="bi bi-cart-x text-muted opacity-25" style="font-size: 5rem;"></i>
-                </div>
+                <i class="bi bi-cart-x text-muted opacity-25 mb-4" style="font-size: 5rem;"></i>
                 <h3 class="fw-bold text-dark">Sepetiniz Boş</h3>
-                <p class="text-muted mb-4">Ödeme yapabilmek için sepetinize ürün eklemelisiniz.</p>
-                <a href="/Products" class="btn btn-primary rounded-pill px-5 py-2">Alışverişe Başla</a>
+                <a href="/Products" class="btn btn-primary rounded-pill px-5 py-2 mt-3">Alışverişe Başla</a>
             </div>
         }
     </div>
@@ -380,22 +269,39 @@
 
 @if (User.Identity.IsAuthenticated)
 {
-    @* Özel JS dosyasını çağırıyoruz *@
-    <script src="~/js/checkout.js"></script>
+    <script src="~/js/checkout.js" asp-append-version="true"></script>
 }
 
-<!-- MOBİL SABİT ALT BAR -->
-<div class="fixed-bottom bg-white border-top shadow-lg p-3 d-lg-none" style="z-index: 1040;">
-    <div class="container">
-        <div class="d-flex justify-content-between align-items-center">
-            <div>
-                <small class="text-muted d-block" style="font-size: 0.8rem;">Toplam Tutar</small>
-                <span class="fs-4 fw-bold text-primary">@finalTotal.ToString("c")</span>
-            </div>
-            <button type="submit" form="checkoutForm" class="btn btn-primary rounded-pill px-4 py-2 fw-bold shadow-sm">
-                Ödemeyi Tamamla <i class="bi bi-chevron-right ms-1"></i>
-            </button>
+<script>
+    function toggleInvoice() {
+        var isCorp = document.getElementById('faturaKurumsal').checked;
+        
+        document.getElementById('alanBireysel').style.display = isCorp ? 'none' : 'block';
+        document.getElementById('alanKurumsal').style.display = isCorp ? 'block' : 'none';
+        
+        document.getElementById('inputTc').required = !isCorp;
+        document.getElementById('inputSirket').required = isCorp;
+        document.getElementById('inputVd').required = isCorp;
+        document.getElementById('inputVno').required = isCorp;
 
+        // Geçişlerde çöp veriyi temizleme
+        if(isCorp) document.getElementById('inputTc').value = '';
+        else {
+            document.getElementById('inputSirket').value = '';
+            document.getElementById('inputVd').value = '';
+            document.getElementById('inputVno').value = '';
+        }
+    }
+</script>
+
+<div class="fixed-bottom bg-white border-top shadow-lg p-3 d-lg-none" style="z-index: 1040;">
+    <div class="container d-flex justify-content-between align-items-center">
+        <div>
+            <small class="text-muted d-block">Toplam</small>
+            <span class="fs-4 fw-bold text-primary">@finalTotal.ToString("c")</span>
         </div>
+        <button type="submit" form="checkoutForm" class="btn btn-primary rounded-pill px-4 py-2 fw-bold">
+            Ödemeye Geç <i class="bi bi-chevron-right ms-1"></i>
+        </button>
     </div>
 </div>

@@ -5,7 +5,6 @@ body {
     /* style.css içinde tanımlandı */
     font-family: 'Roboto', system-ui, sans-serif;
     font-size: 0.925rem; /* İçerik boyutunu dengelemek için küçültüldü */
-    color: #333;
 }
 
 /* Navbar vb. */
@@ -41,15 +40,6 @@ body {
 .btn {
     font-size: 14px !important;
     padding: 0.375rem 0.75rem;
-}
-
-/* --- ELEGANT BÖLÜM YAPISI (Ardışık Renkler) --- */
-main > section:nth-of-type(odd) {
-    background-color: #ffffff;
-}
-
-main > section:nth-of-type(even) {
-    background-color: #f9f9f9; /* Gözü yormayan çok hafif gri */
 }
 
 /* --- KÖŞELİ MODERN YAPI --- */

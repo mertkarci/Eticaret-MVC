@@ -1,68 +1,84 @@
 // Adres Kartı Seçim Efekti
 function selectAddress(element) {
-    // Tüm kartlardan selected sınıfını kaldır
-    document.querySelectorAll('input[name="DeliveryAddress"]').forEach(input => {
+    document.querySelectorAll('input[name="DeliveryAddressGuid"]').forEach(input => {
         input.closest('.address-card').classList.remove('selected');
     });
-    // Seçilene ekle
     element.classList.add('selected');
 
-    // Radyo butonunu işaretle
     const radio = element.querySelector('input[type="radio"]');
-    if (radio) radio.checked = true;
+    if (radio) {
+        radio.checked = true;
+    }
 
-    // Eğer fatura adresi aynı ise hidden inputu güncelle
     updateBillingInput();
 }
 
 function selectBillingAddress(element) {
-    document.querySelectorAll('input[name="BillingAddress"]').forEach(input => {
+    document.querySelectorAll('input[name="BillingAddressGuid"][type="radio"]').forEach(input => {
         input.closest('.address-card').classList.remove('selected');
     });
     element.classList.add('selected');
     const radio = element.querySelector('input[type="radio"]');
-    if (radio) radio.checked = true;
+    if (radio) {
+        radio.checked = true;
+    }
 }
 
 function toggleBillingSection() {
     const checkbox = document.getElementById('sameAddress');
     const section = document.getElementById('billingSection');
-    const billingDefault = document.getElementById('billingAddressDefault');
 
     if (checkbox && section) {
         if (checkbox.checked) {
             section.style.display = 'none';
-            // Fatura adresi seçimlerini temizle
-            document.querySelectorAll('input[name="BillingAddress"]').forEach(r => r.checked = false);
-            updateBillingInput();
+            // Radyo butonlarındaki seçimleri kaldır ki çakışma olmasın
+            document.querySelectorAll('input[name="BillingAddressGuid"][type="radio"]').forEach(r => r.checked = false);
+            document.querySelectorAll('#billingSection .address-card').forEach(c => c.classList.remove('selected'));
         } else {
             section.style.display = 'block';
-            // Hidden inputu devre dışı bırak, artık radyo butonları geçerli
-            if (billingDefault) billingDefault.name = "";
         }
+        updateBillingInput();
     }
 }
 
 function updateBillingInput() {
     const checkbox = document.getElementById('sameAddress');
-    if (checkbox && checkbox.checked) {
-        const selectedDelivery = document.querySelector('input[name="DeliveryAddress"]:checked');
-        const hiddenInput = document.getElementById('billingAddressDefault');
+    const hiddenInput = document.getElementById('billingAddressDefault');
+    const selectedDelivery = document.querySelector('input[name="DeliveryAddressGuid"]:checked');
 
+    if (checkbox && checkbox.checked) {
         if (hiddenInput) {
-            // Hidden inputu aktif et ve değerini güncelle
-            hiddenInput.name = "BillingAddress";
+            hiddenInput.name = "BillingAddressGuid"; // MVC'nin beklediği isimle aktif et
             if (selectedDelivery) {
                 hiddenInput.value = selectedDelivery.value;
             }
         }
+    } else {
+        if (hiddenInput) {
+            hiddenInput.name = ""; // Fatura adresi farklıysa hidden input gönderilmesin
+        }
     }
 }
 
-// Sayfa yüklendiğinde çalıştır
+// Sayfa yüklendiğinde ve form gönderilmeden önce çalıştır
 document.addEventListener('DOMContentLoaded', function () {
-    // Sadece checkout sayfasında çalışması için kontrol
-    if(document.getElementById('checkoutForm')) {
+    const form = document.getElementById('checkoutForm');
+    if(form) {
+        // Sayfa ilk açıldığında seçili bir teslimat adresi yoksa ilkini otomatik seç
+        let selectedDelivery = document.querySelector('input[name="DeliveryAddressGuid"]:checked');
+        if (!selectedDelivery) {
+            const firstDelivery = document.querySelector('input[name="DeliveryAddressGuid"]');
+            if (firstDelivery) {
+                firstDelivery.checked = true;
+                firstDelivery.closest('.address-card').classList.add('selected');
+            }
+        }
+
         updateBillingInput();
+
+        // Form gönderimi sırasında son bir kez daha değerin doğruluğundan emin ol
+        form.addEventListener('submit', function(e) {
+            updateBillingInput();
+        });
     }
 });
