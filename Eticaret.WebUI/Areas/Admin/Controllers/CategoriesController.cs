@@ -199,6 +199,20 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
             var category = await _context.Categories.FindAsync(id);
             if (category != null)
             {
+                // 1. İLİŞKİLİ ÜRÜNLERİ BOŞA ÇIKAR (Kategoriyi NULL yap)
+                var relatedProducts = await _context.Products.Where(p => p.CategoryId == id).ToListAsync();
+                foreach (var product in relatedProducts)
+                {
+                    product.CategoryId = null;
+                }
+
+                // 2. ALT KATEGORİLERİ BOŞA ÇIKAR (Alt kategorileri ana kategoriye taşı veya bağımsız yap)
+                var subCategories = await _context.Categories.Where(c => c.ParentId == id).ToListAsync();
+                foreach (var subCategory in subCategories)
+                {
+                    subCategory.ParentId = 0;
+                }
+
                 if (!string.IsNullOrEmpty(category.Image))
                 {
                     FileHelper.FileRemover(category.Image, "/wwwroot/img/categories/");

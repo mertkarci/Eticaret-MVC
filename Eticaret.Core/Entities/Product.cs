@@ -23,7 +23,7 @@ public class Product : IEntity
     public Category? Category {get; set;} 
 
     [Display(Name ="Marka ID")]
-    public int BrandId {get; set;}
+    public int? BrandId {get; set;}
     
     // Aynı şekilde Brand için de etiketi ekledik.
     [Display(Name ="Marka")] 

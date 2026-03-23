@@ -62,7 +62,7 @@ namespace Eticaret.WebUI.Controllers
             var productQuery = _service.GetQueryable().Where(p => p.isActive);
 
             if (selectedBrands != null && selectedBrands.Any())
-                productQuery = productQuery.Where(p => p.BrandId != 0 && selectedBrands.Contains(p.BrandId));
+                productQuery = productQuery.Where(p => p.BrandId.HasValue && selectedBrands.Contains(p.BrandId.Value));
 
             if (selectedCategories != null && selectedCategories.Any())
             {

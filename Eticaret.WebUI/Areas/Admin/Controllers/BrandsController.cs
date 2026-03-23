@@ -164,6 +164,13 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
             var brand = await _context.Brands.FindAsync(id);
             if (brand != null)
             {
+                // 1. İLİŞKİLİ ÜRÜNLERİ BOŞA ÇIKAR (Markayı NULL yap)
+                var relatedProducts = await _context.Products.Where(p => p.BrandId == id).ToListAsync();
+                foreach (var product in relatedProducts)
+                {
+                    product.BrandId = null;
+                }
+
                 if (!string.IsNullOrEmpty(brand.Logo))
                 {
                     FileHelper.FileRemover(brand.Logo, "/wwwroot/img/brands/");

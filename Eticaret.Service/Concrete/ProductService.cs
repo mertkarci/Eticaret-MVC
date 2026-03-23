@@ -31,7 +31,7 @@ public class ProductService : IProductService
         var query = _productService.GetQueryable().Include(p => p.Brand).Include(p => p.Category).AsQueryable();
 
         if (selectedBrands != null && selectedBrands.Any())
-            query = query.Where(p => selectedBrands.Contains(p.BrandId));
+            query = query.Where(p => p.BrandId.HasValue && selectedBrands.Contains(p.BrandId.Value));
 
         if (selectedCategories != null && selectedCategories.Any())
             query = query.Where(p => p.CategoryId.HasValue && selectedCategories.Contains(p.CategoryId.Value));
