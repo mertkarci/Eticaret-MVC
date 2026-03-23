@@ -16,10 +16,12 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
     public class AddressesController : Controller
     {
         private readonly DatabaseContext _context;
+        private readonly ILogger<AddressesController> _logger;
 
-        public AddressesController(DatabaseContext context)
+        public AddressesController(DatabaseContext context, ILogger<AddressesController> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         // GET: Admin/Addresses
@@ -66,6 +68,7 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
             {
                 _context.Add(address);
                 await _context.SaveChangesAsync();
+                _logger.LogInformation("Kullanıcı İşlemi: {Admin} adlı yönetici, {AddressId} ID'li yeni bir adres oluşturdu.", User.Identity.Name, address.Id);
                 return RedirectToAction(nameof(Index));
             }
             ViewData["AppUserId"] = new SelectList(_context.AppUsers, "Id", "Email", address.AppUserId);
@@ -106,6 +109,7 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
                 try
                 {
                     _context.Update(address);
+                    _logger.LogInformation("Kullanıcı İşlemi: {Admin} adlı yönetici, {AddressId} ID'li adresi düzenledi.", User.Identity.Name, address.Id);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
@@ -152,7 +156,10 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
             var address = await _context.Addresses.FindAsync(id);
             if (address != null)
             {
+
                 _context.Addresses.Remove(address);
+                _logger.LogInformation("Kullanıcı İşlemi: {Admin} adlı yönetici, {AddressId} ID'li adresi sildi.", User.Identity.Name, address.Id);
+
             }
 
             await _context.SaveChangesAsync();

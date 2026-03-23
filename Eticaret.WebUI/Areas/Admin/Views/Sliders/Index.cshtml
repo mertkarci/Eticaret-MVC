@@ -17,6 +17,7 @@
                 <tr>
                     <th class="ps-4">Görsel</th>
                     <th>@Html.DisplayNameFor(model => model.Title)</th>
+                    <th>@Html.DisplayNameFor(model => model.EnumSliderType)</th>
                     <th>@Html.DisplayNameFor(model => model.Link)</th>
                     <th class="text-end pe-4">İşlemler</th>
                 </tr>
@@ -28,7 +29,8 @@
                         <td class="ps-4">
                             @if (!string.IsNullOrEmpty(item.Image))
                             {
-                                <img src="/img/sliders/@item.Image" alt="@item.Title" class="rounded shadow-sm" style="width: 100px; height: 40px; object-fit: cover;" />
+                                <img src="/img/sliders/@item.Image" alt="@item.Title" class="rounded shadow-sm"
+                                    style="width: 100px; height: 40px; object-fit: cover;" />
                             }
                             else
                             {
@@ -36,14 +38,17 @@
                             }
                         </td>
                         <td class="fw-bold text-dark">@Html.DisplayFor(modelItem => item.Title)</td>
+                        <td class="fw-bold text-dark">@item.EnumSliderType.ToString()</td>
                         <td>
-                            <a href="@item.Link" target="_blank" class="text-decoration-none text-truncate d-block" style="max-width: 200px;">
+                            <a href="@item.Link" target="_blank" class="text-decoration-none text-truncate d-block"
+                                style="max-width: 200px;">
                                 @Html.DisplayFor(modelItem => item.Link)
                             </a>
                         </td>
                         <td class="text-end pe-4">
                             <div class="action-buttons">
-                                <a asp-action="Edit" class="btn btn-outline-primary" asp-route-id="@item.Id" title="Düzenle">
+                                <a asp-action="Edit" class="btn btn-outline-primary" asp-route-id="@item.Id"
+                                    title="Düzenle">
                                     <i class="bi bi-pencil-square"></i>
                                 </a>
                                 <a asp-action="Delete" class="btn btn-outline-danger" asp-route-id="@item.Id" title="Sil">

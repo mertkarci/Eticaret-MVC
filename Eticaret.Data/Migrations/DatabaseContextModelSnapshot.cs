@@ -322,6 +322,36 @@ namespace Eticaret.Data.Migrations
                     b.ToTable("News");
                 });
 
+            modelBuilder.Entity("Eticaret.Core.Entities.Notification", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Image")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("isActive")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("isString")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Notification");
+                });
+
             modelBuilder.Entity("Eticaret.Core.Entities.Order", b =>
                 {
                     b.Property<int>("Id")
@@ -500,6 +530,24 @@ namespace Eticaret.Data.Migrations
                     b.ToTable("ProductImages");
                 });
 
+            modelBuilder.Entity("Eticaret.Core.Entities.SiteSettings", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsMaintenanceMode")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("MaintenanceMessage")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SiteSettings");
+                });
+
             modelBuilder.Entity("Eticaret.Core.Entities.Slider", b =>
                 {
                     b.Property<int>("Id")
@@ -509,6 +557,9 @@ namespace Eticaret.Data.Migrations
                     b.Property<string>("Description")
                         .HasMaxLength(50)
                         .HasColumnType("TEXT");
+
+                    b.Property<int>("EnumSliderType")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Image")
                         .HasMaxLength(50)

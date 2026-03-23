@@ -17,10 +17,12 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
     public class CategoriesController : Controller
     {
         private readonly DatabaseContext _context;
+        private readonly ILogger<CategoriesController> _logger;
 
-        public CategoriesController(DatabaseContext context)
+        public CategoriesController(DatabaseContext context, ILogger<CategoriesController> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         // GET: Admin/Categories
@@ -76,7 +78,7 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
                     finalSlug = $"{baseSlug}-{counter++}";
                 }
                 category.Slug = finalSlug;
-
+                _logger.LogInformation("Kullanıcı İşlemi: {Admin} adlı yönetici, {CategoryName} isimli yeni bir kategori oluşturdu.", User.Identity.Name, category.Name);
                 _context.Add(category);
                 await _context.SaveChangesAsync();
 
@@ -138,12 +140,13 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
                     if (cbResmiSil)
                     {
                         category.Image = string.Empty;
+                        _logger.LogInformation("Kullanıcı İşlemi: {Admin} adlı yönetici, {CategoryName} isimli kategorinin görselini sildi.", User.Identity.Name, category.Name);
                     }
                     if (Image != null)
                     {
                         category.Image = await FileHelper.FileLoaderAsync(Image, "/img/categories/");
                     }
-
+                    _logger.LogInformation("Kullanıcı İşlemi: {Admin} adlı yönetici, {CategoryName} isimli kategoriyi düzenledi.", User.Identity.Name, category.Name);
                     _context.Update(category);
                     await _context.SaveChangesAsync();
                 }
@@ -151,6 +154,7 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
                 {
                     if (!CategoryExists(category.Id))
                     {
+                        _logger.LogInformation("Kullanıcı İşlemi: {Admin} adlı yönetici, {CategoryName} isimli kategoriyi düzenlerken bir hata oluştu.", User.Identity.Name, category.Name);
                         return NotFound();
                     }
                     else
@@ -199,6 +203,7 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
                 {
                     FileHelper.FileRemover(category.Image, "/wwwroot/img/categories/");
                 }
+                _logger.LogInformation("Kullanıcı İşlemi: {Admin} adlı yönetici, {CategoryName} isimli kategoriyi sildi.", User.Identity.Name, category.Name);
                 _context.Categories.Remove(category);
             }
 

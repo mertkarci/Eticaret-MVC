@@ -2,18 +2,30 @@ using Eticaret.Core.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Eticaret.WebUI.ExtensionMethods;
 using Eticaret.Service.Abstract;
+using Microsoft.Extensions.Logging;
 
 namespace Eticaret.WebUI.Controllers
 {
     public class FavouritesController : Controller
     {
         private readonly IService<Product> _service;
+        private readonly ILogger<FavouritesController> _logger;
 
-        public FavouritesController(IService<Product> service)
+        public FavouritesController(IService<Product> service, ILogger<FavouritesController> logger)
         {
             _service = service;
-
+            _logger = logger;
         }
+
+        private string GetRoleName()
+        {
+            if (User?.Identity?.IsAuthenticated == true)
+            {
+                return User.IsInRole("Admin") ? "Admin" : "Üye";
+            }
+            return "Misafir";
+        }
+
         [Route("favorilerim")]
         public ActionResult Index()
         {
@@ -48,11 +60,15 @@ namespace Eticaret.WebUI.Controllers
             {
                 favourites.RemoveAll(i => i.Id == productId);
                 isNowFavorite = false;
+                
+                _logger.LogInformation("Müşteri İşlemi: {User} adlı {Role} rolündeki kullanıcı '{ProductName}' (ID: {ProductId}) ürününü favorilerinden çıkardı.", User.Identity?.Name ?? "Ziyaretçi", GetRoleName(), product.Name, product.Id);
             }
             else
             {
                 favourites.Add(product);
                 isNowFavorite = true;
+                
+                _logger.LogInformation("Müşteri İşlemi: {User} adlı {Role} rolündeki kullanıcı '{ProductName}' (ID: {ProductId}) ürününü favorilerine ekledi.", User.Identity?.Name ?? "Ziyaretçi", GetRoleName(), product.Name, product.Id);
             }
 
             HttpContext.Session.SetJson("GetFavourites", favourites);
@@ -64,10 +80,14 @@ namespace Eticaret.WebUI.Controllers
         public IActionResult Remove(int productId)
         {
             var favourites = GetFavourites();
-            if (favourites.Any(p => p.Id == productId))
+            var productToRemove = favourites.FirstOrDefault(p => p.Id == productId);
+            
+            if (productToRemove != null)
             {
                 favourites.RemoveAll(i => i.Id == productId);
                 HttpContext.Session.SetJson("GetFavourites", favourites);
+                
+                _logger.LogInformation("Müşteri İşlemi: {User} adlı {Role} rolündeki kullanıcı '{ProductName}' (ID: {ProductId}) ürününü favorilerinden çıkardı.", User.Identity?.Name ?? "Ziyaretçi", GetRoleName(), productToRemove.Name, productToRemove.Id);
             }
             return RedirectToAction("Index");
         }

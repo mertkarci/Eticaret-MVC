@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.Extensions.Logging;
 namespace Eticaret.WebUI;
 
 [Route("hesabim")]
@@ -19,13 +20,24 @@ public class AccountsController : Controller
     private readonly IService<Order> _serviceOrder;
     private readonly IAuthService _authService;
     private readonly IUserService _userService;
+    private readonly ILogger<AccountsController> _logger;
 
-    public AccountsController(IService<AppUser> service, IService<Order> serviceOrder, IAuthService authService, IUserService userService)
+    public AccountsController(IService<AppUser> service, IService<Order> serviceOrder, IAuthService authService, IUserService userService, ILogger<AccountsController> logger)
     {
         _service = service;
         _serviceOrder = serviceOrder;
         _authService = authService;
         _userService = userService;
+        _logger = logger;
+    }
+
+    private string GetRoleName()
+    {
+        if (User?.Identity?.IsAuthenticated == true)
+        {
+            return User.IsInRole("Admin") ? "Admin" : "Üye";
+        }
+        return "Misafir";
     }
 
 
@@ -93,6 +105,9 @@ public class AccountsController : Controller
                 <strong> Tebrikler! </strong> Bilgileriniz başarıyla güncellendi.
                 <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
             </div>";
+            
+                _logger.LogInformation("Müşteri İşlemi: {User} adlı {Role} rolündeki kullanıcı profil bilgilerini güncelledi.", model.Email ?? User.Identity?.Name, GetRoleName());
+                
                 return RedirectToAction("Index");
             }
             else
@@ -204,6 +219,10 @@ public class AccountsController : Controller
         }
 
         await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, result.Principal);
+        
+        var role = result.Principal.IsInRole("Admin") ? "Admin" : "Üye";
+        _logger.LogInformation("Müşteri İşlemi: {User} adlı {Role} rolündeki kullanıcı sisteme giriş yaptı.", loginViewModel.Email, role);
+        
         return Redirect(string.IsNullOrEmpty(loginViewModel.ReturnUrl) ? "/" : loginViewModel.ReturnUrl);
     }
 
@@ -231,13 +250,19 @@ public class AccountsController : Controller
         }
 
         TempData["Message"] = "Kaydınız başarıyla oluşturuldu. Lütfen giriş yapınız.";
+        _logger.LogInformation("Müşteri İşlemi: {User} adlı yeni kullanıcı sisteme Üye olarak kayıt oldu.", appUser.Email);
+        
         return RedirectToAction(nameof(SignIn));
     }
 
     [HttpGet("cikis-yap")]
     public async Task<IActionResult> SignOutAsync()
     {
+        var roleName = GetRoleName();
+        var userName = HttpContext.User.Identity?.Name ?? "Bilinmeyen Kullanıcı";
+        
         await HttpContext.SignOutAsync();
+        _logger.LogInformation("Müşteri İşlemi: {User} adlı {Role} rolündeki kullanıcı sistemden çıkış yaptı.", userName, roleName);
         return RedirectToAction("SignIn");
     }
 
@@ -274,6 +299,9 @@ public class AccountsController : Controller
         await HttpContext.SignOutAsync();
         await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, result.Principal);
 
+        var role = result.Principal.IsInRole("Admin") ? "Admin" : "Üye";
+        _logger.LogInformation("Müşteri İşlemi: {User} adlı {Role} rolündeki kullanıcı Google hesabı ile sisteme giriş yaptı.", email, role);
+
         return Redirect(string.IsNullOrEmpty(returnUrl) ? "/" : returnUrl);
     }
 
@@ -308,6 +336,8 @@ public class AccountsController : Controller
 
         if (mailSent) TempData["Message"] = "<div class='alert alert-success'>Bağlantı mail adresinize gönderildi.</div>";
         else TempData["Message"] = "<div class='alert alert-danger'>Sistemsel bir hata oluştu.</div>";
+        
+        _logger.LogInformation("Müşteri İşlemi: {User} adlı {Role} rolündeki kullanıcı şifre sıfırlama talebinde bulundu.", Email, GetRoleName());
 
         return View();
     }
@@ -333,6 +363,8 @@ public class AccountsController : Controller
         if (result.IsSuccess)
         {
             TempData["Message"] = "<div class='alert alert-success alert-dismissible fade show rounded-0' role='alert'>Şifreniz başarıyla güncellenmiştir! Lütfen yeni şifrenizle giriş yapın.<button type='button' class='btn-close' data-bs-dismiss='alert'></button></div>";
+            _logger.LogInformation("Müşteri İşlemi: Bir {Role} başarıyla şifresini yeniledi.", GetRoleName());
+            
             return RedirectToAction("SignIn");
         }
 

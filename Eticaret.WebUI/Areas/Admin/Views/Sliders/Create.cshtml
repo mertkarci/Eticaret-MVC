@@ -10,12 +10,25 @@
     <div class="row g-4">
         <div class="col-lg-8">
             <div class="card card-admin">
-                <div class="card-header"><h5 class="card-title mb-0">Slider İçeriği</h5></div>
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Slider İçeriği</h5>
+                </div>
                 <div class="card-body">
                     <div class="mb-3">
                         <label asp-for="Title" class="form-label"></label>
                         <input asp-for="Title" class="form-control form-control-lg" />
                         <span asp-validation-for="Title" class="text-danger small"></span>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-group">
+                            <label asp-for="EnumSliderType" class="control-label"></label>
+                            <select asp-for="EnumSliderType"
+                                asp-items="Html.GetEnumSelectList<Eticaret.Core.Entities.EnumSliderType>()"
+                                class="form-control">
+                                <option value="">- Slider Tipi Seçiniz -</option>
+                            </select>
+                            <span asp-validation-for="EnumSliderType" class="text-danger"></span>
+                        </div>
                     </div>
                     <div class="mb-3">
                         <label asp-for="Description" class="form-label"></label>
@@ -31,7 +44,9 @@
             </div>
 
             <div class="card card-admin mt-4">
-                <div class="card-header"><h5 class="card-title mb-0">Slider Görseli</h5></div>
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Slider Görseli</h5>
+                </div>
                 <div class="card-body">
                     <label for="file-upload" class="custom-file-upload-container">
                         <div class="icon"><i class="bi bi-images"></i></div>
@@ -47,7 +62,9 @@
         <div class="col-lg-4">
             <div class="sticky-form-sidebar">
                 <div class="card card-admin">
-                    <div class="card-header"><h5 class="card-title mb-0">Eylemler</h5></div>
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Eylemler</h5>
+                    </div>
                     <div class="card-body">
                         <div class="d-grid gap-2">
                             <button type="submit" class="btn btn-submit shadow-sm">
@@ -65,8 +82,10 @@
 </form>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
     <script>
-        function previewImage(event) { const reader = new FileReader(); reader.onload = function(){ const output = document.getElementById('image-preview'); output.src = reader.result; output.style.display = 'block'; }; reader.readAsDataURL(event.target.files[0]); }
+        function previewImage(event) { const reader = new FileReader(); reader.onload = function () { const output = document.getElementById('image-preview'); output.src = reader.result; output.style.display = 'block'; }; reader.readAsDataURL(event.target.files[0]); }
     </script>
 }

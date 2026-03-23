@@ -1,0 +1,51 @@
+@model Eticaret.Core.Entities.Notification
+
+@{
+    ViewData["Title"] = "Popup Detayları";
+}
+
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="card card-admin mb-4">
+            <div class="card-header"><h5 class="card-title mb-0">Popup İçeriği</h5></div>
+            <div class="card-body">
+                <h3 class="mb-3">@Model.Name</h3>
+                <p class="text-muted mb-4">@Model.CreateDate.ToString("dd MMMM yyyy")</p>
+                
+                @if (!string.IsNullOrEmpty(Model.Image))
+                {
+                    <img src="/img/popup/@Model.Image" alt="@Model.Name" class="img-fluid rounded mb-4 w-100" />
+                }
+                
+                <div class="p-3 bg-light rounded border">
+                    @Model.Description
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="sticky-form-sidebar">
+            <div class="card card-admin">
+                <div class="card-header"><h5 class="card-title mb-0">Durum ve İşlemler</h5></div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-4">
+                        <span>Yayın Durumu:</span>
+                        @if (Model.isActive)
+                        {
+                            <span class="badge bg-success">Yayında</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">Yayında Değil</span>
+                        }
+                    </div>
+                    <div class="d-grid gap-2">
+                        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary shadow-sm"><i class="bi bi-pencil-square me-2"></i> Düzenle</a>
+                        <a asp-action="Index" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-2"></i> Listeye Dön</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

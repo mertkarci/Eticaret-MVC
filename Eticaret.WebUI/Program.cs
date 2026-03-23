@@ -6,22 +6,48 @@ using Eticaret.Service.Concrete;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
+using Serilog.Events;
 
 var builder = WebApplication.CreateBuilder(args);
 
 var webUiPath = builder.Environment.ContentRootPath;
 
 
+builder.Host.UseSerilog();
+
 var dbPath = Path.GetFullPath(Path.Combine(webUiPath, "..", "Eticaret.Data", "Eticaret.db"));
 
+var logDbPath = Path.GetFullPath(Path.Combine(webUiPath, "..", "Eticaret.Data", "Logs.db"));
 
 Console.WriteLine($"--------------------------------------------------");
-Console.WriteLine($"KULLANILAN DB YOLU: {dbPath}");
+Console.WriteLine($"ANA DB: {dbPath}");
+Console.WriteLine($"LOG DB: {logDbPath}");
 Console.WriteLine($"--------------------------------------------------");
-
 
 builder.Services.AddDbContext<DatabaseContext>(options =>
     options.UseSqlite($"Data Source={dbPath}"));
+
+Serilog.Debugging.SelfLog.Enable(Console.Out);
+
+try
+{
+    Log.Logger = new LoggerConfiguration()
+        .MinimumLevel.Information()
+        .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+        .MinimumLevel.Override("System", LogEventLevel.Warning)
+        .WriteTo.Console()
+        .WriteTo.SQLite(
+            sqliteDbPath: logDbPath,
+            tableName: "AppLogs",
+            storeTimestampInUtc: true // Tabloyu otomatik oluşturması için şart
+        )
+        .CreateLogger();
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"Serilog başlatılamadı: {ex.Message}");
+}
 
 builder.Services.AddControllersWithViews(options =>
 {
@@ -83,7 +109,7 @@ builder.Services.AddRateLimiter(options =>
         limiterOptions.Window = TimeSpan.FromMinutes(1);
         limiterOptions.QueueLimit = 0;
     });
-    
+
 });
 
 builder.Services.AddSession(options =>
@@ -103,6 +129,7 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddSingleton<IMaintenanceService, MaintenanceService>();
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(p =>
 {
@@ -158,6 +185,8 @@ app.UseHttpsRedirection();
 
 // Statik Dosyalar (CSS, JS, Resimler için ŞART)
 app.UseStaticFiles();
+
+app.UseMiddleware<Eticaret.WebUI.Middlewares.MaintenanceMiddleware>(); // Bakım middlewarei 
 
 app.UseRouting();
 

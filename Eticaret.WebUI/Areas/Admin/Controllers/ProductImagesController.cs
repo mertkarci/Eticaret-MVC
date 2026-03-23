@@ -17,10 +17,13 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
     public class ProductImagesController : Controller
     {
         private readonly DatabaseContext _context;
+        private readonly ILogger<ProductImagesController> _logger;
 
-        public ProductImagesController(DatabaseContext context)
+
+        public ProductImagesController(DatabaseContext context, ILogger<ProductImagesController> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         // GET: Admin/ProductImages
@@ -73,6 +76,7 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
                 productImage.Name = await FileHelper.FileLoaderAsync(Name, "/img/products/");
                 _context.Add(productImage);
                 await _context.SaveChangesAsync();
+                _logger.LogInformation("Kullanıcı İşlemi: {Admin} adlı yönetici, {ProductId} ID'li ürün için ,{ProductImageId} ID'li yeni bir görsel oluşturdu.", User.Identity.Name, productImage.ProductId, productImage.Id);
                 return RedirectToAction(nameof(Index));
             }
             ViewData["ProductId"] = new SelectList(_context.Products, "Id", "Name", productImage.ProductId);
@@ -114,6 +118,7 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
                     if (cbResmiSil)
                     {
                         productImage.Name = string.Empty;
+                        _logger.LogInformation("Kullanıcı İşlemi: {Admin} adlı yönetici, {ProductId} ID'li ürün için ,{ProductImageId} ID'li görselinin içeriğini sildi.", User.Identity.Name, productImage.ProductId, productImage.Id);
                     }
                     if (Image != null)
                     {
@@ -121,6 +126,7 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
                     }
 
                     _context.Update(productImage);
+                    _logger.LogInformation("Kullanıcı İşlemi: {Admin} adlı yönetici, {ProductId} ID'li ürün için ,{ProductImageId} ID'li görseli düzenledi.", User.Identity.Name, productImage.ProductId, productImage.Id);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
@@ -168,6 +174,7 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
             if (productImage != null)
             {
                 _context.ProductImages.Remove(productImage);
+                _logger.LogInformation("Kullanıcı İşlemi: {Admin} adlı yönetici, {ProductId} ID'li ürün için ,{ProductImageId} ID'li görseli sildi.", User.Identity.Name, productImage.ProductId, productImage.Id);
             }
 
             await _context.SaveChangesAsync();

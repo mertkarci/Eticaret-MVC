@@ -1,0 +1,41 @@
+@model IEnumerable<Eticaret.Core.Entities.Slider>
+
+@{
+    async Task RenderSliderContent()
+    {
+        @foreach (var item in Model)
+        {
+            <span class="mx-8 flex items-center text-white text-sm md:text-base shrink-0">
+                <span class="mr-2 text-yellow-400">⚡</span>
+                @if ((int)item.EnumSliderType == 1)
+                {
+                    <img src="/img/sliders/@item.Image" alt="@item.Title" class="h-6 md:h-8 object-contain" />
+                }
+                else
+                {
+                    <span class="font-semibold">@item.Title</span>
+                }
+            </span>
+        }
+    }
+}
+
+<div class="group relative flex overflow-x-hidden border-y border-white/10 bg-black py-3">
+    <div class="animate-marquee whitespace-nowrap flex items-center">
+        @{ await RenderSliderContent(); }
+        @{ await RenderSliderContent(); } @* Boşluk kalmaması için en az 2 kez yan yana olmalı *@
+    </div>
+
+    <div class="absolute top-0 flex animate-marquee2 whitespace-nowrap py-3 items-center">
+        @{ await RenderSliderContent(); }
+        @{ await RenderSliderContent(); }
+    </div>
+</div>
+
+<style>
+    /* Hover durumunda durması için Tailwind ile grup yönetimi */
+    .group:hover .animate-marquee,
+    .group:hover .animate-marquee2 {
+        animation-play-state: paused;
+    }
+</style>

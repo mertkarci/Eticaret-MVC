@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting; // Added for Rate Limiting
 using System.Security.Claims;
+using Microsoft.Extensions.Logging;
 
 namespace Eticaret.WebUI.Controllers
 {
@@ -13,11 +14,13 @@ namespace Eticaret.WebUI.Controllers
     {
         private readonly IService<AppUser> _serviceAppUser;
         private readonly IService<Address> _serviceAddress;
+        private readonly ILogger<MyAddressesController> _logger;
 
-        public MyAddressesController(IService<AppUser> serviceAppUser, IService<Address> serviceAddress)
+        public MyAddressesController(IService<AppUser> serviceAppUser, IService<Address> serviceAddress, ILogger<MyAddressesController> logger)
         {
             _serviceAppUser = serviceAppUser;
             _serviceAddress = serviceAddress;
+            _logger = logger;
         }
 
         private async Task<AppUser?> GetCurrentUserAsync()
@@ -30,6 +33,7 @@ namespace Eticaret.WebUI.Controllers
             return await _serviceAppUser.GetAsync(p => p.UserGuid == parsedGuid); 
         }
 
+        private string GetRoleName() => User.IsInRole("Admin") ? "Admin" : "Üye";
 
         [HttpGet("")]
         public async Task<IActionResult> Index()
@@ -72,6 +76,8 @@ namespace Eticaret.WebUI.Controllers
 
                 await _serviceAddress.AddAsync(address); // Prefer AddAsync if your service supports it
                 await _serviceAddress.SaveChangesAsync();
+                
+                _logger.LogInformation("Müşteri İşlemi: {User} adlı {Role} rolündeki kullanıcı '{AddressTitle}' başlıklı yeni bir adres ekledi.", appUser.Email, GetRoleName(), address.Title);
                 
                 TempData["Message"] = "Adres başarıyla eklendi.";
                 return RedirectToAction(nameof(Index));
@@ -140,6 +146,8 @@ namespace Eticaret.WebUI.Controllers
                 _serviceAddress.Update(model);
                 await _serviceAddress.SaveChangesAsync();
                 
+                _logger.LogInformation("Müşteri İşlemi: {User} adlı {Role} rolündeki kullanıcı '{AddressTitle}' başlıklı adresini güncelledi.", appUser.Email, GetRoleName(), model.Title);
+                
                 TempData["Message"] = "Adres başarıyla güncellendi.";
                 return RedirectToAction(nameof(Index));
             }
@@ -184,6 +192,8 @@ namespace Eticaret.WebUI.Controllers
             {
                 _serviceAddress.Delete(model);
                 await _serviceAddress.SaveChangesAsync();
+                
+                _logger.LogInformation("Müşteri İşlemi: {User} adlı {Role} rolündeki kullanıcı '{AddressTitle}' başlıklı adresini sildi.", appUser.Email, GetRoleName(), model.Title);
                 
                 TempData["Message"] = "Adres başarıyla silindi.";
                 return RedirectToAction(nameof(Index)); 

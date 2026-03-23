@@ -10,6 +10,7 @@ using Eticaret.Data;
 using Eticaret.WebUI.Utils;
 using Microsoft.EntityFrameworkCore.Infrastructure.Internal;
 using Microsoft.AspNetCore.Authorization;
+using Serilog;
 
 namespace Eticaret.WebUI.Areas.Admin.Controllers
 {
@@ -18,10 +19,11 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
     public class BrandsController : Controller
     {
         private readonly DatabaseContext _context;
-
-        public BrandsController(DatabaseContext context)
+        private readonly ILogger<AddressesController> _logger;
+        public BrandsController(DatabaseContext context, ILogger<AddressesController> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         // GET: Admin/Brands
@@ -63,9 +65,10 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
         {
             if (ModelState.IsValid)
             {
-                brand.Logo = await FileHelper.FileLoaderAsync(Logo,"/img/brands/");
+                brand.Logo = await FileHelper.FileLoaderAsync(Logo, "/img/brands/");
                 _context.Add(brand);
                 await _context.SaveChangesAsync();
+                _logger.LogInformation("Kullanıcı İşlemi: {Admin} adlı yönetici, {BrandName} isimli yeni bir marka oluşturdu.", User.Identity.Name, brand.Name);
                 return RedirectToAction(nameof(Index));
             }
             return View(brand);
@@ -92,7 +95,7 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id,  Brand brand, IFormFile? Logo, bool cbResmiSil)
+        public async Task<IActionResult> Edit(int id, Brand brand, IFormFile? Logo, bool cbResmiSil)
         {
             if (id != brand.Id)
             {
@@ -103,22 +106,26 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
             {
                 try
                 {
-                    if(cbResmiSil)
+                    if (cbResmiSil)
                     {
+                        _logger.LogInformation("Kullanıcı İşlemi: {Admin} adlı yönetici, {BrandName} isimli markanın görselini sildi.", User.Identity.Name, brand.Name);
                         brand.Logo = string.Empty;
                     }
-                    if(Logo != null)
+                    if (Logo != null)
                     {
-                        
-                    brand.Logo = await FileHelper.FileLoaderAsync(Logo,"/img/brands/");
+
+                        brand.Logo = await FileHelper.FileLoaderAsync(Logo, "/img/brands/");
                     }
                     _context.Update(brand);
+                    _logger.LogInformation("Kullanıcı İşlemi: {Admin} adlı yönetici, {BrandName} isimli markayı düzenledi.", User.Identity.Name, brand.Name);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
                     if (!BrandExists(brand.Id))
                     {
+                        _logger.LogInformation("Kullanıcı İşlemi: {Admin} adlı yönetici, {BrandName} isimli markayı düzenlerken bir hata oluştu.", User.Identity.Name, brand.Name);
+
                         return NotFound();
                     }
                     else
@@ -132,7 +139,7 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
         }
 
         // GET: Admin/Brands/Delete/5
-        public async Task<IActionResult> Delete(int? id,IFormFile? Logo)
+        public async Task<IActionResult> Delete(int? id, IFormFile? Logo)
         {
             if (id == null)
             {
@@ -157,10 +164,11 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
             var brand = await _context.Brands.FindAsync(id);
             if (brand != null)
             {
-                if(!string.IsNullOrEmpty(brand.Logo))
+                if (!string.IsNullOrEmpty(brand.Logo))
                 {
-                    FileHelper.FileRemover(brand.Logo,"/wwwroot/img/brands/");
+                    FileHelper.FileRemover(brand.Logo, "/wwwroot/img/brands/");
                 }
+                _logger.LogInformation("Kullanıcı İşlemi: {Admin} adlı yönetici, {BrandName} isimli markayı sildi.", User.Identity.Name, brand.Name);
                 _context.Brands.Remove(brand);
             }
 

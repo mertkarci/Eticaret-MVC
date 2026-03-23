@@ -17,10 +17,13 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
     public class SlidersController : Controller
     {
         private readonly DatabaseContext _context;
+        private readonly ILogger<SlidersController> _logger;
 
-        public SlidersController(DatabaseContext context)
+
+        public SlidersController(DatabaseContext context, ILogger<SlidersController> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         // GET: Admin/Sliders
@@ -50,6 +53,20 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
         // GET: Admin/Sliders/Create
         public IActionResult Create()
         {
+            var enumValues = Enum.GetValues(typeof(EnumSliderType))
+                     .Cast<EnumSliderType>()
+                     .Select(e => new SelectListItem
+                     {
+                         Value = ((int)e).ToString(),
+                         Text = e.GetType()
+                                 .GetMember(e.ToString())
+                                 .First()
+                                 .GetCustomAttributes(typeof(System.ComponentModel.DataAnnotations.DisplayAttribute), false)
+                                 .Cast<System.ComponentModel.DataAnnotations.DisplayAttribute>()
+                                 .FirstOrDefault()?.Name ?? e.ToString()
+                     }).ToList();
+
+            ViewData["EnumSliderType"] = enumValues;
             return View();
         }
 
@@ -58,13 +75,14 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Slider slider,IFormFile? Image)
+        public async Task<IActionResult> Create(Slider slider, IFormFile? Image)
         {
             if (ModelState.IsValid)
             {
-                slider.Image = await FileHelper.FileLoaderAsync(Image,"/img/sliders/");
+                slider.Image = await FileHelper.FileLoaderAsync(Image, "/img/sliders/");
                 _context.Add(slider);
                 await _context.SaveChangesAsync();
+                _logger.LogInformation("Kullanıcı İşlemi: {Admin} adlı yönetici, {SliderTitle} adında ,{SliderId} ID'li yeni bir slider oluşturdu.", User.Identity.Name, slider.Title, slider.Id);
                 return RedirectToAction(nameof(Index));
             }
             return View(slider);
@@ -73,6 +91,20 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
         // GET: Admin/Sliders/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
+            var enumValues = Enum.GetValues(typeof(EnumSliderType))
+         .Cast<EnumSliderType>()
+         .Select(e => new SelectListItem
+         {
+             Value = ((int)e).ToString(),
+             Text = e.GetType()
+                     .GetMember(e.ToString())
+                     .First()
+                     .GetCustomAttributes(typeof(System.ComponentModel.DataAnnotations.DisplayAttribute), false)
+                     .Cast<System.ComponentModel.DataAnnotations.DisplayAttribute>()
+                     .FirstOrDefault()?.Name ?? e.ToString()
+         }).ToList();
+
+            ViewData["EnumSliderType"] = enumValues;
             if (id == null)
             {
                 return NotFound();
@@ -102,16 +134,18 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
             {
                 try
                 {
-                    if(cbResmiSil)
+                    if (cbResmiSil)
                     {
                         slider.Image = string.Empty;
+                        _logger.LogInformation("Kullanıcı İşlemi: {Admin} adlı yönetici, {SliderTitle} adında ,{SliderId} ID'li sliderin görselini sildi.", User.Identity.Name, slider.Title, slider.Id);
                     }
-                    if(Image != null)
+                    if (Image != null)
                     {
-                        
-                    slider.Image = await FileHelper.FileLoaderAsync(Image,"/img/sliders/");
+
+                        slider.Image = await FileHelper.FileLoaderAsync(Image, "/img/sliders/");
                     }
                     _context.Update(slider);
+                    _logger.LogInformation("Kullanıcı İşlemi: {Admin} adlı yönetici, {SliderTitle} adında ,{SliderId} ID'li slideri düzenledi.", User.Identity.Name, slider.Title, slider.Id);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
@@ -156,11 +190,12 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
             var slider = await _context.Sliders.FindAsync(id);
             if (slider != null)
             {
-                if(!string.IsNullOrEmpty(slider.Image))
+                if (!string.IsNullOrEmpty(slider.Image))
                 {
-                    FileHelper.FileRemover(slider.Image,"/wwwroot/img/sliders/");
+                    FileHelper.FileRemover(slider.Image, "/wwwroot/img/sliders/");
                 }
                 _context.Sliders.Remove(slider);
+                _logger.LogInformation("Kullanıcı İşlemi: {Admin} adlı yönetici, {SliderTitle} adında ,{SliderId} ID'li sliderı sildi.", User.Identity.Name, slider.Title, slider.Id);
             }
 
             await _context.SaveChangesAsync();

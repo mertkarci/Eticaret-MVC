@@ -16,10 +16,13 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
     public class ThemeSettingsController : Controller
     {
         private readonly DatabaseContext _context;
+        private readonly ILogger<ThemeSettingsController> _logger;
 
-        public ThemeSettingsController(DatabaseContext context)
+
+        public ThemeSettingsController(DatabaseContext context, ILogger<ThemeSettingsController> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         // GET: Admin/ThemeSettings
@@ -62,6 +65,14 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
             if (ModelState.IsValid)
             {
                 _context.Add(themeSetting);
+                if (themeSetting.IsActive)
+                {
+                    _logger.LogInformation("Kullanıcı İşlemi: {Admin} adlı yönetici, {ThemeName} adlı yeni bir tema oluşturdu ve aktif oldu.", User.Identity.Name, themeSetting.Name);
+                }
+                else
+                {
+                    _logger.LogInformation("Kullanıcı İşlemi: {Admin} adlı yönetici, {ThemeName} adlı yeni bir tema oluşturdu.", User.Identity.Name, themeSetting.Name);
+                }
                 await CheckForTheme(themeSetting);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -102,6 +113,14 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
                 try
                 {
                     _context.Update(themeSetting);
+                    if (themeSetting.IsActive)
+                    {
+                        _logger.LogInformation("Kullanıcı İşlemi: {Admin} adlı yönetici, {ThemeName} adlı temayı aktifleştirdi.", User.Identity.Name, themeSetting.Name);
+                    }
+                    else
+                    {
+                        _logger.LogInformation("Kullanıcı İşlemi: {Admin} adlı yönetici, {ThemeName} adlı temayi düzenledi.", User.Identity.Name, themeSetting.Name);
+                    }
                     await CheckForTheme(themeSetting);
                     await _context.SaveChangesAsync();
                 }
@@ -148,6 +167,7 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
             if (themeSetting != null)
             {
                 _context.ThemeSettings.Remove(themeSetting);
+                _logger.LogInformation("Kullanıcı İşlemi: {Admin} adlı yönetici, {ThemeName} adlı temayı sildi.", User.Identity.Name, themeSetting.Name);
             }
 
             await _context.SaveChangesAsync();

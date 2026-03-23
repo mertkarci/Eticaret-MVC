@@ -17,10 +17,12 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
     public class NewsController : Controller
     {
         private readonly DatabaseContext _context;
+        private readonly ILogger<NewsController> _logger;
 
-        public NewsController(DatabaseContext context)
+        public NewsController(DatabaseContext context, ILogger<NewsController> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         // GET: Admin/News
@@ -58,13 +60,14 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(News news,IFormFile Image)
+        public async Task<IActionResult> Create(News news, IFormFile Image)
         {
             if (ModelState.IsValid)
             {
 
-                news.Image = await FileHelper.FileLoaderAsync(Image,"/img/news/");
+                news.Image = await FileHelper.FileLoaderAsync(Image, "/img/news/");
                 _context.Add(news);
+                _logger.LogInformation("Kullanıcı İşlemi: {Admin} adlı yönetici, {NewsName} isimli yeni bir kampanya&duyuru oluşturdu.", User.Identity.Name, news.Name);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
@@ -92,7 +95,7 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, News news,IFormFile? Image, bool cbResmiSil)
+        public async Task<IActionResult> Edit(int id, News news, IFormFile? Image, bool cbResmiSil)
         {
             if (id != news.Id)
             {
@@ -103,14 +106,17 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
             {
                 try
                 {
-                    if(cbResmiSil)
+                    if (cbResmiSil)
                     {
                         news.Image = string.Empty;
+                        _logger.LogInformation("Kullanıcı İşlemi: {Admin} adlı yönetici, {NewsName} isimli kampanya&duyuru'nun görselini sildi.", User.Identity.Name, news.Name);
                     }
-                    if(Image != null)
-                    { 
-                        news.Image = await FileHelper.FileLoaderAsync(Image,"/img/news/");
+                    if (Image != null)
+                    {
+                        news.Image = await FileHelper.FileLoaderAsync(Image, "/img/news/");
                     }
+                    _logger.LogInformation("Kullanıcı İşlemi: {Admin} adlı yönetici, {NewsName} isimli kampanya&duyuru'yu düzenledi.", User.Identity.Name, news.Name);
+
                     _context.Update(news);
                     await _context.SaveChangesAsync();
                 }
@@ -156,10 +162,11 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
             var news = await _context.News.FindAsync(id);
             if (news != null)
             {
-                                if(!string.IsNullOrEmpty(news.Image))
+                if (!string.IsNullOrEmpty(news.Image))
                 {
-                    FileHelper.FileRemover(news.Image,"/wwwroot/img/news/");
+                    FileHelper.FileRemover(news.Image, "/wwwroot/img/news/");
                 }
+                _logger.LogInformation("Kullanıcı İşlemi: {Admin} adlı yönetici, {NewsName} isimli kampanya&duyuru'yu sildi.", User.Identity.Name, news.Name);
                 _context.News.Remove(news);
             }
 

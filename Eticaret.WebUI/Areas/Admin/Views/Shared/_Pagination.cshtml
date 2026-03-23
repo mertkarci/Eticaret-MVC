@@ -1,0 +1,41 @@
+@{
+    int currentPage = ViewBag.CurrentPage != null ? (int)ViewBag.CurrentPage : 1;
+    int totalPages = ViewBag.TotalPages != null ? (int)ViewBag.TotalPages : 1;
+    string level = ViewBag.CurrentLevel != null ? (string)ViewBag.CurrentLevel : "";
+    string search = ViewBag.CurrentSearch != null ? (string)ViewBag.CurrentSearch : "";
+    
+    int startPage = Math.Max(1, currentPage - 2);
+    int endPage = Math.Min(totalPages, currentPage + 2);
+}
+
+@if (totalPages > 1)
+{
+    <nav aria-label="Sayfalama navigasyonu">
+        <ul class="pagination pagination-sm mb-0">
+            @if (currentPage > 1)
+            {
+                <li class="page-item">
+                    <a class="page-link" href="?page=@(currentPage - 1)&level=@level&search=@search" aria-label="Önceki">
+                        <span aria-hidden="true">&laquo; Önceki</span>
+                    </a>
+                </li>
+            }
+
+            @for (int i = startPage; i <= endPage; i++)
+            {
+                <li class="page-item @(i == currentPage ? "active" : "")">
+                    <a class="page-link" href="?page=@i&level=@level&search=@search">@i</a>
+                </li>
+            }
+
+            @if (currentPage < totalPages)
+            {
+                <li class="page-item">
+                    <a class="page-link" href="?page=@(currentPage + 1)&level=@level&search=@search" aria-label="Sonraki">
+                        <span aria-hidden="true">Sonraki &raquo;</span>
+                    </a>
+                </li>
+            }
+        </ul>
+    </nav>
+}

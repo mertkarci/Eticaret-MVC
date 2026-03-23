@@ -1,0 +1,52 @@
+@model Eticaret.Core.Entities.SiteSettings
+
+@{
+    ViewData["Title"] = "Site Ayarları";
+}
+
+<div class="container-fluid px-4">
+    <h1 class="mt-4">Site Ayarları</h1>
+    <ol class="breadcrumb mb-4">
+        <li class="breadcrumb-item"><a asp-area="Admin" asp-controller="Main" asp-action="Index">Dashboard</a></li>
+        <li class="breadcrumb-item active">Site Ayarları</li>
+    </ol>
+
+    @if (TempData["Message"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle me-1"></i> @TempData["Message"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="card card-admin mb-4">
+        <div class="card-header">
+            <i class="fas fa-cogs me-1"></i>
+            Bakım Modu ve Genel Ayarlar
+        </div>
+        <div class="card-body">
+            <form asp-action="Index" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <input type="hidden" asp-for="Id" />
+
+                <div class="mb-4">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" role="switch" asp-for="IsMaintenanceMode" id="maintenanceSwitch">
+                        <label class="form-check-label form-label ms-2" for="maintenanceSwitch" style="cursor: pointer;">Bakım Modunu Aktifleştir</label>
+                    </div>
+                    <small class="text-muted d-block mt-1">Bu seçenek aktif edildiğinde, site ziyaretçileri aşağıda belirttiğiniz bakım mesajı ile karşılaşır.</small>
+                </div>
+
+                <div class="mb-4">
+                    <label asp-for="MaintenanceMessage" class="form-label">Bakım Modu Mesajı</label>
+                    <textarea asp-for="MaintenanceMessage" class="form-control" rows="4" placeholder="Sitemiz şu anda güncellenmektedir..."></textarea>
+                    <span asp-validation-for="MaintenanceMessage" class="text-danger"></span>
+                </div>
+
+                <button type="submit" class="btn btn-submit w-auto">
+                    <i class="fas fa-save me-2"></i> Ayarları Kaydet
+                </button>
+            </form>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,88 @@
+@model Eticaret.Core.Entities.Notification
+
+<div id="promo-popup" class="fixed inset-0 z-[9999] hidden items-center justify-center bg-slate-900/60 backdrop-blur-md opacity-0 transition-opacity duration-500">
+    
+    <div class="relative w-full max-w-md sm:max-w-lg transform scale-95 opacity-0 transition-all duration-500 ease-out mx-4" id="promo-modal">
+        
+        <button onclick="closePopup(@Model.Id)" class="absolute top-4 right-4 z-50 flex h-9 w-9 items-center justify-center rounded-full bg-white/70 backdrop-blur-md text-slate-600 shadow-sm ring-1 ring-black/10 hover:bg-white hover:text-red-500 hover:scale-110 transition-all focus:outline-none">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+
+        <div class="overflow-hidden rounded-[2rem] bg-white shadow-2xl ring-1 ring-slate-900/5">
+            
+            @if (Model.isString && !string.IsNullOrEmpty(Model.Image))
+            {
+                <div class="relative w-full aspect-auto bg-slate-50">
+                    <img src="/img/popup/@Model.Image" alt="@Model.Name" class="w-full h-auto block object-cover" />
+                </div>
+            }
+            else
+            {
+                <div class="relative p-8 sm:p-10 bg-gradient-to-b from-white to-slate-50">
+                    <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500"></div>
+                    
+                    <h3 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight mb-5 pr-8">
+                        @Model.Name
+                    </h3>
+                    
+                    @if (!string.IsNullOrEmpty(Model.Description))
+                    {
+                        <div class="prose prose-slate prose-p:leading-relaxed prose-a:text-indigo-600 hover:prose-a:text-indigo-500 prose-a:font-medium max-w-none text-slate-600">
+                            @Html.Raw(Model.Description)
+                        </div>
+                    }
+                </div>
+            }
+            
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const popupId = '@Model.Id';
+        const storageKey = 'popup_shown_' + popupId;
+        const popupContainer = document.getElementById('promo-popup');
+        const promoModal = document.getElementById('promo-modal');
+
+        // Hafıza Kontrolü
+        if (!localStorage.getItem(storageKey)) {
+            // Sayfa yüklendikten 1.2 saniye sonra zarifçe ekrana gelir
+            setTimeout(() => {
+                popupContainer.classList.remove('hidden');
+                popupContainer.classList.add('flex');
+                
+                // CSS transitionların tetiklenmesi için minik bir gecikme
+                setTimeout(() => {
+                    popupContainer.classList.remove('opacity-0');
+                    popupContainer.classList.add('opacity-100');
+                    
+                    promoModal.classList.remove('scale-95', 'opacity-0');
+                    promoModal.classList.add('scale-100', 'opacity-100');
+                }, 50);
+            }, 1200); 
+        }
+    });
+
+    function closePopup(id) {
+        const popupContainer = document.getElementById('promo-popup');
+        const promoModal = document.getElementById('promo-modal');
+        
+        // Bir daha göstermeme garantisi
+        localStorage.setItem('popup_shown_' + id, 'true');
+
+        // Çıkış Animasyonu
+        popupContainer.classList.remove('opacity-100');
+        popupContainer.classList.add('opacity-0');
+        
+        promoModal.classList.remove('scale-100', 'opacity-100');
+        promoModal.classList.add('scale-95', 'opacity-0');
+
+        setTimeout(() => {
+            popupContainer.classList.remove('flex');
+            popupContainer.classList.add('hidden');
+        }, 500); // Transition duration (500ms) ile uyumlu
+    }
+</script>

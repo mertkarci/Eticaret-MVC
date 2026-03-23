@@ -17,10 +17,12 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
     public class AppUsersController : Controller
     {
         private readonly DatabaseContext _context;
+        private readonly ILogger<AppUsersController> _logger;
 
-        public AppUsersController(DatabaseContext context)
+        public AppUsersController(DatabaseContext context, ILogger<AppUsersController> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         // GET: Admin/AppUsers
@@ -37,7 +39,6 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
                 return NotFound();
             }
 
-            // 1. Kullanıcıyı bul
             var appUser = await _context.AppUsers
                 .FirstOrDefaultAsync(m => m.Id == id);
 
@@ -46,20 +47,16 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
                 return NotFound();
             }
 
-            // 2. Kullanıcının Siparişlerini bul
-            // Sipariş nesnesinin içindeki AppUserId'nin, bizim aradığımız id'ye eşit olanlarını listele
+
             var orders = await _context.Orders
                 .Where(o => o.AppUserId == id)
                 .ToListAsync();
 
-            // 3. Kullanıcının Adreslerini bul
-            // Adres nesnesinin içindeki AppUserId'nin, bizim aradığımız id'ye eşit olanlarını listele
             var addresses = await _context.Addresses
                 .Where(a => a.AppUserId == id)
                 .ToListAsync();
 
-            // 4. Hepsini ViewModel kutusuna doldur ve View'a gönder
-            // (Bunu yapmazsak View'da sekmelere verileri dağıtamayız)
+
             var model = new UserDetailsViewModel
             {
                 User = appUser,
@@ -76,9 +73,6 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
             return View();
         }
 
-        // POST: Admin/AppUsers/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         public async Task<IActionResult> Create(AppUser appUser)
         {
@@ -86,6 +80,9 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
             {
                 _context.Add(appUser);
                 await _context.SaveChangesAsync();
+                
+                _logger.LogInformation("Kullanıcı İşlemi: {Admin} adlı yönetici, {UserId} ID'li yeni bir kullanıcı oluşturdu.", User.Identity.Name, appUser.Id);
+                
                 return RedirectToAction(nameof(Index), new { area = "Admin" });
             }
             return View(appUser);
@@ -124,6 +121,8 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
                 {
                     _context.Update(appUser);
                     await _context.SaveChangesAsync();
+                    
+                    _logger.LogInformation("Kullanıcı İşlemi: {Admin} adlı yönetici, {UserId} ID'li kullanıcının bilgilerini güncelledi.", User.Identity.Name, appUser.Id);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -171,38 +170,32 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
             {
                 if (isHardDelete)
                 {
-                    // --- 1. SEÇENEK: HARD DELETE (Kalıcı Silme) ---
-                    // FOREIGN KEY hatası almamak için önce bu kullanıcıya ait diğer verileri silmeliyiz.
 
-                    // Kullanıcının adreslerini bul ve sil (DbSet adın 'Addresses' değilse kendine göre düzelt)
                     var userAddresses = _context.Addresses.Where(a => a.AppUserId == id);
                     if (userAddresses.Any())
                     {
                         _context.Addresses.RemoveRange(userAddresses);
                     }
 
-                    // Kullanıcının siparişlerini bul ve sil (DbSet adın 'Orders' değilse düzelt)
-                    // Not: Siparişlerin içindeki OrderLines tabloları cascade delete ile otomatik silinmiyorsa, onları da bulup silmen gerekebilir.
                     var userOrders = _context.Orders.Where(o => o.AppUserId == id);
                     if (userOrders.Any())
                     {
                         _context.Orders.RemoveRange(userOrders);
                     }
 
-                    // Bağlantılı verileri temizledikten sonra artık kullanıcıyı kökünden silebiliriz.
                     _context.AppUsers.Remove(appUser);
                 }
                 else
                 {
-                    // --- 2. SEÇENEK: SOFT DELETE (Pasife Çekme) ---
-                    // Veritabanından silmek yerine durumu pasif yapıyoruz. Muhasebe ve sipariş geçmişi bozulmaz.
+
                     appUser.isActive = false;
 
                     _context.AppUsers.Update(appUser);
                 }
 
-                // Yapılan işlemi (Silme veya Güncelleme) veritabanına kaydet
                 await _context.SaveChangesAsync();
+                
+                _logger.LogInformation("Kullanıcı İşlemi: {Admin} adlı yönetici, {UserId} ID'li kullanıcıyı sildi. (Kalıcı Silme: {IsHardDelete})", User.Identity.Name, id, isHardDelete);
             }
 
             return RedirectToAction(nameof(Index), new { area = "Admin" });

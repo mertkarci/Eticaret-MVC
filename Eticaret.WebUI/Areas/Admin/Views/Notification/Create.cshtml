@@ -1,0 +1,97 @@
+@model Eticaret.Core.Entities.Notification
+
+@{
+    ViewData["Title"] = "Yeni Popup Ekle";
+}
+
+<form asp-action="Create" enctype="multipart/form-data">
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="card card-admin">
+                <div class="card-header"><h5 class="card-title mb-0">Popup İçeriği</h5></div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label asp-for="Name" class="form-label">Başlık</label>
+                        <input asp-for="Name" class="form-control form-control-lg" />
+                        <span asp-validation-for="Name" class="text-danger small"></span>
+                    </div>
+                    <div class="mb-0">
+                        <label asp-for="Description" class="form-label"></label>
+                        <textarea asp-for="Description" class="form-control" rows="6"></textarea>
+                        <span asp-validation-for="Description" class="text-danger small"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card card-admin mt-4" id="imageUploadCard">
+                <div class="card-header"><h5 class="card-title mb-0">Kapak Görseli</h5></div>
+                <div class="card-body">
+                    <label for="file-upload" class="custom-file-upload-container">
+                        <div class="icon"><i class="bi bi-card-image"></i></div>
+                        <div class="text">Görsel yüklemek için tıklayın</div>
+                        <input id="file-upload" asp-for="Image" type="file" onchange="previewImage(event)" />
+                    </label>
+                    <img id="image-preview" src="#" alt="Önizleme" />
+                    <span asp-validation-for="Image" class="text-danger small mt-2 d-block"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="sticky-form-sidebar">
+                <div class="card card-admin">
+                    <div class="card-header"><h5 class="card-title mb-0">Yayınla</h5></div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-submit shadow-sm">
+                                <i class="bi bi-send me-2"></i> Duyuruyu Yayınla
+                            </button>
+                            <a asp-action="Index" class="btn btn-outline-secondary">
+                                <i class="bi bi-x-lg me-2"></i> İptal
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card card-admin mt-4">
+                    <div class="card-header"><h5 class="card-title mb-0">Seçenekler & Durum</h5></div>
+                    <div class="card-body">
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" asp-for="isString" id="isStringToggle" />
+                            <label class="form-check-label" asp-for="isString"></label>
+                        </div>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" asp-for="isActive" />
+                            <label class="form-check-label" asp-for="isActive">Aktif</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        function previewImage(event) { const reader = new FileReader(); reader.onload = function(){ const output = document.getElementById('image-preview'); output.src = reader.result; output.style.display = 'block'; }; reader.readAsDataURL(event.target.files[0]); }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const isStringToggle = document.getElementById("isStringToggle");
+            const imageCard = document.getElementById("imageUploadCard");
+
+            function toggleImageCard() {
+                if (isStringToggle && imageCard) {
+                    imageCard.style.display = isStringToggle.checked ? "block" : "none";
+                }
+            }
+
+            if (isStringToggle) {
+                isStringToggle.addEventListener("change", toggleImageCard);
+                toggleImageCard(); // Sayfa ilk yüklendiğinde durumu kontrol et
+            }
+        });
+    </script>
+}

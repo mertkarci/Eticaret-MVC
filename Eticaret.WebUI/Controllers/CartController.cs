@@ -18,18 +18,29 @@ namespace Eticaret.WebUI.Controllers
 
         // 🚨 Eski IOrderService silindi, yerine IOrderIyService geldi
         private readonly IOrderIyService _orderIyService;
+        private readonly ILogger<CartController> _logger;
 
-        public CartController(IService<Product> serviceProduct, IService<AppUser> serviceAppUser, IService<Address> serviceAddress, IOrderIyService orderIyService)
+        public CartController(IService<Product> serviceProduct, IService<AppUser> serviceAppUser, IService<Address> serviceAddress, IOrderIyService orderIyService, ILogger<CartController> logger)
         {
             _serviceProduct = serviceProduct;
             _serviceAppUser = serviceAppUser;
             _serviceAddress = serviceAddress;
             _orderIyService = orderIyService;
+            _logger = logger;
         }
 
         private CartService GetCart()
         {
             return HttpContext.Session.GetJson<CartService>("Cart") ?? new CartService();
+        }
+
+        private string GetRoleName()
+        {
+            if (User?.Identity?.IsAuthenticated == true)
+            {
+                return User.IsInRole("Admin") ? "Admin" : "Üye";
+            }
+            return "Misafir";
         }
 
         [HttpGet("")]
@@ -54,6 +65,8 @@ namespace Eticaret.WebUI.Controllers
                 var cart = GetCart();
                 cart.AddProduct(product, quantity);
                 HttpContext.Session.SetJson("Cart", cart);
+                
+                _logger.LogInformation("Müşteri İşlemi: {User} adlı {Role} rolündeki kullanıcı sepetine '{ProductName}' (ID: {ProductId}) ürününü ekledi.", User.Identity?.Name ?? "Ziyaretçi", GetRoleName(), product.Name, product.Id);
 
                 var returnUrl = Request.Headers["Referer"].ToString();
                 if (!string.IsNullOrEmpty(returnUrl))
@@ -74,6 +87,8 @@ namespace Eticaret.WebUI.Controllers
                 var cart = GetCart();
                 cart.UpdateProduct(product, quantity);
                 HttpContext.Session.SetJson("Cart", cart);
+                
+                _logger.LogInformation("Müşteri İşlemi: {User} adlı {Role} rolündeki kullanıcı sepetindeki '{ProductName}' (ID: {ProductId}) ürününün miktarını güncelledi.", User.Identity?.Name ?? "Ziyaretçi", GetRoleName(), product.Name, product.Id);
             }
             return RedirectToAction("Index");
         }
@@ -88,6 +103,8 @@ namespace Eticaret.WebUI.Controllers
                 var cart = GetCart();
                 cart.RemoveProduct(product);
                 HttpContext.Session.SetJson("Cart", cart);
+                
+                _logger.LogInformation("Müşteri İşlemi: {User} adlı {Role} rolündeki kullanıcı sepetinden '{ProductName}' (ID: {ProductId}) ürününü çıkardı.", User.Identity?.Name ?? "Ziyaretçi", GetRoleName(), product.Name, product.Id);
             }
             return RedirectToAction("Index");
         }
@@ -189,14 +206,22 @@ namespace Eticaret.WebUI.Controllers
             var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "85.34.78.112";
 
             var result = await _orderIyService.InitializePaymentAsync(requestModel, cart, userToProcess, ipAddress);
+            
+            string roleName = GetRoleName();
+            string userName = User.Identity?.IsAuthenticated == true ? (User.Identity.Name ?? "Üye") : $"{requestModel.GuestName} (Kayıtsız)";
 
             if (result.IsSuccess)
             {
                 HttpContext.Session.SetJson("PendingCheckoutData", requestModel);
 
+                _logger.LogInformation("Müşteri İşlemi: {User} adlı {Role} rolündeki kullanıcı ödeme işlemini başlattı. (Toplam: {TotalPrice} ₺)", userName, roleName, cart.TotalPrice());
+
                 ViewBag.IyzicoForm = result.HtmlFormContent;
                 return View("PaymentPage");
             }
+
+            // BAŞARISIZ ÖDEME BAŞLATMA İŞLEMİ LOGU (Örn: Iyzico bağlantı hatası)
+            _logger.LogWarning("Müşteri İşlemi (Başarısız): {User} adlı {Role} rolündeki kullanıcının ödeme başlatma işlemi başarısız oldu. Hata: {ErrorMessage}", userName, roleName, result.ErrorMessage);
 
             TempData["Message"] = "Ödeme altyapısına bağlanılamadı: " + result.ErrorMessage;
             return RedirectToAction("Checkout");
@@ -227,14 +252,22 @@ namespace Eticaret.WebUI.Controllers
             }
 
             var result = await _orderIyService.FinalizeOrderAsync(token, originalRequest, cart, userToProcess);
+            
+            string roleName = GetRoleName();
+            string userName = User.Identity?.IsAuthenticated == true ? (User.Identity.Name ?? "Üye") : $"{originalRequest.GuestName} (Kayıtsız)";
 
             if (result.IsSuccess)
             {
                 HttpContext.Session.Remove("Cart");
                 HttpContext.Session.Remove("PendingCheckoutData");
+                
+                _logger.LogInformation("Müşteri İşlemi: {User} adlı {Role} rolündeki kullanıcının ödeme işlemi başarıyla tamamlandı. Sipariş No: {OrderNumber}", userName, roleName, result.OrderNumber);
 
                 return RedirectToAction("Thanks", new { orderNumber = result.OrderNumber });
             }
+
+            // BAŞARISIZ ÖDEME TAMAMLAMA İŞLEMİ LOGU (Örn: Bakiye yetersizliği, red)
+            _logger.LogWarning("Müşteri İşlemi (Başarısız): {User} adlı {Role} rolündeki kullanıcının ödeme işlemi reddedildi. Hata: {ErrorMessage}", userName, roleName, result.Message);
 
             TempData["Message"] = "Ödeme işlemi başarısız: " + result.Message;
             return RedirectToAction("Checkout"); 

@@ -13,18 +13,19 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
     public class ProductsController : Controller
     {
         private readonly DatabaseContext _context;
+        private readonly ILogger<ProductsController> _logger;
 
-        public ProductsController(DatabaseContext context)
+
+        public ProductsController(DatabaseContext context, ILogger<ProductsController> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
-        // AKILLI FİZİKSEL SİLME METODU (Dosya başka üründe yoksa siler)
         private async Task CheckAndDeletePhysicalFileAsync(string fileName)
         {
             if (string.IsNullOrEmpty(fileName)) return;
 
-            // Bu resim herhangi bir ürünün Kapağı olarak kullanılıyor mu?
             bool usedAsCover = await _context.Products.AnyAsync(p => p.Image == fileName);
             // Bu resim herhangi bir ürünün Galerisinde kullanılıyor mu?
             bool usedInGallery = await _context.ProductImages.AnyAsync(p => p.Name == fileName);
@@ -51,7 +52,7 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
                 .Include(p => p.Category)
                 .Include(p => p.ProductImages)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            
+
             if (product == null) return NotFound();
 
             return View(product);
@@ -98,6 +99,7 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
 
                 _context.Add(product);
                 await _context.SaveChangesAsync();
+                _logger.LogInformation("Kullanıcı İşlemi: {Admin} adlı yönetici, {ProductName} adında {ProductId} ID'li yeni bir ürün oluşturdu.", User.Identity.Name, product.Name, product.Id);
 
                 if (AdditionalImages != null && AdditionalImages.Count > 0)
                 {
@@ -182,9 +184,10 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
                     if (cbResmiSil)
                     {
                         dbProduct.Image = string.Empty;
+                        _logger.LogInformation("Kullanıcı İşlemi: {Admin} adlı yönetici, {ProductName} adında {ProductId} ID'li ürünün görselinin içeriğini sildi.", User.Identity.Name, product.Name, product.Id);
                         coverChanged = true;
                     }
-                    
+
                     if (Image != null)
                     {
                         dbProduct.Image = await FileHelper.FileLoaderAsync(Image, "/img/products/");
@@ -202,7 +205,7 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
                     dbProduct.Slug = finalSlug;
 
                     _context.Update(dbProduct);
-
+                    _logger.LogInformation("Kullanıcı İşlemi: {Admin} adlı yönetici, {ProductName} adında {ProductId} ID'li ürünü düzenledi.", User.Identity.Name, product.Name, product.Id);
                     if (AdditionalImages != null && AdditionalImages.Count > 0)
                     {
                         int allowedUploads = 6 - currentImageCount;
@@ -219,13 +222,14 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
                                     Name = uploadedFileName
                                 };
                                 _context.ProductImages.Add(newProductImage);
+                                _logger.LogInformation("Kullanıcı İşlemi: {Admin} adlı yönetici, {ProductName} adında {ProductId} ID'li ürüne {ProductImageName} adında yeni görsel ekledi.", User.Identity.Name, product.Name, product.Id, newProductImage.Name);
+
                             }
                         }
                     }
 
                     await _context.SaveChangesAsync();
 
-                    // Kayıt başarılı olduktan SONRA eski kapağı güvenle sil
                     if (coverChanged && !string.IsNullOrEmpty(oldImage))
                     {
                         await CheckAndDeletePhysicalFileAsync(oldImage);
@@ -253,12 +257,11 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
             if (image == null) return Json(new { success = false, message = "Resim bulunamadı." });
 
             string fileName = image.Name;
-            
-            // 1. Önce Veritabanı bağını koparıyoruz
+
             _context.ProductImages.Remove(image);
+            _logger.LogInformation("Kullanıcı İşlemi: {Admin} adlı yönetici, {ProductImageName} adlı görselini ürünün içeriğinden sildi.", User.Identity.Name, fileName);
             await _context.SaveChangesAsync();
 
-            // 2. Sonra akıllı siliciye gönderiyoruz
             await CheckAndDeletePhysicalFileAsync(fileName);
 
             return Json(new { success = true });
@@ -293,6 +296,7 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
                 var galleryImages = product.ProductImages?.Select(x => x.Name).ToList() ?? new List<string>();
 
                 _context.Products.Remove(product);
+                _logger.LogInformation("Kullanıcı İşlemi: {Admin} adlı yönetici, {ProductName} adında {ProductId} ID'li ürünü sildi.", User.Identity.Name, product.Name, product.Id);
                 await _context.SaveChangesAsync();
 
                 // Tüm resimleri akıllı siliciyle kontrol et

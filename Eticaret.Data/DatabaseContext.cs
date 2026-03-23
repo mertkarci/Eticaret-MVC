@@ -26,20 +26,15 @@ public class DatabaseContext : DbContext
     public DbSet<OrderLine> OrderLines { get; set; }
     public DbSet<ProductImage> ProductImages { get; set; }
     public DbSet<ThemeSetting> ThemeSettings { get; set; }
+    public DbSet<SiteSettings> SiteSettings { get; set; }
+    public DbSet<Notification> Notification { get; set; }
 
-
-
-    // --- 2. DÜZELTME: OnConfiguring SİLİNDİ ---
-    // Buradaki OnConfiguring metodunu kaldırdım.
-    // Çünkü veritabanı yolunu artık Program.cs içinde "dbPath" ile veriyoruz.
-    // Burada kalırsa çakışma yaratır.
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
 
-        // Varsayılan Tema Verileri (Seed Data)
         modelBuilder.Entity<ThemeSetting>().HasData(
             new ThemeSetting
             {
@@ -86,10 +81,10 @@ public class DatabaseContext : DbContext
                 Id = 4,
                 Name = "Soft Nature",
 
-                MainColor = "#4CAF50",        // Doğa yeşili
-                SecondaryColor = "#A3D9A5",   // Açık yeşil
+                MainColor = "#4CAF50",
+                SecondaryColor = "#A3D9A5",
 
-                BackgroundColor = "#F1F8F4",  // Ferah açık ton
+                BackgroundColor = "#F1F8F4",
                 TextColor = "#263238",
 
                 NavbarBgColor = "#FFFFFF",

@@ -17,10 +17,12 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
     public class OrdersController : Controller
     {
         private readonly DatabaseContext _context;
+        private readonly ILogger<OrdersController> _logger;
 
-        public OrdersController(DatabaseContext context)
+        public OrdersController(DatabaseContext context, ILogger<OrdersController> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         // GET: Admin/Orders
@@ -66,6 +68,7 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
             {
                 _context.Add(order);
                 await _context.SaveChangesAsync();
+                _logger.LogInformation("Kullanıcı İşlemi: {Admin} adlı yönetici, {OrderId} ID'li yeni bir sipariş oluşturdu.", User.Identity.Name, order.Id);
                 return RedirectToAction(nameof(Index));
             }
             return View(order);
@@ -76,7 +79,7 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
         {
             if (id == null) return NotFound();
 
-            var order = await _context.Orders.Include(o=>o.AppUser).FirstOrDefaultAsync(m=>m.Id == id);
+            var order = await _context.Orders.Include(o => o.AppUser).FirstOrDefaultAsync(m => m.Id == id);
             if (order == null) return NotFound();
 
             // Müşteri listesini ViewBag'e ekle (Yoksa sayfa hata verince dropdown boşalır)
@@ -109,6 +112,7 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
                     dbOrder.TotalPrice = order.TotalPrice;
 
                     _context.Update(dbOrder);
+                    _logger.LogInformation("Kullanıcı İşlemi: {Admin} adlı yönetici, {OrderId} ID'li siparişini düzenledi.", User.Identity.Name, order.Id);
                     await _context.SaveChangesAsync();
 
                     return RedirectToAction(nameof(Index));
@@ -148,6 +152,7 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
             if (order != null)
             {
                 _context.Orders.Remove(order);
+                _logger.LogInformation("Kullanıcı İşlemi: {Admin} adlı yönetici, {OrderId} ID'li siparişini sildi.", User.Identity.Name, order.Id);
             }
 
             await _context.SaveChangesAsync();

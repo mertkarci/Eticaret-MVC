@@ -24,8 +24,19 @@ namespace Eticaret.WebUI.Areas.Admin.Controllers
             // YENİ KARTLAR: Sipariş durumlarının isimlerine göre dinamik olarak sayıyoruz
             // (Enum yapınızın adı tam bilinmediği için ToString() ile en güvenli kelime aramasını yapıyoruz)
             var allStates = await _context.Orders.Select(o => o.OrderState).ToListAsync();
-            ViewBag.PendingOrders = allStates.Count(s => s.ToString().IndexOf("Bekliyor", StringComparison.OrdinalIgnoreCase) >= 0 || s.ToString().IndexOf("Pending", StringComparison.OrdinalIgnoreCase) >= 0);
-            ViewBag.CancelledOrders = allStates.Count(s => s.ToString().IndexOf("Iptal", StringComparison.OrdinalIgnoreCase) >= 0 || s.ToString().IndexOf("Cancel", StringComparison.OrdinalIgnoreCase) >= 0 || s.ToString() == "İptal Edildi");
+
+            ViewBag.PendingOrders = allStates.Count(s => s != null && (
+                s.ToString().Contains("Bekliyor", StringComparison.InvariantCultureIgnoreCase) || 
+                s.ToString().Contains("Pending", StringComparison.InvariantCultureIgnoreCase) || 
+                s.ToString().Contains("Wait", StringComparison.InvariantCultureIgnoreCase) || 
+                s.ToString() == "0" // Enum yerine veritabanında int (0, 1, 2) tutuluyorsa (0 genelde Bekliyor demektir)
+            ));
+
+            ViewBag.CancelledOrders = allStates.Count(s => s != null && (
+                s.ToString().Contains("Iptal", StringComparison.InvariantCultureIgnoreCase) || 
+                s.ToString().Contains("İptal", StringComparison.InvariantCultureIgnoreCase) || 
+                s.ToString().Contains("Rejected", StringComparison.InvariantCultureIgnoreCase)
+            ));
 
             // 2. ÇİZGİ GRAFİK (Son 6 Ayın Satışları)
             var last6Months = Enumerable.Range(0, 6)
