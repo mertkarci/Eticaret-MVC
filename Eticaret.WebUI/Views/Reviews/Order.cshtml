@@ -1,0 +1,105 @@
+@model Eticaret.WebUI.Models.OrderReviewViewModel
+@{
+    ViewData["Title"] = "Sipariş Değerlendirmesi";
+}
+
+<div class="container mx-auto px-4 py-8 max-w-3xl">
+    <!-- Sayfa Başlığı -->
+    <div class="text-center mb-8">
+        <h1 class="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white tracking-tight">Sipariş Değerlendirmesi</h1>
+        <p class="mt-2 text-gray-500 dark:text-gray-400">
+            <strong>@Model.OrderNumber</strong> numaralı siparişinizdeki ürünleri değerlendirin.
+        </p>
+    </div>
+
+    <!-- TempData Mesajları (Tailwind ile yeniden tasarlandı) -->
+    @if (TempData["Success"] != null)
+    {
+        <div class="bg-emerald-50 dark:bg-emerald-900/30 border-l-4 border-emerald-500 text-emerald-800 dark:text-emerald-300 p-4 rounded-md mb-6" role="alert">
+            <div class="flex">
+                <div class="py-1"><i class="bi bi-check-circle-fill mr-3 text-lg"></i></div>
+                <div>
+                    <p class="font-bold">Başarılı!</p>
+                    <p class="text-sm">@TempData["Success"]</p>
+                </div>
+            </div>
+        </div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="bg-red-50 dark:bg-red-900/30 border-l-4 border-red-500 text-red-800 dark:text-red-300 p-4 rounded-md mb-6" role="alert">
+            <div class="flex">
+                <div class="py-1"><i class="bi bi-exclamation-triangle-fill mr-3 text-lg"></i></div>
+                <div>
+                    <p class="font-bold">Hata!</p>
+                    <p class="text-sm">@TempData["Error"]</p>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Değerlendirilecek Ürün Kalmadıysa Gösterilecek Alan -->
+    @if (!Model.PendingReviews.Any())
+    {
+        <div class="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl p-10 text-center shadow-sm">
+            <i class="bi bi-award text-5xl text-emerald-400 mb-4 inline-block"></i>
+            <h3 class="text-lg font-bold text-gray-800 dark:text-white mb-2">Bu Siparişte Değerlendirilecek Ürün Kalmadı</h3>
+            <p class="text-gray-500 dark:text-gray-400 max-w-md mx-auto">Tüm ürünleri değerlendirdiğiniz için teşekkür ederiz!</p>
+            <a asp-controller="Accounts" asp-action="MyOrders" class="btn btn-primary mt-5">Diğer Siparişlerim</a>
+        </div>
+    }
+    else
+    {
+        <div class="space-y-6">
+            @foreach (var item in Model.PendingReviews)
+            {
+                <div class="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl shadow-sm overflow-hidden">
+                    <div class="p-6 flex flex-col md:flex-row items-start gap-6">
+                        <!-- Ürün Görseli -->
+                        <div class="w-24 h-24 flex-shrink-0 bg-gray-50 dark:bg-slate-900 rounded-lg border border-gray-100 dark:border-slate-700 p-2">
+                            @if (!string.IsNullOrEmpty(item.ProductImage))
+                            {
+                                <img src="~/img/products/@item.ProductImage" class="w-full h-full object-contain mix-blend-multiply dark:mix-blend-normal" alt="@item.ProductName" />
+                            }
+                            else
+                            {
+                                <img src="~/img/no-image.png" class="w-full h-full object-contain" alt="Resim Yok" />
+                            }
+                        </div>
+
+                        <!-- Değerlendirme Formu -->
+                        <div class="flex-grow w-full">
+                            <h2 class="text-lg font-bold text-gray-800 dark:text-white mb-4">@item.ProductName</h2>
+                            
+                            <form asp-controller="Reviews" asp-action="Submit" method="post" class="space-y-4">
+                                <input type="hidden" name="token" value="@Model.ReviewToken" />
+                                <input type="hidden" name="productId" value="@item.ProductId" />
+                                
+                                <div>
+                                    <label for="rating-@item.ProductId" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Puanınız</label>
+                                    <select id="rating-@item.ProductId" name="rating" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary dark:bg-slate-700 dark:border-slate-600 dark:text-white">
+                                        <option value="" disabled selected>Lütfen bir puan seçin...</option>
+                                        <option value="5">★★★★★ (5) Harika, kesinlikle öneririm!</option>
+                                        <option value="4">★★★★☆ (4) Çok iyi, memnun kaldım.</option>
+                                        <option value="3">★★★☆☆ (3) İdare eder, fena değil.</option>
+                                        <option value="2">★★☆☆☆ (2) Kötü, beklentimi karşılamadı.</option>
+                                        <option value="1">★☆☆☆☆ (1) Çok kötü, kesinlikle önermem.</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label for="description-@item.ProductId" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Yorumunuz</label>
+                                    <textarea id="description-@item.ProductId" name="description" rows="4" required minlength="10" placeholder="Ürünle ilgili deneyimlerinizi paylaşın..." class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary dark:bg-slate-700 dark:border-slate-600 dark:text-white"></textarea>
+                                </div>
+                                
+                                <div class="text-right">
+                                    <button type="submit" class="btn btn-primary">Yorumu Gönder</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

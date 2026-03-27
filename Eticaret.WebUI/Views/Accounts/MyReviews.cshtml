@@ -1,0 +1,86 @@
+@model IEnumerable<Eticaret.Core.Entities.Comment>
+@{
+    ViewData["Title"] = "Değerlendirmelerim";
+}
+
+<div class="container py-4 py-md-5">
+    <div class="row">
+        <div class="col-md-4 col-lg-3 mb-4 mb-md-0">
+            <partial name="_AccountSidebarPartial" />
+        </div>
+
+        <div class="col-md-8 col-lg-9">
+            <div class="card shadow-sm border-0 rounded-3">
+                <div class="card-header bg-white border-bottom py-3">
+                    <h5 class="mb-0 fw-bold text-dark">Değerlendirmelerim</h5>
+                </div>
+                <div class="card-body p-4" style="max-height: 75vh; overflow-y: auto;">
+                    @if (!Model.Any())
+                    {
+                        <div class="bg-white dark:bg-slate-800 rounded-xl p-10 text-center">
+                            <i class="bi bi-chat-square-text text-5xl text-gray-300 dark:text-slate-600 mb-4 inline-block"></i>
+                            <h3 class="text-lg font-bold text-gray-800 dark:text-white mb-2">Henüz Bir Değerlendirme Yapmadınız</h3>
+                            <p class="text-gray-500 dark:text-gray-400 max-w-md mx-auto">Siparişleriniz teslim edildikten sonra, sipariş detaylarınız üzerinden ürünlerinizi değerlendirebilirsiniz.</p>
+                            <a asp-controller="Accounts" asp-action="MyOrders" class="btn btn-primary mt-5">Siparişlerim'e Git</a>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            @foreach (var item in Model)
+                            {
+                                <div class="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl shadow-sm p-6 flex flex-col hover:shadow-md transition-shadow">
+                                    <div class="flex items-start gap-4 mb-4">
+                                        <div class="w-16 h-16 flex-shrink-0 bg-gray-50 dark:bg-slate-900 rounded-lg border border-gray-100 dark:border-slate-700 p-1">
+                                            @if (!string.IsNullOrEmpty(item.Product?.Image))
+                                            {
+                                                <img src="~/img/products/@item.Product.Image" class="w-full h-full object-contain mix-blend-multiply dark:mix-blend-normal" alt="@item.Product.Name">
+                                            }
+                                        </div>
+                                        <div class="flex-grow">
+                                            <a asp-controller="Products" asp-action="Details" asp-route-slug="@item.Product?.Slug" class="text-base font-bold text-gray-800 dark:text-gray-200 hover:text-primary transition-colors no-underline line-clamp-2">
+                                                @item.Product?.Name
+                                            </a>
+                                            <div class="text-sm text-gray-500 mt-1">@item.CreateDate.ToString("dd MMM yyyy")</div>
+                                        </div>
+                                        
+                                        <!-- Onay Durumu -->
+                                        <div>
+                                            @if (item.IsActive)
+                                            {
+                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400">
+                                                    Yayında
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400">
+                                                    Kaldırıldı
+                                                </span>
+                                            }
+                                        </div>
+                                    </div>
+
+                                    <!-- Yıldızlar -->
+                                    <div class="flex text-warning mb-3 text-lg">
+                                        @for (int i = 1; i <= 5; i++)
+                                        {
+                                            <i class="bi @(i <= item.Rating ? "bi-star-fill" : "bi-star text-gray-300 dark:text-slate-600") mr-1"></i>
+                                        }
+                                    </div>
+
+                                    <p class="text-gray-700 dark:text-gray-300 text-sm leading-relaxed m-0 flex-grow italic">"@item.Description"</p>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+            <div class="d-md-none mt-4">
+                <a href="/hesabim/cikis-yap" class="btn btn-outline-danger w-100 rounded-pill shadow-sm">
+                    <i class="bi bi-box-arrow-right me-2"></i> Çıkış Yap
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

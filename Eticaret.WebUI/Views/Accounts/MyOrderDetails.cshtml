@@ -11,16 +11,18 @@
     <!-- ÜST BİLGİ (HEADER) -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
         <div class="flex items-center gap-4">
-            <a asp-controller="Accounts" asp-action="MyOrders" 
-               class="w-10 h-10 flex items-center justify-center bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 hover:text-primary transition-colors shadow-sm focus:outline-none">
+            <a asp-controller="Accounts" asp-action="MyOrders"
+                class="w-10 h-10 flex items-center justify-center bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 hover:text-primary transition-colors shadow-sm focus:outline-none">
                 <i class="bi bi-arrow-left text-lg"></i>
             </a>
             <div>
-                <h1 class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white m-0 tracking-tight">Sipariş Detayı</h1>
-                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1 mb-0">Sipariş No: <span class="font-medium text-gray-700 dark:text-gray-300">#@Model.OrderNumber</span></p>
+                <h1 class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white m-0 tracking-tight">Sipariş
+                    Detayı</h1>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1 mb-0">Sipariş No: <span
+                        class="font-medium text-gray-700 dark:text-gray-300">#@Model.OrderNumber</span></p>
             </div>
         </div>
-        
+
         <!-- Badge (Arka Plandan Gelen Dinamik Renk) -->
         <span class="inline-flex items-center px-4 py-2 rounded-full text-sm font-bold shadow-sm @ui.BadgeClass">
             <i class="bi bi-@ui.Icon mr-2"></i> @Html.DisplayFor(m => Model.OrderState)
@@ -29,44 +31,56 @@
 
     <!-- ANA İÇERİK GRID YAPISI -->
     <div class="flex flex-col lg:flex-row gap-6 lg:gap-8 items-start">
-        
+
         <!-- SOL SÜTUN (Sipariş İçeriği - Ürünler) -->
         <div class="w-full lg:w-2/3 space-y-6">
-            <div class="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl shadow-sm overflow-hidden">
-                <div class="px-6 py-4 border-b border-gray-200 dark:border-slate-700 bg-gray-50/50 dark:bg-slate-800/50">
+            <div
+                class="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl shadow-sm overflow-hidden">
+                <div
+                    class="px-6 py-4 border-b border-gray-200 dark:border-slate-700 bg-gray-50/50 dark:bg-slate-800/50">
                     <h2 class="text-lg font-bold text-gray-800 dark:text-white m-0 flex items-center">
                         <i class="bi bi-basket mr-2 text-primary"></i> Sipariş İçeriği
                     </h2>
                 </div>
-                
+
                 <div class="divide-y divide-gray-100 dark:divide-slate-700/50">
                     @foreach (var line in Model.OrderLines)
                     {
-                        <div class="p-6 flex flex-col sm:flex-row gap-5 sm:items-center hover:bg-gray-50/50 dark:hover:bg-slate-700/20 transition-colors">
-                            
+                        <div
+                            class="p-6 flex flex-col sm:flex-row gap-5 sm:items-center hover:bg-gray-50/50 dark:hover:bg-slate-700/20 transition-colors">
+
                             <!-- Ürün Görseli -->
-                            <div class="w-20 h-20 sm:w-24 sm:h-24 flex-shrink-0 bg-white dark:bg-slate-900 rounded-lg border border-gray-100 dark:border-slate-700 p-2 relative overflow-hidden group">
-                                <img src="~/img/products/@line.Product.Image" 
-                                     class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500 mix-blend-multiply dark:mix-blend-normal" 
-                                     alt="@line.Product.Name">
+                            <div
+                                class="w-20 h-20 sm:w-24 sm:h-24 flex-shrink-0 bg-white dark:bg-slate-900 rounded-lg border border-gray-100 dark:border-slate-700 p-2 relative overflow-hidden group">
+                                <img src="~/img/products/@line.Product.Image"
+                                    class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500 mix-blend-multiply dark:mix-blend-normal"
+                                    alt="@line.Product.Name">
                             </div>
-                            
+
                             <!-- Ürün Detayları -->
                             <div class="flex-grow flex flex-col min-w-0">
-                                <a asp-route="ProductDetail" asp-route-slug="@line.Product.Slug" 
-                                   class="text-base font-semibold text-gray-800 dark:text-gray-200 hover:text-primary transition-colors no-underline line-clamp-2" 
-                                   title="@line.Product.Name">
+                                <a asp-route="ProductDetail" asp-route-slug="@line.Product.Slug"
+                                    class="text-base font-semibold text-gray-800 dark:text-gray-200 hover:text-primary transition-colors no-underline line-clamp-2"
+                                    title="@line.Product.Name">
                                     @line.Product.Name
                                 </a>
-                                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1.5 mb-0">Kodu: <span class="font-medium">@line.Product.ProductCode</span></p>
+                                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1.5 mb-0">Kodu: <span
+                                        class="font-medium">@line.Product.ProductCode</span></p>
                             </div>
-                            
+                                @if (Model.OrderState == Eticaret.Core.Entities.EnumOrderState.Completed && ViewBag.HasPendingReviews == true)
+                            {
+                                <a asp-controller="Reviews" asp-action="Order" asp-route-token="@Model.ReviewToken" class="btn btn-warning">
+                                    <i class="bi bi-star-fill"></i> Siparişi Değerlendir
+                                </a>
+                            }
                             <!-- Fiyat ve Adet (Mobilde Alt Alta, Masaüstünde Yana Yana) -->
-                            <div class="flex sm:flex-col justify-between items-center sm:items-end gap-2 mt-2 sm:mt-0 min-w-[130px]">
+                            <div
+                                class="flex sm:flex-col justify-between items-center sm:items-end gap-2 mt-2 sm:mt-0 min-w-[130px]">
                                 <div class="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1.5">
-                                    @line.UnitPrice.ToString("c") 
-                                    <i class="bi bi-x text-xs"></i> 
-                                    <span class="inline-flex items-center justify-center bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-gray-200 font-bold px-2 py-0.5 rounded-md min-w-[1.5rem]">@line.Quantity</span>
+                                    @line.UnitPrice.ToString("c")
+                                    <i class="bi bi-x text-xs"></i>
+                                    <span
+                                        class="inline-flex items-center justify-center bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-gray-200 font-bold px-2 py-0.5 rounded-md min-w-[1.5rem]">@line.Quantity</span>
                                 </div>
                                 <div class="text-lg font-black text-gray-900 dark:text-white">
                                     @((line.UnitPrice * line.Quantity).ToString("c"))
@@ -80,16 +94,19 @@
 
         <!-- SAĞ SÜTUN (Sipariş Özeti & Teslimat) -->
         <div class="w-full lg:w-1/3 space-y-6 lg:sticky lg:top-24">
-            
+
             <!-- Özet Kartı -->
-            <div class="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl shadow-sm overflow-hidden">
-                <div class="px-6 py-4 border-b border-gray-200 dark:border-slate-700 bg-gray-50/50 dark:bg-slate-800/50">
+            <div
+                class="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl shadow-sm overflow-hidden">
+                <div
+                    class="px-6 py-4 border-b border-gray-200 dark:border-slate-700 bg-gray-50/50 dark:bg-slate-800/50">
                     <h2 class="text-lg font-bold text-gray-800 dark:text-white m-0">Sipariş Özeti</h2>
                 </div>
                 <div class="p-6 space-y-4">
                     <div class="flex justify-between items-center text-sm text-gray-600 dark:text-gray-400">
                         <span>Ara Toplam</span>
-                        <span class="font-semibold text-gray-800 dark:text-gray-200">@Model.TotalPrice.ToString("c")</span>
+                        <span
+                            class="font-semibold text-gray-800 dark:text-gray-200">@Model.TotalPrice.ToString("c")</span>
                     </div>
                     <div class="flex justify-between items-center text-sm text-gray-600 dark:text-gray-400">
                         <span>Kargo</span>
@@ -104,27 +121,32 @@
             </div>
 
             <!-- Teslimat Bilgileri Kartı -->
-            <div class="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl shadow-sm overflow-hidden">
-                <div class="px-6 py-4 border-b border-gray-200 dark:border-slate-700 bg-gray-50/50 dark:bg-slate-800/50">
+            <div
+                class="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl shadow-sm overflow-hidden">
+                <div
+                    class="px-6 py-4 border-b border-gray-200 dark:border-slate-700 bg-gray-50/50 dark:bg-slate-800/50">
                     <h2 class="text-lg font-bold text-gray-800 dark:text-white m-0">Teslimat Bilgileri</h2>
                 </div>
                 <div class="p-6 space-y-6">
                     <!-- Adres Bilgisi -->
                     <div class="flex items-start gap-3.5">
-                        <div class="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center text-primary flex-shrink-0 mt-0.5">
+                        <div
+                            class="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center text-primary flex-shrink-0 mt-0.5">
                             <i class="bi bi-geo-alt-fill"></i>
                         </div>
                         <div>
                             <h3 class="font-bold text-gray-800 dark:text-white text-sm m-0 mb-1">Teslimat Adresi</h3>
                             <p class="text-gray-600 dark:text-gray-400 text-sm leading-relaxed m-0">
-                                @(string.IsNullOrEmpty(Model.DeliveryAddress) ? "Adres bilgisi bulunamadı." : Model.DeliveryAddress)
+                                @(string.IsNullOrEmpty(Model.DeliveryAddress) ? "Adres bilgisi bulunamadı." :
+                                                                Model.DeliveryAddress)
                             </p>
                         </div>
                     </div>
-                    
+
                     <!-- Tarih Bilgisi -->
                     <div class="flex items-start gap-3.5">
-                        <div class="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center text-primary flex-shrink-0 mt-0.5">
+                        <div
+                            class="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center text-primary flex-shrink-0 mt-0.5">
                             <i class="bi bi-calendar-check-fill"></i>
                         </div>
                         <div>

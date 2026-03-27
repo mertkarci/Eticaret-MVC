@@ -1,4 +1,4 @@
-﻿﻿using System.Diagnostics;
+﻿﻿﻿﻿﻿﻿using System.Diagnostics;
 using System.Security.Claims;
 using Eticaret.Core.Entities;
 using Eticaret.Service.Abstract;
@@ -21,14 +21,16 @@ public class AccountsController : Controller
     private readonly IAuthService _authService;
     private readonly IUserService _userService;
     private readonly ILogger<AccountsController> _logger;
+    private readonly IService<Comment> _serviceComment;
 
-    public AccountsController(IService<AppUser> service, IService<Order> serviceOrder, IAuthService authService, IUserService userService, ILogger<AccountsController> logger)
+    public AccountsController(IService<AppUser> service, IService<Order> serviceOrder, IAuthService authService, IUserService userService, ILogger<AccountsController> logger, IService<Comment> serviceComment)
     {
         _service = service;
         _serviceOrder = serviceOrder;
         _authService = authService;
         _userService = userService;
         _logger = logger;
+        _serviceComment = serviceComment;
     }
 
     private string GetRoleName()
@@ -173,7 +175,46 @@ public class AccountsController : Controller
 
         if (order == null) return NotFound("Sipariş bulunamadı!");
 
+        var reviewedProductIds = await _serviceComment.GetQueryable()
+            .Where(c => c.AppUserId == user.Id) // Sipariş bazlı değil, KULLANICI bazlı kontrol
+            .Select(c => c.ProductId)
+            .ToListAsync();
+
+        var pendingReviewsCount = order.OrderLines
+            .Where(ol => !reviewedProductIds.Contains(ol.ProductId))
+            .DistinctBy(ol => ol.ProductId)
+            .Count();
+
+        ViewBag.HasPendingReviews = pendingReviewsCount > 0;
+
         return View(order);
+    }
+
+    [Authorize]
+    [HttpGet("degerlendirmelerim")]
+    public async Task<IActionResult> MyReviews()
+    {
+        var userGuidClaim = HttpContext.User.FindFirst("UserGuid");
+        if (userGuidClaim == null || !Guid.TryParse(userGuidClaim.Value, out Guid guidFromCookie))
+        {
+            await HttpContext.SignOutAsync();
+            return RedirectToAction("SignIn");
+        }
+
+        AppUser user = await _service.GetAsync(p => p.UserGuid == guidFromCookie);
+        if (user is null)
+        {
+            await HttpContext.SignOutAsync();
+            return RedirectToAction("SignIn");
+        }
+
+        var comments = await _serviceComment.GetQueryable()
+            .Include(c => c.Product)
+            .Where(c => c.AppUserId == user.Id)
+            .OrderByDescending(c => c.CreateDate)
+            .ToListAsync();
+
+        return View(comments);
     }
 
     [HttpGet("giris-yap")]

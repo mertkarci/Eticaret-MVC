@@ -1,4 +1,4 @@
-﻿using System.Transactions;
+﻿﻿using System.Transactions;
 using System.ComponentModel.DataAnnotations;
 namespace Eticaret.Core.Entities;
 
@@ -43,6 +43,9 @@ public class Order : IEntity
 
     [Display(Name = "Sipariş Durumu")]
     public EnumOrderState OrderState { get; set; }
+
+    [ScaffoldColumn(false)]
+    public Guid ReviewToken { get; set; } = Guid.NewGuid();
 }
 public enum EnumOrderState
 {

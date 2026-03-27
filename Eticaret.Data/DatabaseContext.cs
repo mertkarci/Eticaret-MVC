@@ -28,6 +28,7 @@ public class DatabaseContext : DbContext
     public DbSet<ThemeSetting> ThemeSettings { get; set; }
     public DbSet<SiteSettings> SiteSettings { get; set; }
     public DbSet<Notification> Notification { get; set; }
+    public DbSet<Comment> Comments { get; set; }
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

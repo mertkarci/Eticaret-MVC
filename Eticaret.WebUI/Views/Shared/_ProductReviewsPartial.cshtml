@@ -1,0 +1,193 @@
+@model Eticaret.WebUI.Models.ProductReviewViewModel
+
+@functions {
+    // C# tarafında geçen süreyi hesaplayan yardımcı metod (4 gün önce vs.)
+    public string GetTimeAgo(DateTime createDate)
+    {
+        var timeSpan = DateTime.Now - createDate;
+        if (timeSpan.TotalDays > 365) return $"{(int)(timeSpan.TotalDays / 365)} yıl önce";
+        if (timeSpan.TotalDays > 30) return $"{(int)(timeSpan.TotalDays / 30)} ay önce";
+        if (timeSpan.TotalDays >= 1) return $"{(int)timeSpan.TotalDays} gün önce";
+        if (timeSpan.TotalHours >= 1) return $"{(int)timeSpan.TotalHours} saat önce";
+        if (timeSpan.TotalMinutes >= 1) return $"{(int)timeSpan.TotalMinutes} dakika önce";
+        return "Az önce";
+    }
+}
+
+@if (Model != null && Model.TotalReviews > 0)
+{
+    <div id="degerlendirmeler" class="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl shadow-sm mt-8 p-4 sm:p-6 md:p-8">
+        
+        <!-- SATIR 1: Özet ve Puan Dağılım Barları -->
+        <div class="flex flex-col md:flex-row gap-6 md:gap-12 mb-8 pb-8 border-b border-gray-100 dark:border-slate-700">
+            
+            <!-- Sol Taraf: Ortalama Derece -->
+            <div class="md:w-1/3 flex flex-col items-center justify-center bg-gray-50/50 dark:bg-slate-700/30 rounded-xl p-6">
+                <div class="text-6xl font-black text-gray-800 dark:text-white">@Model.AverageRating.ToString("0.0")</div>
+                <div class="flex justify-center text-primary my-3 text-2xl gap-1">
+                    @for (int i = 1; i <= 5; i++)
+                    {
+                        <i class="bi @(i <= Math.Round(Model.AverageRating) ? "bi-star-fill" : "bi-star")"></i>
+                    }
+                </div>
+                <div class="text-sm font-medium text-gray-500 dark:text-gray-400">@Model.TotalReviews Değerlendirme</div>
+            </div>
+
+            <!-- Sağ Taraf: Puan Dağılımı (Bar Grafiği - Temanın Rengiyle) -->
+            <div class="md:w-2/3 flex flex-col justify-center space-y-3">
+                @for (int star = 5; star >= 1; star--)
+                {
+                    int count = Model.RatingCounts.ContainsKey(star) ? Model.RatingCounts[star] : 0;
+                    double percentage = Model.TotalReviews > 0 ? (double)count / Model.TotalReviews * 100 : 0;
+                    <div class="flex items-center gap-4">
+                        <span class="text-sm font-bold text-gray-600 dark:text-gray-300 w-12 flex items-center gap-1">
+                            @star <i class="bi bi-star-fill text-primary text-xs"></i>
+                        </span>
+                        <div class="w-full bg-gray-100 dark:bg-slate-700 rounded-full h-3">
+                            <div class="bg-primary h-3 rounded-full transition-all duration-1000" style="width: @percentage.ToString("0")%"></div>
+                        </div>
+                        <span class="text-sm font-medium text-gray-500 dark:text-gray-400 w-10 text-right">@count</span>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- SATIR 2+: Yorum Kartları (Baştan 2 Yorum Gelecek) -->
+        <div id="reviews-container" class="grid grid-cols-1 gap-4">
+            @foreach (var comment in Model.Comments)
+            {
+                var displayName = !string.IsNullOrEmpty(comment.AppUser?.Name) ? $"{comment.AppUser.Name} {comment.AppUser.Surname?.Substring(0,1)}." : (!string.IsNullOrEmpty(comment.GuestName) ? comment.GuestName : "Gizli Müşteri");
+                var initial = !string.IsNullOrEmpty(displayName) ? displayName.Substring(0, 1).ToUpper() : "?";
+                var timeAgo = GetTimeAgo(comment.CreateDate);
+
+                <!-- TEKİL YORUM KARTI -->
+                <div class="bg-white dark:bg-slate-800 border border-gray-100 dark:border-slate-700 shadow-sm hover:shadow-md transition-shadow rounded-xl p-4 sm:p-5 flex flex-col gap-2">
+                    
+                    <!-- 1. Satır: Kullanıcı Adı, Süre ve Yıldızlar -->
+                    <div class="flex items-center justify-between gap-2">
+                        <div class="flex items-center gap-3 min-w-0">
+                            <div class="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-lg flex-shrink-0">
+                                @initial
+                            </div>
+                            <div class="flex flex-col truncate">
+                                <span class="font-bold text-gray-800 dark:text-white text-sm truncate">@displayName</span>
+                                <span class="text-xs font-medium text-gray-500 dark:text-gray-400">@timeAgo</span>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center gap-1 bg-primary/5 px-2 py-1 rounded-lg flex-shrink-0">
+                            <div class="flex text-primary text-xs sm:text-sm">
+                                @for (int i = 1; i <= 5; i++)
+                                {
+                                    <i class="bi @(i <= comment.Rating ? "bi-star-fill" : "bi-star")"></i>
+                                }
+                            </div>
+                            <span class="font-bold text-gray-700 dark:text-gray-300 text-xs sm:text-sm ml-1">@comment.Rating.0</span>
+                        </div>
+                    </div>
+                    
+                    <!-- 2. Satır: Yorum İçeriği -->
+                    <div class="text-sm text-gray-600 dark:text-gray-300 leading-relaxed mt-1 sm:pl-[3.25rem]">
+                        @comment.Description
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- YORUMLARI GETİR (AJAX LOAD MORE) BUTONU -->
+        @if (Model.TotalReviews > 2)
+        {
+            <div class="mt-8 text-center">
+                <button type="button" id="loadMoreReviewsBtn" data-product="@Model.ProductId" data-skip="2" class="inline-flex items-center justify-center gap-2 px-6 py-3 border-2 border-primary text-primary hover:bg-primary hover:text-white rounded-full font-bold transition-all duration-300 focus:outline-none shadow-sm">
+                    <span>Daha Fazla Yorum İncele</span>
+                    <span class="bg-primary/10 text-current px-2 py-0.5 rounded-md text-xs" id="remainingReviewsCount">@(Model.TotalReviews - 2)</span>
+                </button>
+            </div>
+        }
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const loadMoreBtn = document.getElementById('loadMoreReviewsBtn');
+            if (!loadMoreBtn) return;
+
+            loadMoreBtn.addEventListener('click', function() {
+                const productId = this.getAttribute('data-product');
+                const skip = parseInt(this.getAttribute('data-skip'));
+                const take = 5; // Veritabanından her basışta kaçar tane çekileceği
+                
+                const originalHtml = this.innerHTML;
+                this.innerHTML = '<i class="bi bi-arrow-repeat animate-spin text-lg"></i> Yükleniyor...';
+                this.disabled = true;
+
+                // Optimize edilmiş Endpoint'e istek atılır
+                fetch(`/urun/yorumlar?productId=${productId}&skip=${skip}&take=${take}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        const container = document.getElementById('reviews-container');
+                        
+                        data.forEach(c => {
+                            let starsHtml = '';
+                            for(let i = 1; i <= 5; i++) {
+                                starsHtml += `<i class="bi ${i <= c.rating ? 'bi-star-fill' : 'bi-star'}"></i>`;
+                            }
+
+                            // Gelen yeni yorumları dinamik olarak bas (Mobilde bozulmasın diye min-w-0 ve truncate kullanıldı)
+                            const card = `
+                                <div class="bg-white dark:bg-slate-800 border border-gray-100 dark:border-slate-700 shadow-sm hover:shadow-md transition-shadow rounded-xl p-4 sm:p-5 flex flex-col gap-2 opacity-0" style="animation: fadeIn 0.5s forwards;">
+                                    <div class="flex items-center justify-between gap-2">
+                                        <div class="flex items-center gap-3 min-w-0">
+                                            <div class="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-lg flex-shrink-0">
+                                                ${c.initial}
+                                            </div>
+                                            <div class="flex flex-col truncate">
+                                                <span class="font-bold text-gray-800 dark:text-white text-sm truncate">${c.displayName}</span>
+                                                <span class="text-xs font-medium text-gray-500 dark:text-gray-400">${c.dateText}</span>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-center gap-1 bg-primary/5 px-2 py-1 rounded-lg flex-shrink-0">
+                                            <div class="flex text-primary text-xs sm:text-sm">
+                                                ${starsHtml}
+                                            </div>
+                                            <span class="font-bold text-gray-700 dark:text-gray-300 text-xs sm:text-sm ml-1">${c.rating}</span>
+                                        </div>
+                                    </div>
+                                    <div class="text-sm text-gray-600 dark:text-gray-300 leading-relaxed mt-1 sm:pl-[3.25rem]">
+                                        ${c.description}
+                                    </div>
+                                </div>
+                            `;
+                            container.insertAdjacentHTML('beforeend', card);
+                        });
+
+                        // Sayacı güncelle
+                        const newSkip = skip + data.length;
+                        this.setAttribute('data-skip', newSkip);
+                        
+                        const total = parseInt('@Model.TotalReviews');
+                        const remaining = total - newSkip;
+
+                        if (remaining > 0) {
+                            this.innerHTML = `<span>Daha Fazla Yorum İncele</span><span class="bg-primary/10 text-current px-2 py-0.5 rounded-md text-xs" id="remainingReviewsCount">${remaining}</span>`;
+                            this.disabled = false;
+                        } else {
+                            // Başka yorum kalmadıysa butonu gizle
+                            this.style.display = 'none';
+                        }
+                    })
+                    .catch(err => {
+                        console.error('Yorumlar yüklenirken hata oluştu:', err);
+                        this.innerHTML = originalHtml;
+                        this.disabled = false;
+                    });
+            });
+        });
+    </script>
+    <style>
+        @@keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+}

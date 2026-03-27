@@ -1,16 +1,38 @@
 using Eticaret.Core.Entities;
 using Eticaret.Service.Abstract;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
+using Serilog;
 
 namespace Eticaret.Service.Concrete;
 
 public class CategoryService : ICategoryService
 {
     private readonly IService<Category> _categoryService;
+    private readonly IMemoryCache _memoryCache;
+    private const string TopMenuCategoriesCacheKey = "TopMenuCategories";
 
-    public CategoryService(IService<Category> categoryService)
+
+    public CategoryService(IService<Category> categoryService, IMemoryCache memoryCache)
     {
         _categoryService = categoryService;
+        _memoryCache = memoryCache;
+    }
+    public async Task<List<Category>> GetTopMenuCategoriesAsync()
+    {
+        if (!_memoryCache.TryGetValue(TopMenuCategoriesCacheKey, out List<Category> categories))
+        {
+            categories = await _categoryService.GetAllAsync(c => c.isTopMenu && c.isActive);
+            var cacheOptions = new MemoryCacheEntryOptions()
+                .SetAbsoluteExpiration(TimeSpan.FromHours(2));
+            _memoryCache.Set(TopMenuCategoriesCacheKey, categories, cacheOptions);
+        }
+        return categories;
+    }
+    
+    public void ClearTopMenuCategoriesCache()
+    {
+        _memoryCache.Remove(TopMenuCategoriesCacheKey); 
     }
 
     public async Task<(Category Category, List<Category> SubCategories, List<Product> AllProducts, List<Brand> AvailableBrands)?> GetCategoryDetailsBySlugAsync(string slug)
@@ -26,12 +48,7 @@ public class CategoryService : ICategoryService
             .Include(c => c.Products).ThenInclude(pr => pr.Brand)
             .ToListAsync();
 
-        var allProducts = category.Products?.ToList() ?? new List<Product>();
-        foreach (var sub in subCategories)
-        {
-            if (sub.Products != null) allProducts.AddRange(sub.Products);
-        }
-
+        var allProducts = GetProductsForCategoryAndSubCategories(category, subCategories);
         var availableBrands = allProducts
             .Where(p => p.Brand != null)
             .Select(p => p.Brand)
@@ -54,12 +71,7 @@ public class CategoryService : ICategoryService
             .Include(c => c.Products).ThenInclude(pr => pr.Brand)
             .ToListAsync();
 
-        var allProducts = category.Products?.ToList() ?? new List<Product>();
-        foreach (var sub in subCategories)
-        {
-            if (sub.Products != null) allProducts.AddRange(sub.Products);
-        }
-
+        var allProducts = GetProductsForCategoryAndSubCategories(category, subCategories);
         // Marka Filtresi
         if (selectedBrands != null && selectedBrands.Any())
             allProducts = allProducts.Where(p => p.Brand != null && selectedBrands.Contains(p.Brand.Id)).ToList();
@@ -80,5 +92,33 @@ public class CategoryService : ICategoryService
         }
 
         return allProducts;
+    }
+
+    private List<Product> GetProductsForCategoryAndSubCategories(Category category, List<Category> subCategories)
+    {
+        var allProducts = category.Products?.ToList() ?? new List<Product>();
+        foreach (var sub in subCategories)
+        {
+            if (sub.Products != null) allProducts.AddRange(sub.Products);
+        }
+        return allProducts;
+    }
+
+    public async Task AddCategoryAndClearCacheAsync(Category category)
+    {
+        await _categoryService.AddAsync(category);
+        ClearTopMenuCategoriesCache();
+    }
+
+    public void UpdateCategoryAndClearCache(Category category)
+    {
+        _categoryService.Update(category);
+        ClearTopMenuCategoriesCache();
+    }
+
+    public void DeleteCategoryAndClearCache(Category category)
+    {
+        _categoryService.Delete(category);
+        ClearTopMenuCategoriesCache();
     }
 }

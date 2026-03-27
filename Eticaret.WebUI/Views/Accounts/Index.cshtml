@@ -6,29 +6,15 @@
 <div class="container py-4 py-md-5">
     <div class="row">
         <div class="col-md-4 col-lg-3 mb-4 mb-md-0">
-            <div class="list-group shadow-sm border-0 rounded-3 overflow-hidden">
-                <a asp-action="Index" class="list-group-item list-group-item-action active border-0 py-3">
-                    <i class="bi bi-person me-2"></i> Üyelik Bilgileri
-                </a>
-                <a asp-controller="Accounts" asp-action="MyOrders" class="list-group-item list-group-item-action border-0 py-3">
-                    <i class="bi bi-bag-check me-2"></i> Siparişlerim
-                </a>
-                <a asp-controller="MyAddresses" asp-action="Index" class="list-group-item list-group-item-action border-0 py-3">
-                    <i class="bi bi-geo-alt me-2"></i> Adreslerim
-                </a>
-                <a href="/hesabim/cikis-yap" class="list-group-item list-group-item-action text-danger border-0 py-3 d-none d-md-block">
-                    <i class="bi bi-box-arrow-right me-2"></i> Çıkış Yap
-                </a>
-            </div>
+            <partial name="_AccountSidebarPartial" />
         </div>
 
         <div class="col-md-8 col-lg-9">
             @if (TempData["Message"] != null)
             {
-                /* GÜVENLİ: Bu HTML kodu doğrudan Controller'da bizim tarafımızdan yazıldığı için Html.Raw kullanımı risk taşımaz. */
                 @Html.Raw(TempData["Message"])
             }
-            
+
             <div class="card shadow-sm border-0 rounded-3">
                 <div class="card-header bg-white border-bottom py-3">
                     <h5 class="mb-0 fw-bold text-dark">Üyelik Bilgilerini Güncelle</h5>
@@ -40,12 +26,14 @@
 
                         <div class="row g-3 mb-3">
                             <div class="col-md-6">
-                                <label asp-for="Name" class="form-label fw-medium small text-secondary">Ad <span class="text-danger">*</span></label>
+                                <label asp-for="Name" class="form-label fw-medium small text-secondary">Ad <span
+                                        class="text-danger">*</span></label>
                                 <input asp-for="Name" class="form-control" required />
                                 <span asp-validation-for="Name" class="text-danger small"></span>
                             </div>
                             <div class="col-md-6">
-                                <label asp-for="Surname" class="form-label fw-medium small text-secondary">Soyad <span class="text-danger">*</span></label>
+                                <label asp-for="Surname" class="form-label fw-medium small text-secondary">Soyad <span
+                                        class="text-danger">*</span></label>
                                 <input asp-for="Surname" class="form-control" required />
                                 <span asp-validation-for="Surname" class="text-danger small"></span>
                             </div>
@@ -53,22 +41,21 @@
 
                         <div class="mb-4">
                             <label asp-for="Phone" class="form-label fw-medium small text-secondary">Telefon</label>
-                            <input asp-for="Phone" class="form-control" 
-                                   placeholder="05XX XXX XX XX" 
-                                   pattern="05[0-9]{9}" 
-                                   maxlength="11" 
-                                   minlength="11" 
-                                   title="Lütfen telefon numaranızı 05 ile başlayarak 11 haneli olacak şekilde giriniz (Örn: 05523233344)"
-                                   oninput="this.value = this.value.replace(/[^0-9]/g, '')" />
+                            <input asp-for="Phone" class="form-control" placeholder="05XX XXX XX XX"
+                                pattern="05[0-9]{9}" maxlength="11" minlength="11"
+                                title="Lütfen telefon numaranızı 05 ile başlayarak 11 haneli olacak şekilde giriniz (Örn: 05523233344)"
+                                oninput="this.value = this.value.replace(/[^0-9]/g, '')" />
                             <span asp-validation-for="Phone" class="text-danger small"></span>
                             <div class="form-text small">Sipariş ve kargo bilgilendirmeleri için kullanılacaktır.</div>
                         </div>
 
                         <div class="mb-4 p-3 bg-light rounded-3 border">
-                            <label asp-for="Email" class="form-label fw-medium small text-secondary">Email Adresi</label>
-                            <input asp-for="Email" class="form-control text-muted" style="background-color: #e9ecef;" readonly />
+                            <label asp-for="Email" class="form-label fw-medium small text-secondary">Email
+                                Adresi</label>
+                            <input asp-for="Email" class="form-control text-muted" style="background-color: #e9ecef;"
+                                readonly />
                             <div class="form-text mt-2 small text-muted">
-                                <i class="bi bi-shield-lock-fill text-warning me-1"></i> 
+                                <i class="bi bi-shield-lock-fill text-warning me-1"></i>
                                 Güvenlik gereği E-posta adresiniz bu ekrandan değiştirilemez.
                             </div>
                         </div>

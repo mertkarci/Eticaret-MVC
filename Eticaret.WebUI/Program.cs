@@ -13,8 +13,21 @@ var builder = WebApplication.CreateBuilder(args);
 
 var webUiPath = builder.Environment.ContentRootPath;
 
+builder.Host.UseSerilog((context, config) =>
+{
+    var logDbPath = Path.GetFullPath(Path.Combine(webUiPath, "..", "Eticaret.Data", "Logs.db"));
 
-builder.Host.UseSerilog();
+    config
+        .MinimumLevel.Information()
+        .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+        .MinimumLevel.Override("System", LogEventLevel.Warning)
+        .WriteTo.Console()
+        .WriteTo.SQLite(
+            sqliteDbPath: logDbPath,
+            tableName: "AppLogs",
+            storeTimestampInUtc: true // Tabloyu otomatik oluşturması için şart
+        );
+});
 
 var dbPath = Path.GetFullPath(Path.Combine(webUiPath, "..", "Eticaret.Data", "Eticaret.db"));
 
@@ -27,27 +40,6 @@ Console.WriteLine($"--------------------------------------------------");
 
 builder.Services.AddDbContext<DatabaseContext>(options =>
     options.UseSqlite($"Data Source={dbPath}"));
-
-Serilog.Debugging.SelfLog.Enable(Console.Out);
-
-try
-{
-    Log.Logger = new LoggerConfiguration()
-        .MinimumLevel.Information()
-        .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
-        .MinimumLevel.Override("System", LogEventLevel.Warning)
-        .WriteTo.Console()
-        .WriteTo.SQLite(
-            sqliteDbPath: logDbPath,
-            tableName: "AppLogs",
-            storeTimestampInUtc: true // Tabloyu otomatik oluşturması için şart
-        )
-        .CreateLogger();
-}
-catch (Exception ex)
-{
-    Console.WriteLine($"Serilog başlatılamadı: {ex.Message}");
-}
 
 builder.Services.AddControllersWithViews(options =>
 {
@@ -128,6 +120,7 @@ builder.Services.AddScoped<IOrderIyService, OrderIyService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<IBrandService, BrandService>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddSingleton<IMaintenanceService, MaintenanceService>();
 
@@ -159,6 +152,7 @@ builder.Services.AddAuthorization(p =>
     p.AddPolicy("AdminPolicy", policy => policy.RequireClaim(ClaimTypes.Role, "Admin"));
     p.AddPolicy("UserPolicy", policy => policy.RequireClaim(ClaimTypes.Role, "Admin", "User"));
 });
+builder.Services.AddMemoryCache();
 
 var app = builder.Build();
 

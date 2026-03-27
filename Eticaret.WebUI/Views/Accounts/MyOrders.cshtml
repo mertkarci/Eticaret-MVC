@@ -10,27 +10,7 @@
     <div class="row">
         <!-- SOL MENÜ (SIDEBAR) -->
         <div class="col-md-4 col-lg-3 mb-4 mb-md-0">
-            <!-- Sol menüyü ekranda sabit tutan (Sticky) yapı -->
-            <div class="position-sticky" style="top: 6rem; z-index: 10;">
-                <div class="list-group shadow-sm border-0 rounded-3 overflow-hidden">
-                    <a asp-action="Index" class="list-group-item list-group-item-action border-0 py-3">
-                        <i class="bi bi-person me-2"></i> Üyelik Bilgileri
-                    </a>
-                    <!-- Bulunduğumuz sayfa "active" -->
-                    <a asp-controller="Accounts" asp-action="MyOrders"
-                        class="list-group-item list-group-item-action active border-0 py-3">
-                        <i class="bi bi-bag-check me-2"></i> Siparişlerim
-                    </a>
-                    <a asp-controller="MyAddresses" asp-action="Index"
-                        class="list-group-item list-group-item-action border-0 py-3">
-                        <i class="bi bi-geo-alt me-2"></i> Adreslerim
-                    </a>
-                    <a href="/hesabim/cikis-yap"
-                        class="list-group-item list-group-item-action text-danger border-0 py-3 d-none d-md-block">
-                        <i class="bi bi-box-arrow-right me-2"></i> Çıkış Yap
-                    </a>
-                </div>
-            </div>
+            <partial name="_AccountSidebarPartial" />
         </div>
 
         <!-- SAĞ İÇERİK (SİPARİŞLERİM KARTI) -->

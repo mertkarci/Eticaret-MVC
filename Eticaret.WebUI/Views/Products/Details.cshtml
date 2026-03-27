@@ -5,6 +5,8 @@
 @{
     ViewData["Title"] = Model.Product.Name;
     var favourites = Context.Session.GetJson<List<Product>>("GetFavourites") ?? new List<Product>();
+    var reviews = ViewBag.Reviews as Eticaret.WebUI.Models.ProductReviewViewModel;
+
 }
 
 <!-- ANA ÜRÜN KISMI -->
@@ -15,45 +17,54 @@
         <nav aria-label="breadcrumb" class="mb-6">
             <ol class="flex flex-wrap items-center text-sm text-gray-500 dark:text-gray-400 gap-y-2">
                 <li class="flex items-center">
-                    <a asp-controller="Home" asp-action="Index" class="hover:text-primary transition-colors no-underline text-inherit">Ana Sayfa</a>
+                    <a asp-controller="Home" asp-action="Index"
+                        class="hover:text-primary transition-colors no-underline text-inherit">Ana Sayfa</a>
                 </li>
                 <li class="flex items-center px-2"><span class="text-gray-300 dark:text-gray-600">/</span></li>
                 <li class="flex items-center">
-                    <a asp-controller="Products" asp-action="Index" class="hover:text-primary transition-colors no-underline text-inherit">Ürünler</a>
+                    <a asp-controller="Products" asp-action="Index"
+                        class="hover:text-primary transition-colors no-underline text-inherit">Ürünler</a>
                 </li>
                 <li class="flex items-center px-2"><span class="text-gray-300 dark:text-gray-600">/</span></li>
-                <li class="text-gray-800 dark:text-gray-300 font-medium truncate max-w-[180px] sm:max-w-xs md:max-w-md" aria-current="page" title="@Model.Product.Name">@Model.Product.Name</li>
+                <li class="text-gray-800 dark:text-gray-300 font-medium truncate max-w-[180px] sm:max-w-xs md:max-w-md"
+                    aria-current="page" title="@Model.Product.Name">@Model.Product.Name</li>
             </ol>
         </nav>
 
         <div class="flex flex-col lg:flex-row gap-8 xl:gap-12 items-start">
-            
+
             @* --- SOL ALAN: RESİM GALERİSİ --- *@
             <div class="w-full lg:w-7/12">
-                <div class="product-gallery-wrapper border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 rounded-lg p-4 lg:p-8">
+                <div
+                    class="product-gallery-wrapper border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 rounded-lg p-4 lg:p-8">
                     <partial name="_ProductImageGallery" model="Model.Product" />
                 </div>
             </div>
 
             @* --- SAĞ ALAN: VATAN TARZI SATIN ALMA KUTUSU --- *@
             <div class="w-full lg:w-5/12 flex flex-col">
-                
+
                 <!-- Başlık ve Ürün Kodu -->
                 <div class="mb-6 pb-6 border-b border-gray-200 dark:border-slate-700">
-                    <h1 class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white leading-tight mb-3">@Model.Product.Name</h1>
+                    <h1 class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white leading-tight mb-3">
+                        @Model.Product.Name</h1>
                     <div class="text-sm text-gray-500 dark:text-gray-400 font-medium">
-                        Ürün Kodu: <span class="text-gray-800 dark:text-gray-200 font-bold">@Model.Product.ProductCode</span>
+                        Ürün Kodu: <span
+                            class="text-gray-800 dark:text-gray-200 font-bold">@Model.Product.ProductCode</span>
                     </div>
                 </div>
 
                 <!-- Buy Box (Gri Arkaplanlı Kutu) -->
-                <div class="bg-gray-50 dark:bg-slate-800/80 border border-gray-200 dark:border-slate-700 rounded-lg p-6 mb-6">
-                    
+                <div
+                    class="bg-gray-50 dark:bg-slate-800/80 border border-gray-200 dark:border-slate-700 rounded-lg p-6 mb-6">
+
                     <!-- Fiyatlar -->
                     <div class="mb-6">
-                        <div class="text-sm text-gray-500 dark:text-gray-400 line-through mb-1 font-medium">Eski Fiyat: @((Model.Product.Price * 1.2m).ToString("c"))</div>
+                        <div class="text-sm text-gray-500 dark:text-gray-400 line-through mb-1 font-medium">Eski Fiyat:
+                            @((Model.Product.Price * 1.2m).ToString("c"))</div>
                         <div class="text-4xl font-extrabold text-primary">@Model.Product.Price.ToString("c")</div>
-                        <div class="mt-3 inline-flex items-center gap-1.5 text-xs font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-900/30 px-3 py-1.5 rounded">
+                        <div
+                            class="mt-3 inline-flex items-center gap-1.5 text-xs font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-900/30 px-3 py-1.5 rounded">
                             <i class="bi bi-truck text-base"></i> ÜCRETSİZ KARGO
                         </div>
                     </div>
@@ -62,24 +73,33 @@
                     <div class="hidden lg:block">
                         <form asp-controller="Cart" asp-action="Add" method="post" class="m-0">
                             <input type="hidden" name="ProductId" value="@Model.Product.Id">
-                            
+
                             <div class="flex flex-col xl:flex-row gap-3">
                                 <!-- Adet Seçici -->
-                                <div class="flex items-center border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-900 rounded h-12 w-full xl:w-32 flex-shrink-0">
-                                    <button type="button" onclick="decreaseQty()" class="qty-btn w-10 h-full flex items-center justify-center text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors focus:outline-none"><i class="bi bi-dash text-lg"></i></button>
-                                    <input id="desktopQtyInput" name="quantity" type="number" value="1" min="1" readonly class="qty-input flex-1 w-full h-full text-center font-bold text-gray-900 dark:text-white bg-transparent border-none focus:ring-0 p-0" />
-                                    <button type="button" onclick="increaseQty()" class="qty-btn w-10 h-full flex items-center justify-center text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors focus:outline-none"><i class="bi bi-plus text-lg"></i></button>
+                                <div
+                                    class="flex items-center border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-900 rounded h-12 w-full xl:w-32 flex-shrink-0">
+                                    <button type="button" onclick="decreaseQty()"
+                                        class="qty-btn w-10 h-full flex items-center justify-center text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors focus:outline-none"><i
+                                            class="bi bi-dash text-lg"></i></button>
+                                    <input id="desktopQtyInput" name="quantity" type="number" value="1" min="1" readonly
+                                        class="qty-input flex-1 w-full h-full text-center font-bold text-gray-900 dark:text-white bg-transparent border-none focus:ring-0 p-0" />
+                                    <button type="button" onclick="increaseQty()"
+                                        class="qty-btn w-10 h-full flex items-center justify-center text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors focus:outline-none"><i
+                                            class="bi bi-plus text-lg"></i></button>
                                 </div>
 
                                 <!-- Sepete Ekle -->
-                                <button type="submit" class="flex-1 h-12 bg-primary hover:opacity-90 hover:shadow-md hover:-translate-y-0.5 text-white text-base font-bold uppercase tracking-wide rounded flex items-center justify-center gap-2 transition-all duration-300 focus:outline-none shadow">
+                                <button type="submit"
+                                    class="flex-1 h-12 bg-primary hover:opacity-90 hover:shadow-md hover:-translate-y-0.5 text-white text-base font-bold uppercase tracking-wide rounded flex items-center justify-center gap-2 transition-all duration-300 focus:outline-none shadow">
                                     <i class="bi bi-cart3 text-xl"></i> SEPETE EKLE
                                 </button>
-                                
+
                                 <!-- Favori -->
-                                <button type="button" data-product-id="@Model.Product.Id" title="@(favourites.Any(x => x.Id == Model.Product.Id) ? "Favorilerden Çıkar" : "Favorilere Ekle")"
-                                        class="fav-toggle-btn w-12 h-12 flex-shrink-0 flex items-center justify-center rounded border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-gray-500 hover:text-red-500 hover:border-red-500 transition-colors focus:outline-none">
-                                    <i class="bi @(favourites.Any(x => x.Id == Model.Product.Id) ? "bi-heart-fill text-red-500" : "bi-heart") text-xl"></i>
+                                <button type="button" data-product-id="@Model.Product.Id"
+                                    title="@(favourites.Any(x => x.Id == Model.Product.Id) ? "Favorilerden Çıkar" : "Favorilere Ekle")"
+                                    class="fav-toggle-btn w-12 h-12 flex-shrink-0 flex items-center justify-center rounded border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-gray-500 hover:text-red-500 hover:border-red-500 transition-colors focus:outline-none">
+                                    <i
+                                        class="bi @(favourites.Any(x => x.Id == Model.Product.Id) ? "bi-heart-fill text-red-500" : "bi-heart") text-xl"></i>
                                 </button>
                             </div>
                         </form>
@@ -88,11 +108,14 @@
 
                 <!-- Bilgilendirme Kutucukları -->
                 <div class="grid grid-cols-1 gap-3 text-sm font-medium text-gray-700 dark:text-gray-300">
-                    <div class="flex items-center gap-3 p-3 border border-gray-200 dark:border-slate-700 rounded bg-white dark:bg-slate-800">
+                    <div
+                        class="flex items-center gap-3 p-3 border border-gray-200 dark:border-slate-700 rounded bg-white dark:bg-slate-800">
                         <i class="bi bi-shield-check text-2xl text-primary"></i> <span>Orijinal Ürün Garantisi</span>
                     </div>
-                    <div class="flex items-center gap-3 p-3 border border-gray-200 dark:border-slate-700 rounded bg-white dark:bg-slate-800">
-                        <i class="bi bi-arrow-counterclockwise text-2xl text-primary"></i> <span>14 Gün İçinde Kolay İade</span>
+                    <div
+                        class="flex items-center gap-3 p-3 border border-gray-200 dark:border-slate-700 rounded bg-white dark:bg-slate-800">
+                        <i class="bi bi-arrow-counterclockwise text-2xl text-primary"></i> <span>14 Gün İçinde Kolay
+                            İade</span>
                     </div>
                 </div>
 
@@ -104,9 +127,13 @@
 <!-- AÇIKLAMA (ÖZELLİKLER) KISMI -->
 <section class="py-10 bg-gray-50 dark:bg-slate-800/50 border-t border-b border-gray-200 dark:border-slate-700">
     <div class="container mx-auto px-4 max-w-7xl">
-        <div class="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg p-6 md:p-10 shadow-sm">
-            <h2 class="text-xl md:text-2xl font-bold text-gray-900 dark:text-white mb-6 pb-4 border-b border-gray-200 dark:border-slate-700">Ürün Açıklaması</h2>
-            <div class="text-gray-600 dark:text-gray-300 leading-relaxed text-sm md:text-base prose dark:prose-invert max-w-none">
+        <div
+            class="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg p-6 md:p-10 shadow-sm">
+            <h2
+                class="text-xl md:text-2xl font-bold text-gray-900 dark:text-white mb-6 pb-4 border-b border-gray-200 dark:border-slate-700">
+                Ürün Açıklaması</h2>
+            <div
+                class="text-gray-600 dark:text-gray-300 leading-relaxed text-sm md:text-base prose dark:prose-invert max-w-none">
                 @Model.Product.Description
             </div>
         </div>
@@ -118,7 +145,9 @@
     <div class="container mx-auto px-4 max-w-7xl">
         <div class="mb-8 flex items-center justify-between">
             <h2 class="text-2xl font-bold text-gray-900 dark:text-white m-0">Önerilen Ürünler</h2>
-            <a asp-controller="Products" asp-action="Index" class="text-primary font-bold text-sm hover:text-secondary transition-colors no-underline">Tümünü Gör <i class="bi bi-arrow-right"></i></a>
+            <a asp-controller="Products" asp-action="Index"
+                class="text-primary font-bold text-sm hover:text-secondary transition-colors no-underline">Tümünü Gör <i
+                    class="bi bi-arrow-right"></i></a>
         </div>
 
         <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
@@ -134,37 +163,46 @@
 </section>
 
 @* --- MOBIL STICKY BOTTOM BAR (Sadece mobilde görünür, alta yapışır) --- *@
-<div class="lg:hidden fixed bottom-0 left-0 w-full bg-white dark:bg-slate-900 border-t border-gray-200 dark:border-slate-700 p-3 z-40 shadow-[0_-4px_15px_rgba(0,0,0,0.1)] flex items-center justify-between gap-3" style="padding-bottom: max(0.75rem, env(safe-area-inset-bottom));">
-    
+<div class="lg:hidden fixed bottom-0 left-0 w-full bg-white dark:bg-slate-900 border-t border-gray-200 dark:border-slate-700 p-3 z-40 shadow-[0_-4px_15px_rgba(0,0,0,0.1)] flex items-center justify-between gap-3"
+    style="padding-bottom: max(0.75rem, env(safe-area-inset-bottom));">
+
     <div class="flex flex-col">
-        <span class="text-xs text-gray-500 dark:text-gray-400 line-through mb-0.5">@((Model.Product.Price * 1.2m).ToString("c"))</span>
+        <span class="text-xs text-gray-500 dark:text-gray-400 line-through mb-0.5">@((Model.Product.Price *
+                        1.2m).ToString("c"))</span>
         <span class="text-xl font-black text-primary leading-none">@Model.Product.Price.ToString("c")</span>
     </div>
-    
+
     <div class="flex items-center gap-2 flex-1 justify-end">
-         <!-- Mobil Favori Butonu -->
-        <button type="button" data-product-id="@Model.Product.Id" title="@(favourites.Any(x => x.Id == Model.Product.Id) ? "Favorilerden Çıkar" : "Favorilere Ekle")"
-                class="fav-toggle-btn w-11 h-11 flex items-center justify-center rounded border border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-800 text-gray-500 focus:outline-none">
-            <i class="bi @(favourites.Any(x => x.Id == Model.Product.Id) ? "bi-heart-fill text-red-500" : "bi-heart") text-lg"></i>
+        <!-- Mobil Favori Butonu -->
+        <button type="button" data-product-id="@Model.Product.Id"
+            title="@(favourites.Any(x => x.Id == Model.Product.Id) ? "Favorilerden Çıkar" : "Favorilere Ekle")"
+            class="fav-toggle-btn w-11 h-11 flex items-center justify-center rounded border border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-800 text-gray-500 focus:outline-none">
+            <i
+                class="bi @(favourites.Any(x => x.Id == Model.Product.Id) ? "bi-heart-fill text-red-500" : "bi-heart") text-lg"></i>
         </button>
 
         <!-- Mobil Sepete Ekle Butonu -->
         <form asp-controller="Cart" asp-action="Add" method="post" class="flex-1 m-0 max-w-[180px]">
             <input type="hidden" name="ProductId" value="@Model.Product.Id">
             <input type="hidden" name="quantity" id="mobileQtyInput" value="1">
-            <button class="w-full h-11 bg-primary hover:opacity-90 active:scale-95 text-white font-bold text-sm uppercase rounded transition-all focus:outline-none flex items-center justify-center gap-2 shadow" type="submit" onclick="syncQty()">
+            <button
+                class="w-full h-11 bg-primary hover:opacity-90 active:scale-95 text-white font-bold text-sm uppercase rounded transition-all focus:outline-none flex items-center justify-center gap-2 shadow"
+                type="submit" onclick="syncQty()">
                 Sepete Ekle
             </button>
         </form>
     </div>
 </div>
-
+@if (reviews != null)
+{
+    <partial name="~/Views/Shared/_ProductReviewsPartial.cshtml" model="reviews" />
+}
 @section Scripts {
     <script>
         // Miktar Arttırma
         function increaseQty() {
             var input = document.getElementById('desktopQtyInput');
-            if(input) {
+            if (input) {
                 var currentVal = parseInt(input.value) || 1;
                 input.value = currentVal + 1;
             }
@@ -174,7 +212,7 @@
         // Miktar Azaltma
         function decreaseQty() {
             var input = document.getElementById('desktopQtyInput');
-            if(input) {
+            if (input) {
                 var currentVal = parseInt(input.value) || 1;
                 if (currentVal > 1) {
                     input.value = currentVal - 1;

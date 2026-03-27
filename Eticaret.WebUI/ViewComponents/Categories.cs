@@ -6,16 +6,16 @@ namespace Eticaret.WebUI;
 
 public class Categories : ViewComponent
 {
-        private readonly IService<Category> _service;
+        private readonly ICategoryService _service;
 
-        public Categories(IService<Category> service)
+        public Categories(ICategoryService service)
         {
             _service = service;
 
         }
         public async Task<IViewComponentResult> InvokeAsync()
     {
-        var categories = await _service.GetAllAsync(c => c.isTopMenu && c.isActive);
+        var categories = await _service.GetTopMenuCategoriesAsync();
         return View(categories);
     }
 }

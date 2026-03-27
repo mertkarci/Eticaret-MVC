@@ -3,6 +3,7 @@ using System;
 using Eticaret.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Eticaret.Data.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    partial class DatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20260327071405_CommentSystemDB")]
+    partial class CommentSystemDB
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.0");
@@ -254,57 +257,6 @@ namespace Eticaret.Data.Migrations
                             isActive = true,
                             isTopMenu = true
                         });
-                });
-
-            modelBuilder.Entity("Eticaret.Core.Entities.Comment", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int?>("AppUserId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<DateTime>("CreateDate")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("GuestEmail")
-                        .HasMaxLength(50)
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("GuestName")
-                        .HasMaxLength(50)
-                        .HasColumnType("TEXT");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int?>("OrderId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int?>("ParentId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int?>("ProductId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int?>("Rating")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AppUserId");
-
-                    b.HasIndex("ParentId");
-
-                    b.HasIndex("ProductId");
-
-                    b.ToTable("Comments");
                 });
 
             modelBuilder.Entity("Eticaret.Core.Entities.Contact", b =>
@@ -733,27 +685,6 @@ namespace Eticaret.Data.Migrations
                     b.Navigation("AppUser");
                 });
 
-            modelBuilder.Entity("Eticaret.Core.Entities.Comment", b =>
-                {
-                    b.HasOne("Eticaret.Core.Entities.AppUser", "AppUser")
-                        .WithMany()
-                        .HasForeignKey("AppUserId");
-
-                    b.HasOne("Eticaret.Core.Entities.Comment", "Parent")
-                        .WithMany("Replies")
-                        .HasForeignKey("ParentId");
-
-                    b.HasOne("Eticaret.Core.Entities.Product", "Product")
-                        .WithMany()
-                        .HasForeignKey("ProductId");
-
-                    b.Navigation("AppUser");
-
-                    b.Navigation("Parent");
-
-                    b.Navigation("Product");
-                });
-
             modelBuilder.Entity("Eticaret.Core.Entities.Order", b =>
                 {
                     b.HasOne("Eticaret.Core.Entities.AppUser", "AppUser")
@@ -819,11 +750,6 @@ namespace Eticaret.Data.Migrations
             modelBuilder.Entity("Eticaret.Core.Entities.Category", b =>
                 {
                     b.Navigation("Products");
-                });
-
-            modelBuilder.Entity("Eticaret.Core.Entities.Comment", b =>
-                {
-                    b.Navigation("Replies");
                 });
 
             modelBuilder.Entity("Eticaret.Core.Entities.Order", b =>

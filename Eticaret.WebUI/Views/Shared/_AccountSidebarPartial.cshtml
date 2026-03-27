@@ -1,0 +1,26 @@
+@{
+    var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
+    var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
+}
+<div class="list-group shadow-sm border-0 rounded-3 overflow-hidden">
+    <a asp-controller="Accounts" asp-action="Index"
+       class="list-group-item list-group-item-action border-0 py-3 @(currentAction == "Index" && currentController == "Accounts" ? "active" : "")">
+        <i class="bi bi-person me-2"></i> Üyelik Bilgileri
+    </a>
+    <a asp-controller="Accounts" asp-action="MyOrders"
+       class="list-group-item list-group-item-action border-0 py-3 @(currentAction == "MyOrders" ? "active" : "")">
+        <i class="bi bi-bag-check me-2"></i> Siparişlerim
+    </a>
+    <a asp-controller="MyAddresses" asp-action="Index"
+       class="list-group-item list-group-item-action border-0 py-3 @(currentController == "MyAddresses" ? "active" : "")">
+        <i class="bi bi-geo-alt me-2"></i> Adreslerim
+    </a>
+    <a asp-controller="Accounts" asp-action="MyReviews"
+       class="list-group-item list-group-item-action border-0 py-3 @(currentAction == "MyReviews" ? "active" : "")">
+        <i class="bi bi-star me-2"></i> Değerlendirmelerim
+    </a>
+    <a href="/hesabim/cikis-yap"
+       class="list-group-item list-group-item-action text-danger border-0 py-3 d-none d-md-block">
+        <i class="bi bi-box-arrow-right me-2"></i> Çıkış Yap
+    </a>
+</div>

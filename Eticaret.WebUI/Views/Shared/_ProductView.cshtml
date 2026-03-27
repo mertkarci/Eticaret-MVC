@@ -29,14 +29,14 @@
     </div>
 
     <!-- Ürün Görseli (Kare Oran & Zoom Animasyonu) -->
-    <a asp-route="ProductDetail" asp-route-slug="@Model.Slug" class="block relative aspect-square overflow-hidden !bg-white dark:!bg-slate-800 p-0">
+    <a asp-controller="Products" asp-action="Details" asp-route-slug="@Model.Slug" class="block relative aspect-square overflow-hidden !bg-white dark:!bg-slate-800 p-0">
         <img class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500 mix-blend-multiply dark:mix-blend-normal" src="~/img/products/@Model.Image" alt="@Model.Name">
     </a>
 
     <!-- Ürün Bilgileri -->
     <div class="p-4 flex flex-col flex-grow border-t border-gray-50 dark:border-slate-700/50">
         <h3 class="mb-2 h-[2.5rem]">
-            <a asp-route="ProductDetail" asp-route-slug="@Model.Slug" class="text-sm font-semibold text-gray-800 dark:text-gray-200 line-clamp-2 hover:text-primary transition-colors no-underline leading-tight" title="@Model.Name">
+            <a asp-controller="Products" asp-action="Details" asp-route-slug="@Model.Slug" class="text-sm font-semibold text-gray-800 dark:text-gray-200 line-clamp-2 hover:text-primary transition-colors no-underline leading-tight" title="@Model.Name">
                 @Model.Name
             </a>
         </h3>
